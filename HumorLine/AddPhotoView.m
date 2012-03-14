@@ -7,6 +7,7 @@
 //
 
 #import "AddPhotoView.h"
+#include <QuartzCore/QuartzCore.h>
 
 @implementation AddPhotoView
 @synthesize imageView;
@@ -15,7 +16,8 @@
 @synthesize txtHeader;
 @synthesize txtSubheader;
 @synthesize swAddLocation;
-@synthesize delegate = _delegate;
+@synthesize image = _image;
+@synthesize scrollView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -41,6 +43,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    self.imageView.image = self.image;
 }
 
 - (void)viewDidUnload
@@ -51,6 +54,7 @@
     [self setTxtHeader:nil];
     [self setTxtSubheader:nil];
     [self setSwAddLocation:nil];
+    [self setScrollView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -62,12 +66,49 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (UIImage *)renderView:(UIView *)view {
+    UIGraphicsBeginImageContext(view.bounds.size);
+    
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:ctx];
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
 - (IBAction)onAddButtonClick:(id)sender {
-    [self.delegate addPhotoViewDidFinish];
+    UIImage *image = [self renderView:self.scrollView];
+    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото добавлено в фотогаллерею" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.delegate addPhotoViewDidFinish];
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+}
+
+- (IBAction)onBgClick:(id)sender {
+    [self.txtHeader becomeFirstResponder];
+    [self.txtHeader resignFirstResponder];
+}
+
+- (IBAction)onSwAddLocationValueChanged:(id)sender {
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+#pragma mark - UITextFieldDelegate
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if ([textField isEqual:self.txtHeader]) {
+        self.lblHeader.text = textField.text;
+    }
+    else if ([textField isEqual:self.txtSubheader]) {
+        self.lblSubheader.text = textField.text;
+    }
+    return YES;
 }
 
 @end

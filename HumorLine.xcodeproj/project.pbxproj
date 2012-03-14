@@ -15,7 +15,27 @@
 		863D8F72150CC1E3007E745D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 863D8F71150CC1E3007E745D /* main.m */; };
 		863D8F76150CC1E3007E745D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 863D8F75150CC1E3007E745D /* AppDelegate.m */; };
 		863D8F8D150CC4E5007E745D /* MainView.m in Sources */ = {isa = PBXBuildFile; fileRef = 863D8F8B150CC4E5007E745D /* MainView.m */; };
-		863D8F8E150CC4E5007E745D /* MainView_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 863D8F8C150CC4E5007E745D /* MainView_iPhone.xib */; };
+		863D8F8E150CC4E5007E745D /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 863D8F8C150CC4E5007E745D /* MainView.xib */; };
+		86430443150EFCB600B44122 /* Picture.m in Sources */ = {isa = PBXBuildFile; fileRef = 86430442150EFCB600B44122 /* Picture.m */; };
+		864304F1150F225900B44122 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304EE150F225900B44122 /* Default.png */; };
+		864304F2150F225900B44122 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304EF150F225900B44122 /* Icon.png */; };
+		864304F3150F225900B44122 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304F0150F225900B44122 /* Icon@2x.png */; };
+		864304F7150F234500B44122 /* AddTrololoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 864304F5150F234500B44122 /* AddTrololoView.m */; };
+		864304F8150F234500B44122 /* AddTrololoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 864304F6150F234500B44122 /* AddTrololoView.xib */; };
+		864304FC150F520900B44122 /* TrololoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 864304FA150F520900B44122 /* TrololoView.m */; };
+		864304FD150F520900B44122 /* TrololoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 864304FB150F520900B44122 /* TrololoView.xib */; };
+		8643050815107AAC00B44122 /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050115107AAC00B44122 /* 1.png */; };
+		8643050915107AAC00B44122 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050215107AAC00B44122 /* 2.png */; };
+		8643050A15107AAC00B44122 /* 3.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050315107AAC00B44122 /* 3.png */; };
+		8643050B15107AAC00B44122 /* 4.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050415107AAC00B44122 /* 4.png */; };
+		8643050C15107AAC00B44122 /* buttonFace.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050515107AAC00B44122 /* buttonFace.png */; };
+		8643050D15107AAC00B44122 /* buttonPhoto.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050615107AAC00B44122 /* buttonPhoto.png */; };
+		8643050E15107AAC00B44122 /* buttonText.png in Resources */ = {isa = PBXBuildFile; fileRef = 8643050715107AAC00B44122 /* buttonText.png */; };
+		864305121510955F00B44122 /* trollface-hello-kitty.png in Resources */ = {isa = PBXBuildFile; fileRef = 864305111510955F00B44122 /* trollface-hello-kitty.png */; };
+		864305161510B75200B44122 /* AuthorizationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 864305141510B75100B44122 /* AuthorizationView.m */; };
+		864305171510B75200B44122 /* AuthorizationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 864305151510B75200B44122 /* AuthorizationView.xib */; };
+		8643051B1510B83700B44122 /* SignupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 864305191510B83600B44122 /* SignupView.m */; };
+		8643051C1510B83700B44122 /* SignupView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8643051A1510B83600B44122 /* SignupView.xib */; };
 		864E816A150E624F008CF1AA /* SDImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 864E8159150E624F008CF1AA /* SDImageCache.m */; };
 		864E816B150E624F008CF1AA /* SDWebImageDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 864E815D150E624F008CF1AA /* SDWebImageDecoder.m */; };
 		864E816C150E624F008CF1AA /* SDWebImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 864E815F150E624F008CF1AA /* SDWebImageDownloader.m */; };
@@ -29,7 +49,6 @@
 		86967B42150DCD49006BEE8B /* AddCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86967B40150DCD49006BEE8B /* AddCommentView.m */; };
 		86967B43150DCD49006BEE8B /* AddCommentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86967B41150DCD49006BEE8B /* AddCommentView.xib */; };
 		86967B4D150DF74B006BEE8B /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */; };
-		8697EDA0150DAB9400090679 /* Cell_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8697ED9F150DAB9400090679 /* Cell_iPhone.xib */; };
 		86DE236A150DFBCA00156F38 /* AddPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86DE2368150DFBCA00156F38 /* AddPhotoView.m */; };
 		86DE236B150DFBCA00156F38 /* AddPhotoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86DE2369150DFBCA00156F38 /* AddPhotoView.xib */; };
 /* End PBXBuildFile section */
@@ -49,7 +68,32 @@
 		863D8F75150CC1E3007E745D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = HumorLine/AppDelegate.m; sourceTree = "<group>"; };
 		863D8F8A150CC4E5007E745D /* MainView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainView.h; sourceTree = "<group>"; };
 		863D8F8B150CC4E5007E745D /* MainView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainView.m; sourceTree = "<group>"; };
-		863D8F8C150CC4E5007E745D /* MainView_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainView_iPhone.xib; sourceTree = "<group>"; };
+		863D8F8C150CC4E5007E745D /* MainView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainView.xib; sourceTree = "<group>"; };
+		86430441150EFCB600B44122 /* Picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Picture.h; path = HumorLine/Picture.h; sourceTree = "<group>"; };
+		86430442150EFCB600B44122 /* Picture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Picture.m; path = HumorLine/Picture.m; sourceTree = "<group>"; };
+		864304EE150F225900B44122 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		864304EF150F225900B44122 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		864304F0150F225900B44122 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		864304F4150F234500B44122 /* AddTrololoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddTrololoView.h; sourceTree = "<group>"; };
+		864304F5150F234500B44122 /* AddTrololoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddTrololoView.m; sourceTree = "<group>"; };
+		864304F6150F234500B44122 /* AddTrololoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddTrololoView.xib; sourceTree = "<group>"; };
+		864304F9150F520900B44122 /* TrololoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrololoView.h; sourceTree = "<group>"; };
+		864304FA150F520900B44122 /* TrololoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrololoView.m; sourceTree = "<group>"; };
+		864304FB150F520900B44122 /* TrololoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TrololoView.xib; sourceTree = "<group>"; };
+		8643050115107AAC00B44122 /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		8643050215107AAC00B44122 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
+		8643050315107AAC00B44122 /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
+		8643050415107AAC00B44122 /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
+		8643050515107AAC00B44122 /* buttonFace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = buttonFace.png; sourceTree = "<group>"; };
+		8643050615107AAC00B44122 /* buttonPhoto.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = buttonPhoto.png; sourceTree = "<group>"; };
+		8643050715107AAC00B44122 /* buttonText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = buttonText.png; sourceTree = "<group>"; };
+		864305111510955F00B44122 /* trollface-hello-kitty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trollface-hello-kitty.png"; sourceTree = "<group>"; };
+		864305131510B75100B44122 /* AuthorizationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthorizationView.h; sourceTree = "<group>"; };
+		864305141510B75100B44122 /* AuthorizationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationView.m; sourceTree = "<group>"; };
+		864305151510B75200B44122 /* AuthorizationView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AuthorizationView.xib; sourceTree = "<group>"; };
+		864305181510B83600B44122 /* SignupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignupView.h; sourceTree = "<group>"; };
+		864305191510B83600B44122 /* SignupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignupView.m; sourceTree = "<group>"; };
+		8643051A1510B83600B44122 /* SignupView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignupView.xib; sourceTree = "<group>"; };
 		864E8158150E624F008CF1AA /* SDImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDImageCache.h; path = HumorLine/SDImageCache.h; sourceTree = "<group>"; };
 		864E8159150E624F008CF1AA /* SDImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDImageCache.m; path = HumorLine/SDImageCache.m; sourceTree = "<group>"; };
 		864E815A150E624F008CF1AA /* SDImageCacheDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDImageCacheDelegate.h; path = HumorLine/SDImageCacheDelegate.h; sourceTree = "<group>"; };
@@ -71,14 +115,13 @@
 		86967B21150DBF85006BEE8B /* DetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailView.h; sourceTree = "<group>"; };
 		86967B22150DBF85006BEE8B /* DetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailView.m; sourceTree = "<group>"; };
 		86967B23150DBF85006BEE8B /* DetailView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailView.xib; sourceTree = "<group>"; };
-		86967B26150DC282006BEE8B /* MainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenu.h; sourceTree = "<group>"; };
-		86967B27150DC282006BEE8B /* MainMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenu.m; sourceTree = "<group>"; };
+		86967B26150DC282006BEE8B /* MainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainMenu.h; path = HumorLine/MainMenu.h; sourceTree = "<group>"; };
+		86967B27150DC282006BEE8B /* MainMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = HumorLine/MainMenu.m; sourceTree = "<group>"; };
 		86967B3E150DC798006BEE8B /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		86967B3F150DCD49006BEE8B /* AddCommentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddCommentView.h; sourceTree = "<group>"; };
 		86967B40150DCD49006BEE8B /* AddCommentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddCommentView.m; sourceTree = "<group>"; };
 		86967B41150DCD49006BEE8B /* AddCommentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddCommentView.xib; sourceTree = "<group>"; };
 		86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		8697ED9F150DAB9400090679 /* Cell_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Cell_iPhone.xib; sourceTree = "<group>"; };
 		86DE2367150DFBCA00156F38 /* AddPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddPhotoView.h; sourceTree = "<group>"; };
 		86DE2368150DFBCA00156F38 /* AddPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddPhotoView.m; sourceTree = "<group>"; };
 		86DE2369150DFBCA00156F38 /* AddPhotoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddPhotoView.xib; sourceTree = "<group>"; };
@@ -136,16 +179,23 @@
 		863D8F6B150CC1E3007E745D /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				86967B21150DBF85006BEE8B /* DetailView.h */,
-				86967B22150DBF85006BEE8B /* DetailView.m */,
 				863D8F8A150CC4E5007E745D /* MainView.h */,
 				863D8F8B150CC4E5007E745D /* MainView.m */,
-				86967B26150DC282006BEE8B /* MainMenu.h */,
-				86967B27150DC282006BEE8B /* MainMenu.m */,
+				86967B21150DBF85006BEE8B /* DetailView.h */,
+				86967B22150DBF85006BEE8B /* DetailView.m */,
 				86967B3F150DCD49006BEE8B /* AddCommentView.h */,
 				86967B40150DCD49006BEE8B /* AddCommentView.m */,
 				86DE2367150DFBCA00156F38 /* AddPhotoView.h */,
 				86DE2368150DFBCA00156F38 /* AddPhotoView.m */,
+				864304F4150F234500B44122 /* AddTrololoView.h */,
+				864304F5150F234500B44122 /* AddTrololoView.m */,
+				864304F9150F520900B44122 /* TrololoView.h */,
+				864304FA150F520900B44122 /* TrololoView.m */,
+				864305131510B75100B44122 /* AuthorizationView.h */,
+				864305141510B75100B44122 /* AuthorizationView.m */,
+				864305181510B83600B44122 /* SignupView.h */,
+				864305191510B83600B44122 /* SignupView.m */,
+				8643051A1510B83600B44122 /* SignupView.xib */,
 			);
 			name = Controllers;
 			path = HumorLine;
@@ -164,11 +214,40 @@
 			path = HumorLine;
 			sourceTree = "<group>";
 		};
+		864304ED150F224600B44122 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				864304EE150F225900B44122 /* Default.png */,
+				864304EF150F225900B44122 /* Icon.png */,
+				864304F0150F225900B44122 /* Icon@2x.png */,
+			);
+			name = Icons;
+			sourceTree = "<group>";
+		};
+		864304FE150F56F300B44122 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				864305111510955F00B44122 /* trollface-hello-kitty.png */,
+				8643050115107AAC00B44122 /* 1.png */,
+				8643050215107AAC00B44122 /* 2.png */,
+				8643050315107AAC00B44122 /* 3.png */,
+				8643050415107AAC00B44122 /* 4.png */,
+				8643050515107AAC00B44122 /* buttonFace.png */,
+				8643050615107AAC00B44122 /* buttonPhoto.png */,
+				8643050715107AAC00B44122 /* buttonText.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		864E8171150E62D6008CF1AA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				86967B26150DC282006BEE8B /* MainMenu.h */,
+				86967B27150DC282006BEE8B /* MainMenu.m */,
 				863D8F74150CC1E3007E745D /* AppDelegate.h */,
 				863D8F75150CC1E3007E745D /* AppDelegate.m */,
+				86430441150EFCB600B44122 /* Picture.h */,
+				86430442150EFCB600B44122 /* Picture.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -192,11 +271,13 @@
 		86967B29150DC293006BEE8B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				863D8F8C150CC4E5007E745D /* MainView.xib */,
 				86967B23150DBF85006BEE8B /* DetailView.xib */,
-				863D8F8C150CC4E5007E745D /* MainView_iPhone.xib */,
-				8697ED9F150DAB9400090679 /* Cell_iPhone.xib */,
 				86967B41150DCD49006BEE8B /* AddCommentView.xib */,
 				86DE2369150DFBCA00156F38 /* AddPhotoView.xib */,
+				864304F6150F234500B44122 /* AddTrololoView.xib */,
+				864304FB150F520900B44122 /* TrololoView.xib */,
+				864305151510B75200B44122 /* AuthorizationView.xib */,
 			);
 			name = Views;
 			path = HumorLine;
@@ -205,6 +286,8 @@
 		86967B2A150DC29F006BEE8B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				864304FE150F56F300B44122 /* Images */,
+				864304ED150F224600B44122 /* Icons */,
 			);
 			name = Resources;
 			path = HumorLine;
@@ -295,11 +378,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				863D8F70150CC1E3007E745D /* InfoPlist.strings in Resources */,
-				863D8F8E150CC4E5007E745D /* MainView_iPhone.xib in Resources */,
-				8697EDA0150DAB9400090679 /* Cell_iPhone.xib in Resources */,
+				863D8F8E150CC4E5007E745D /* MainView.xib in Resources */,
 				86967B25150DBF85006BEE8B /* DetailView.xib in Resources */,
 				86967B43150DCD49006BEE8B /* AddCommentView.xib in Resources */,
 				86DE236B150DFBCA00156F38 /* AddPhotoView.xib in Resources */,
+				864304F1150F225900B44122 /* Default.png in Resources */,
+				864304F2150F225900B44122 /* Icon.png in Resources */,
+				864304F3150F225900B44122 /* Icon@2x.png in Resources */,
+				864304F8150F234500B44122 /* AddTrololoView.xib in Resources */,
+				864304FD150F520900B44122 /* TrololoView.xib in Resources */,
+				8643050815107AAC00B44122 /* 1.png in Resources */,
+				8643050915107AAC00B44122 /* 2.png in Resources */,
+				8643050A15107AAC00B44122 /* 3.png in Resources */,
+				8643050B15107AAC00B44122 /* 4.png in Resources */,
+				8643050C15107AAC00B44122 /* buttonFace.png in Resources */,
+				8643050D15107AAC00B44122 /* buttonPhoto.png in Resources */,
+				8643050E15107AAC00B44122 /* buttonText.png in Resources */,
+				864305121510955F00B44122 /* trollface-hello-kitty.png in Resources */,
+				864305171510B75200B44122 /* AuthorizationView.xib in Resources */,
+				8643051C1510B83700B44122 /* SignupView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,6 +422,11 @@
 				864E816E150E624F008CF1AA /* SDWebImagePrefetcher.m in Sources */,
 				864E816F150E624F008CF1AA /* UIButton+WebCache.m in Sources */,
 				864E8170150E624F008CF1AA /* UIImageView+WebCache.m in Sources */,
+				86430443150EFCB600B44122 /* Picture.m in Sources */,
+				864304F7150F234500B44122 /* AddTrololoView.m in Sources */,
+				864304FC150F520900B44122 /* TrololoView.m in Sources */,
+				864305161510B75200B44122 /* AuthorizationView.m in Sources */,
+				8643051B1510B83700B44122 /* SignupView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,13 +501,13 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HumorLine/HumorLine-Prefix.pch";
 				INFOPLIST_FILE = "HumorLine/HumorLine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../Library/Developer/Xcode/DerivedData/HumorLine-etgqbqkzghxribccesnxyftlbvyf/Build/Products/Debug-iphoneos\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -416,16 +518,58 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HumorLine/HumorLine-Prefix.pch";
 				INFOPLIST_FILE = "HumorLine/HumorLine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../Library/Developer/Xcode/DerivedData/HumorLine-etgqbqkzghxribccesnxyftlbvyf/Build/Products/Debug-iphoneos\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
+		};
+		8643051D1510BC9400B44122 /* Adhoc */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				OTHER_LDFLAGS = "-ObjC";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/**";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Adhoc;
+		};
+		8643051E1510BC9400B44122 /* Adhoc */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Creative LLC";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "HumorLine/HumorLine-Prefix.pch";
+				INFOPLIST_FILE = "HumorLine/HumorLine-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Library/Developer/Xcode/DerivedData/HumorLine-etgqbqkzghxribccesnxyftlbvyf/Build/Products/Debug-iphoneos\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "59FC1D64-3777-4A25-86B5-F1CA08805D0C";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Adhoc;
 		};
 /* End XCBuildConfiguration section */
 
@@ -435,6 +579,7 @@
 			buildConfigurations = (
 				863D8F80150CC1E3007E745D /* Debug */,
 				863D8F81150CC1E3007E745D /* Release */,
+				8643051D1510BC9400B44122 /* Adhoc */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -444,6 +589,7 @@
 			buildConfigurations = (
 				863D8F83150CC1E3007E745D /* Debug */,
 				863D8F84150CC1E3007E745D /* Release */,
+				8643051E1510BC9400B44122 /* Adhoc */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

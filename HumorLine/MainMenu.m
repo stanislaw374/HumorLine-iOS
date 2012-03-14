@@ -7,18 +7,22 @@
 //
 
 #import "MainMenu.h"
+#import "AddTrololoView.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "AuthorizationView.h"
 
 @interface MainMenu()
 - (void)onLoginButtonClick;
 - (void)onAddButtonClick;
-@property (nonatomic, strong) UIViewController *viewController;
+@property (nonatomic, unsafe_unretained) UIViewController *viewController;
 @property (nonatomic, strong) AddPhotoView *addPhotoView;
 @property (nonatomic, strong) UIPopoverController *popoverContoller;
 @property (nonatomic, strong) UIActionSheet *addActionSheet;
 @property (nonatomic, strong) UIActionSheet *photoActionSheet;
 @property (nonatomic, strong) UIActionSheet *videoActionSheet;
 @property (nonatomic, strong) UIActionSheet *loginActionSheet;
+@property (nonatomic, strong) AddTrololoView *addTrololoView;
+@property (nonatomic, strong) AuthorizationView *authorizationView;
 @end
 
 @implementation MainMenu
@@ -29,8 +33,18 @@
 @synthesize photoActionSheet = _photoActionSheet;
 @synthesize videoActionSheet = _videoActionSheet;
 @synthesize loginActionSheet = _loginActionSheet;
+@synthesize addTrololoView = _addTrololoView;
+@synthesize authorizationView = _authorizationView;
 
 #pragma mark - Lazy Instantiation
+
+- (AuthorizationView *)authorizationView {
+    if (!_authorizationView) {
+        _authorizationView = [[AuthorizationView alloc] init];
+    }
+    return _authorizationView;
+}
+
 - (UIActionSheet *)addActionSheet {
     if (!_addActionSheet) {
         _addActionSheet = [[UIActionSheet alloc] initWithTitle:@"Добавить прикол" delegate:self cancelButtonTitle:@"Отмена" destructiveButtonTitle:nil otherButtonTitles:@"Фото", @"Видео", @"Текст", @"Trololo", nil];                
@@ -59,11 +73,18 @@
     return _loginActionSheet;
 }
 
-- (AddPhotoView *)addPhotoView {
-    if (!_addPhotoView) {
-        _addPhotoView = [[AddPhotoView alloc] init];
+//- (AddPhotoView *)addPhotoView {
+//    if (1) {
+//        _addPhotoView = [[AddPhotoView alloc] init];
+//    }
+//    return _addPhotoView;
+//}
+
+- (AddTrololoView *)addTrololoView {
+    if (!_addTrololoView) {
+        _addTrololoView = [[AddTrololoView alloc] init];
     }
-    return _addPhotoView;
+    return _addTrololoView;
 }
 
 - (id)initWithViewController:(UIViewController *)viewController {
@@ -74,7 +95,8 @@
 }
 
 - (void)addAddButton {
-    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick)];
+    //UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick)];
+    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(onAddButtonClick)];
     self.viewController.navigationItem.leftBarButtonItem = button;
 }
 
@@ -102,6 +124,10 @@
                 break;
             case 1:
                 [self.videoActionSheet showFromBarButtonItem:self.viewController.navigationItem.leftBarButtonItem animated:YES];
+                break;
+            case 2: break;
+            case 3:
+                [self.viewController.navigationController pushViewController:self.addTrololoView animated:YES];                
                 break;
         }        
     }
@@ -136,9 +162,11 @@
                     }
                 }
                 break;
+            case 2:
+                return;
         }
         imagePicker.delegate = self;
-        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
             [self.viewController presentModalViewController:imagePicker animated:YES];
         }
         else {
@@ -146,35 +174,38 @@
             [self.popoverContoller presentPopoverFromBarButtonItem:self.viewController.navigationItem.leftBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         }
     }
+    else if ([actionSheet isEqual:self.loginActionSheet]) {
+        switch (buttonIndex) {
+            case 0:
+                [self.viewController.navigationController pushViewController:self.authorizationView animated:YES];
+                break;
+        }
+    }
 }
 
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
-    [self.viewController dismissModalViewControllerAnimated:YES];
     
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        [self.viewController dismissModalViewControllerAnimated:NO];
+    }
+    else {
+        [self.popoverContoller dismissPopoverAnimated:NO];
+    }
+
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    
-    //[self.viewController.navigationController pushViewController:self.addPhotoView animated:YES];
-    //self.viewController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    //self.viewController.modalPresentationStyle = UIModalPresenta
-    //self.addPhotoView.delegate = self;
-    //[self.viewController presentModalViewController:self.addPhotoView animated:YES];
-    //self.addPhotoView.imageView.image = image;
-    self.addPhotoView.delegate = self;
-    self.addPhotoView.imageView.image = image;
-    [self.viewController.navigationController pushViewController:self.addPhotoView animated:YES];
+    self.addPhotoView = [[AddPhotoView alloc] init];
+    self.addPhotoView.image = image;
+    [self.viewController presentModalViewController:self.addPhotoView animated:YES];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self.viewController dismissModalViewControllerAnimated:YES];
-    self.addPhotoView.delegate = self;
-    [self.viewController.navigationController pushViewController:self.addPhotoView animated:YES];
 }
 
-#pragma mark - AddPhotoViewDelegate
-- (void)addPhotoViewDidFinish {
-    //[self.viewController dismissModalViewControllerAnimated:YES];
-}
+//#pragma mark - AddPhotoViewDelegate
+//- (void)addPhotoViewDidFinish {
+//    [self.viewController dismissModalViewControllerAnimated:YES];
+//}
 
 @end

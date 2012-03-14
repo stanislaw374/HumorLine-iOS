@@ -9,6 +9,4 @@
 #ifndef HumorLine_Constants_h
 #define HumorLine_Constants_h
 
-#define kIMAGEURL [NSURL URLWithString:@"http://www.avazun.ru/storage1/images/demotivators/2010/11/01/12/46/O3goKEMYXI6n4Yscr3.jpg"]
-
 #endif

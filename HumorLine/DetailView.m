@@ -11,6 +11,7 @@
 #import "Constants.h"
 #import "MainMenu.h"
 #import "AddCommentView.h"
+#import "UIButton+WebCache.h"
 
 @interface DetailView()
 @property (nonatomic, strong) MainMenu *mainMenu;
@@ -21,8 +22,12 @@
 @synthesize lblRating;
 @synthesize lblComments;
 @synthesize imageView;
+@synthesize btnContent;
 @synthesize mainMenu = _mainMenu;
 @synthesize addCommentView = _addCommentView;
+@synthesize currentPicture = _currentPicture;
+@synthesize ratingItem;
+@synthesize commentsItem;
 
 - (AddCommentView *)addCommentView {
     if (!_addCommentView) {
@@ -67,7 +72,13 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.imageView setImageWithURL:kIMAGEURL];
+    //[self.imageView setImageWithURL:self.currentPicture.url];
+    if (self.currentPicture.type == Photo) {
+        [self.btnContent setImageWithURL:self.currentPicture.url];
+    }
+    else if (self.currentPicture.type == Text) {
+        [self.btnContent setTitle:self.currentPicture.text forState:UIControlStateNormal];
+    }
 }
 
 - (void)viewDidUnload
@@ -75,6 +86,9 @@
     [self setImageView:nil];
     [self setLblRating:nil];
     [self setLblComments:nil];
+    [self setRatingItem:nil];
+    [self setCommentsItem:nil];
+    [self setBtnContent:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -87,10 +101,13 @@
 }
 
 - (IBAction)onPlusButtonClick:(id)sender {
-    self.lblRating.text = [NSString stringWithFormat:@"%d", [self.lblRating.text intValue] + 1];
+    //self.lblRating.text = [NSString stringWithFormat:@"%d", [self.lblRating.text intValue] + 1];
+    int value = [self.ratingItem.title intValue];
+    self.ratingItem.title = [NSString stringWithFormat:@"%d", value + 1];
 }
 
 - (IBAction)onCommentButtonClick:(id)sender {
+    self.addCommentView.currentPicture = self.currentPicture;
     [self.navigationController pushViewController:self.addCommentView animated:YES];
 }
 

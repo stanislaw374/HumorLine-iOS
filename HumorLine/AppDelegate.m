@@ -23,13 +23,14 @@
 - (UINavigationController *)navigationController {
     if (!_navigationController) {
         _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
+        _navigationController.navigationBar.barStyle = UIBarStyleBlack;
     }
     return _navigationController;
 }
 
 - (MainView *)mainView {
     if (!_mainView) {
-        _mainView = [[MainView alloc] initWithNibName:@"MainView_iPhone" bundle:nil];
+        _mainView = [[MainView alloc] initWithNibName:@"MainView" bundle:nil];
 //        if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 //            _mainView = [[MainView alloc] initWithNibName:@"MainView_iPhone" bundle:nil];
 //            NSLog(@"It's iPhone");

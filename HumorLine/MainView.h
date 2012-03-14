@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MainView : UIViewController <UIActionSheetDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface MainView : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
 
 @end

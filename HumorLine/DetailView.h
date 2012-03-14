@@ -7,14 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Picture.h"
 
 @interface DetailView : UIViewController <UITableViewDataSource>
 
 @property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
+@property (unsafe_unretained, nonatomic) IBOutlet UIButton *btnContent;
+
 - (IBAction)onPlusButtonClick:(id)sender;
 - (IBAction)onCommentButtonClick:(id)sender;
 - (IBAction)onFacebookButtonClick:(id)sender;
 - (IBAction)onVKButtonClick:(id)sender;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblRating;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblComments;
+@property (unsafe_unretained, nonatomic) Picture *currentPicture;
+@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *ratingItem;
+@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *commentsItem;
 @end

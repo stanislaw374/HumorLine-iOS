@@ -20,6 +20,7 @@
 @synthesize textView = _textView;
 @synthesize lblWordsCount = _lblWordsCount;
 @synthesize mainMenu = _mainMenu;
+@synthesize currentPicture = _currentPicture;
 
 - (MainMenu *)mainMenu {
     if (!_mainMenu) {
@@ -57,7 +58,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.imageView setImageWithURL:kIMAGEURL];
+    //[self.imageView setImageWithURL:kIMAGEURL];
+    [self.imageView setImageWithURL:self.currentPicture.url];
 }
 
 - (void)viewDidUnload
@@ -88,7 +90,7 @@
 
 #pragma mark - UITextViewDelegate
 - (void)textViewDidChange:(UITextView *)textView {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
     
     int count = textView.text.length;
     self.lblWordsCount.text = [NSString stringWithFormat:@"%d / 300", count];

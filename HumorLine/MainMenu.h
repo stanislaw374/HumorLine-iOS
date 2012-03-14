@@ -11,7 +11,7 @@
 
 //typedef enum { Photo = 1, Video, Text, Trololo } HZ;
 
-@interface MainMenu : NSObject <UIActionSheetDelegate, UIImagePickerControllerDelegate, AddPhotoViewDelegate, UINavigationControllerDelegate>
+@interface MainMenu : NSObject <UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 - (id)initWithViewController:(UIViewController *)viewController;
 - (void)addAddButton;

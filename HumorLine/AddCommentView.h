@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Picture.h"
 
 @interface AddCommentView : UIViewController <UITextViewDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
 @property (unsafe_unretained, nonatomic) IBOutlet UITextView *textView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblWordsCount;
+@property (unsafe_unretained, nonatomic) Picture *currentPicture;
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onCancelButtonClick:(id)sender;
 
