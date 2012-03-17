@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Picture.h"
+#import "Post.h"
 
 @interface DetailView : UIViewController <UITableViewDataSource>
 
@@ -20,7 +20,7 @@
 - (IBAction)onVKButtonClick:(id)sender;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblRating;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblComments;
-@property (unsafe_unretained, nonatomic) Picture *currentPicture;
+@property (unsafe_unretained, nonatomic) Post *post;
 @property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *ratingItem;
 @property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *commentsItem;
 @end

@@ -7,7 +7,14 @@
 //
 
 #import "AddPhotoView.h"
-#include <QuartzCore/QuartzCore.h>
+#import <QuartzCore/QuartzCore.h>
+#import "Post.h"
+#import "Image.h"
+#import "AppDelegate.h"
+
+@interface AddPhotoView()
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@end
 
 @implementation AddPhotoView
 @synthesize imageView;
@@ -18,6 +25,18 @@
 @synthesize swAddLocation;
 @synthesize image = _image;
 @synthesize scrollView;
+@synthesize locationManager = _locationManager;
+
+#pragma mark - Lazy Instantiation
+- (CLLocationManager *)locationManager {
+    if (!_locationManager) {
+        _locationManager = [[CLLocationManager alloc] init];
+        _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        _locationManager.distanceFilter = kCLDistanceFilterNone;
+        _locationManager.delegate = self;
+    }
+    return _locationManager;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -81,10 +100,27 @@
 
 - (IBAction)onAddButtonClick:(id)sender {
     UIImage *image = [self renderView:self.scrollView];
-    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото добавлено в фотогаллерею" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    Post *post = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
+    post.type = kPostTypePhoto;
+    post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
+    post.image.image = image;
+    
+    if (self.swAddLocation.on) {
+        post.lat = self.locationManager.location.coordinate.latitude;
+        post.lng = self.locationManager.location.coordinate.longitude;
+    }
+    
+    NSError *error;    
+    if (![appDelegate.managedObjectContext save:&error]) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ошибка добавления фото" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+        [alert show];
+    }
+    else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+        [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
@@ -98,6 +134,16 @@
 
 - (IBAction)onSwAddLocationValueChanged:(id)sender {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    UISwitch *switch_ = (UISwitch *)sender;
+    if (switch_.on) {
+        if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+            [self.locationManager startUpdatingLocation];
+        }
+        else {
+            [switch_ setOn:NO];
+        }
+    }
 }
 
 #pragma mark - UITextFieldDelegate
@@ -109,6 +155,15 @@
         self.lblSubheader.text = textField.text;
     }
     return YES;
+}
+
+#pragma mark - CLLocationManagerDelegate
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    [self.locationManager stopUpdatingLocation];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    [self.locationManager stopUpdatingLocation];
 }
 
 @end

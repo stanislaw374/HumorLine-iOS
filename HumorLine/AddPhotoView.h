@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface AddPhotoView : UIViewController <UITextFieldDelegate>
+@interface AddPhotoView : UIViewController <UITextFieldDelegate, CLLocationManagerDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblHeader;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblSubheader;

@@ -23,6 +23,7 @@
 @property (nonatomic, strong) UIActionSheet *loginActionSheet;
 @property (nonatomic, strong) AddTrololoView *addTrololoView;
 @property (nonatomic, strong) AuthorizationView *authorizationView;
+@property (nonatomic, strong) UIImagePickerController *imagePicker;
 @end
 
 @implementation MainMenu
@@ -132,7 +133,7 @@
         }        
     }
     else if ([actionSheet isEqual:self.photoActionSheet] || [actionSheet isEqual:self.videoActionSheet]) {
-        UIImagePickerController *imagePicker;
+        //UIImagePickerController *imagePicker;
         switch (buttonIndex) {
             case 0:
                 if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
@@ -141,10 +142,10 @@
                     return;
                 }
                 else {
-                    imagePicker = [[UIImagePickerController alloc] init];
-                    imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;  
+                    self.imagePicker = [[UIImagePickerController alloc] init];
+                    self.imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;  
                     if ([actionSheet isEqual:self.videoActionSheet]) {
-                        imagePicker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie, nil];
+                        self.imagePicker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie, nil];
                     }
                 }
                 break;
@@ -155,22 +156,22 @@
                     return;
                 }
                 else {
-                    imagePicker = [[UIImagePickerController alloc] init];
-                    imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+                    self.imagePicker = [[UIImagePickerController alloc] init];
+                    self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
                     if ([actionSheet isEqual:self.videoActionSheet]) {
-                        imagePicker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie, nil];
+                        self.imagePicker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie, nil];
                     }
                 }
                 break;
             case 2:
                 return;
         }
-        imagePicker.delegate = self;
+        self.imagePicker.delegate = self;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            [self.viewController presentModalViewController:imagePicker animated:YES];
+            [self.viewController presentModalViewController:self.imagePicker animated:YES];
         }
         else {
-            self.popoverContoller = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
+            self.popoverContoller = [[UIPopoverController alloc] initWithContentViewController:self.imagePicker];
             [self.popoverContoller presentPopoverFromBarButtonItem:self.viewController.navigationItem.leftBarButtonItem permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
         }
     }
@@ -185,18 +186,23 @@
 
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         [self.viewController dismissModalViewControllerAnimated:NO];
     }
     else {
         [self.popoverContoller dismissPopoverAnimated:NO];
     }
-
-    UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    self.addPhotoView = [[AddPhotoView alloc] init];
-    self.addPhotoView.image = image;
-    [self.viewController presentModalViewController:self.addPhotoView animated:YES];
+    CFStringRef mediaType = (__bridge CFStringRef)[info objectForKey:UIImagePickerControllerMediaType];
+    if (CFStringCompare (mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        self.addPhotoView = [[AddPhotoView alloc] init];
+        self.addPhotoView.image = image;
+        [self.viewController presentModalViewController:self.addPhotoView animated:YES];
+    }
+    else if (CFStringCompare(mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
+        NSURL *videoUrl = [info objectForKey:UIImagePickerControllerMediaURL];
+        NSLog(@"videoURL : %@", videoUrl.description);
+    }
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {

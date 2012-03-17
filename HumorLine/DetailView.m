@@ -12,6 +12,7 @@
 #import "MainMenu.h"
 #import "AddCommentView.h"
 #import "UIButton+WebCache.h"
+#import "Image.h"
 
 @interface DetailView()
 @property (nonatomic, strong) MainMenu *mainMenu;
@@ -25,7 +26,7 @@
 @synthesize btnContent;
 @synthesize mainMenu = _mainMenu;
 @synthesize addCommentView = _addCommentView;
-@synthesize currentPicture = _currentPicture;
+@synthesize post = _post;
 @synthesize ratingItem;
 @synthesize commentsItem;
 
@@ -72,13 +73,19 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    //[self.imageView setImageWithURL:self.currentPicture.url];
-    if (self.currentPicture.type == Photo) {
-        [self.btnContent setImageWithURL:self.currentPicture.url];
+    
+    switch (self.post.type) {
+        case kPostTypePhoto:
+            [self.btnContent setImage:self.post.image.image forState:UIControlStateNormal];
+            break;
     }
-    else if (self.currentPicture.type == Text) {
-        [self.btnContent setTitle:self.currentPicture.text forState:UIControlStateNormal];
-    }
+    
+//    if (self.currentPicture.type == Photo) {
+//        [self.btnContent setImageWithURL:self.currentPicture.url];
+//    }
+//    else if (self.currentPicture.type == Text) {
+//        [self.btnContent setTitle:self.currentPicture.text forState:UIControlStateNormal];
+//    }
 }
 
 - (void)viewDidUnload

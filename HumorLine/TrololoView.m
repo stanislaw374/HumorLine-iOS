@@ -18,10 +18,15 @@
 @property (nonatomic, strong) NSMutableArray *imageViews;
 @property (nonatomic, strong) UIImageView *currentImageView;
 @property (nonatomic) BOOL isPreviewing;
+@property (nonatomic) CGPoint lastPoint;
+@property (nonatomic) BOOL mouseSwiped;
+@property (nonatomic) BOOL isGesture;
 - (void)updateUI;
 - (void)viewDragged:(UIPanGestureRecognizer *)gesture;
 - (void)viewPinched:(UIPinchGestureRecognizer *)gesture;
 - (void)onTextFieldDidEndOnExit:(id)sender;
+- (void)saveImage;
+- (void)image: (UIImage *) image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo;
 @end
 
 @implementation TrololoView
@@ -39,6 +44,9 @@
 @synthesize imageViews = _imageViews;
 @synthesize currentImageView = _currentImageView;
 @synthesize isPreviewing = _isPreviewing;
+@synthesize lastPoint = _lastPoint;
+@synthesize mouseSwiped = _mouseSwiped;
+@synthesize isGesture = _isGesture;
 
 - (NSMutableArray *)imageViews {
     if (!_imageViews) {
@@ -61,10 +69,10 @@
     }
     return _addPhotoSheet;
 }
-
-- (UIPanGestureRecognizer *)panGestureRecognizer {
-    return [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
-}
+//
+//- (UIPanGestureRecognizer *)panGestureRecognizer {
+//    return [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -138,11 +146,12 @@
 
 - (IBAction)onTextButtonClick:(id)sender {
     UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.imageView.frame.size.width, 50)];
-    textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+    textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
     textField.placeholder = @"Текст";
-    textField.font = [UIFont boldSystemFontOfSize:32];
+    textField.font = [UIFont boldSystemFontOfSize:36];
     textField.textColor = [UIColor whiteColor];
-    [textField addGestureRecognizer:self.panGestureRecognizer];
+    UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
+    [textField addGestureRecognizer:gesture];
     textField.backgroundColor = [UIColor clearColor];
     [textField addTarget:self action:@selector(onTextFieldDidEndOnExit:) forControlEvents:UIControlEventEditingDidEndOnExit];
     [self.currentImageView addSubview:textField];
@@ -168,8 +177,33 @@
         [self updateUI];
     }
     else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Комикс добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [alert show];
+        if (!self.isPreviewing) [self onPreviewButtonClick:nil];
+        [self saveImage];
+    }
+}
+
+- (void)saveImage {
+    NSLog(@"%@ : imageContextSize : %@", NSStringFromSelector(_cmd), NSStringFromCGSize(self.imageView.frame.size));
+          
+    UIGraphicsBeginImageContext(self.imageView.frame.size);
+    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[UIColor blackColor] CGColor]);
+    CGContextClearRect(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, self.imageView.frame.size.width, self.imageView.frame.size.height));
+    for (UIImageView *iv in self.imageViews) {
+        [iv.image drawInRect:CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height)];
+    }
+    UIImage *imageToSave = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    UIImageWriteToSavedPhotosAlbum(imageToSave, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    NSString *message = error ? @"Ошибка при сохранении изображения" : @"Изображение сохранено в фотогаллерее";
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    
+    if (!error) {
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -214,11 +248,12 @@
 //        }    
 //        //
         
-            int dx = 0, dy = 0;
+            int dx = self.imageView.frame.origin.x, dy = self.imageView.frame.origin.y;
             for (int i = 0; i < self.imagesCount; i++) 
             {
                 UIImageView *iv = [self.imageViews objectAtIndex:i];
                 iv.hidden = NO;
+                iv.userInteractionEnabled = NO;
                 int width, height;
                 switch (self.imagesCount) {
                     case 1:
@@ -260,12 +295,11 @@
     }
     else {
         self.isPreviewing = NO;
-        //self.imageView.hidden = YES;
-        //self.currentImageView.hidden = NO;
         [self updateUI];
         for (UIImageView *iv in self.imageViews) {
             iv.frame = self.imageView.frame;
             iv.hidden = YES;
+            iv.userInteractionEnabled = YES;
         }
         self.currentImageView.hidden = NO;
     }
@@ -286,13 +320,17 @@
 
 #pragma mark - UIActionSheetDelegate
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if ([self.addRageSheet isEqual:actionSheet]) {
+    if ([actionSheet isEqual:self.addRageSheet]) {
         switch (buttonIndex) {
             case 0:
             {
                 UIImageView *image = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"trollface-hello-kitty.png"]];
+                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                    image.transform = CGAffineTransformMakeScale(0.5, 0.5);
+                }
                 image.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-                [image addGestureRecognizer:self.panGestureRecognizer];
+                UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
+                [image addGestureRecognizer:gesture];
                 UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
                 [image addGestureRecognizer:pinchGesture];
                 [image setUserInteractionEnabled:YES];
@@ -331,7 +369,7 @@
 }
 
 - (void)viewDragged:(UIPanGestureRecognizer *)gesture {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
+    self.isGesture = YES;
     
     UIView *view = (UIView *)gesture.view;
 	CGPoint translation = [gesture translationInView:view];
@@ -342,14 +380,16 @@
     
 	// reset translation
 	[gesture setTranslation:CGPointZero inView:view];
+    
+    self.isGesture = NO;
 }
 
-- (void)viewPinched:(UIPinchGestureRecognizer *)gesture {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-    
+- (void)viewPinched:(UIPinchGestureRecognizer *)gesture {     
+    self.isGesture = YES;
     UIView *view = (UIView *)gesture.view;
     CGAffineTransform transform = CGAffineTransformMakeScale(gesture.scale, gesture.scale);
     view.transform = transform;
+    self.isGesture = NO;
 }
 
 #pragma mark - UIImagePickerViewControllerDelegate
@@ -373,11 +413,74 @@
     }
 }
 
-#pragma mark -
-
+#pragma mark - UITextFieldDelegate
 - (void)onTextFieldDidEndOnExit:(id)sender {
     UITextField *textField = (UITextField *)sender;
     [textField resignFirstResponder];
 }
+
+#pragma mark - UIResponder
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (self.isGesture) return;
+    
+    //self.mouseSwiped = NO;
+    UITouch *touch = touches.anyObject;
+    CGPoint touchLocation = [touch locationInView:self.currentImageView];
+    self.lastPoint = touchLocation;
+    
+    //NSLog(@"%@ subviews count = %d", NSStringFromSelector(_cmd), self.currentImageView.subviews.count);
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (self.isGesture) return;
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint touchLocation = [touch locationInView:self.currentImageView];
+    
+    //if (CGPointEqualToPoint(self.lastPoint, touchLocation)) return;
+    
+    UIGraphicsBeginImageContext(self.currentImageView.frame.size);
+    CGSize imageSize = self.currentImageView.image.size;
+    CGSize imageViewSize = self.currentImageView.frame.size;
+    int x = 0, y = 0;
+    if (imageSize.width < imageViewSize.width) {
+        x = (imageViewSize.width - imageSize.width) / 2;
+    }
+    if (imageSize.height < imageViewSize.height) {
+        y = (imageViewSize.height - imageSize.height) / 2;
+    }
+    NSLog(@"x = %d, y = %d", x, y);
+    [self.currentImageView.image drawInRect:CGRectMake(x, y, imageSize.width, imageSize.height)];
+    CGContextRef context = UIGraphicsGetCurrentContext();    
+    CGContextSetLineCap(context, kCGLineCapRound);
+    CGContextSetLineWidth(context, 2);
+    CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
+    CGContextBeginPath(context);
+    CGContextMoveToPoint(context, self.lastPoint.x, self.lastPoint.y);
+    CGContextAddLineToPoint(context, touchLocation.x, touchLocation.y);
+    CGContextStrokePath(context);
+    self.currentImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    self.lastPoint = touchLocation;
+    
+    //NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+//- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+//    if(!self.mouseSwiped) {
+//        UIGraphicsBeginImageContext(self.currentImageView.frame.size);
+//        [self.currentImageView.image drawInRect:CGRectMake(0, 0, self.currentImageView.frame.size.width, self.currentImageView.frame.size.height)];
+//        CGContextSetLineCap(UIGraphicsGetCurrentContext(), kCGLineCapRound);
+//        CGContextSetLineWidth(UIGraphicsGetCurrentContext(), 5.0);
+//        CGContextSetStrokeColorWithColor(UIGraphicsGetCurrentContext(), [[UIColor whiteColor] CGColor]);
+//        CGContextMoveToPoint(UIGraphicsGetCurrentContext(), self.lastPoint.x, self.lastPoint.y);
+//        CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), self.lastPoint.x, self.lastPoint.y);
+//        CGContextStrokePath(UIGraphicsGetCurrentContext());
+//        CGContextFlush(UIGraphicsGetCurrentContext());
+//        self.currentImageView.image = UIGraphicsGetImageFromCurrentImageContext();
+//        UIGraphicsEndImageContext();
+//    }
+//}
 
 @end
