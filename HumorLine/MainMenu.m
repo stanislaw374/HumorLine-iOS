@@ -6,45 +6,48 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#import <MobileCoreServices/MobileCoreServices.h>
 #import "MainMenu.h"
 #import "AddTrololoView.h"
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "AuthorizationView.h"
+#import "AddPhotoView.h"
+#import "AddVideoView.h"
 
 @interface MainMenu()
 - (void)onLoginButtonClick;
 - (void)onAddButtonClick;
 @property (nonatomic, unsafe_unretained) UIViewController *viewController;
-@property (nonatomic, strong) AddPhotoView *addPhotoView;
+//@property (nonatomic, strong) AddPhotoView *addPhotoView;
 @property (nonatomic, strong) UIPopoverController *popoverContoller;
 @property (nonatomic, strong) UIActionSheet *addActionSheet;
 @property (nonatomic, strong) UIActionSheet *photoActionSheet;
 @property (nonatomic, strong) UIActionSheet *videoActionSheet;
 @property (nonatomic, strong) UIActionSheet *loginActionSheet;
-@property (nonatomic, strong) AddTrololoView *addTrololoView;
-@property (nonatomic, strong) AuthorizationView *authorizationView;
+//@property (nonatomic, strong) AddTrololoView *addTrololoView;
+//@property (nonatomic, strong) AuthorizationView *authorizationView;
 @property (nonatomic, strong) UIImagePickerController *imagePicker;
 @end
 
 @implementation MainMenu
 @synthesize viewController = _viewController;
-@synthesize addPhotoView = _addPhotoView;
+//@synthesize addPhotoView = _addPhotoView;
 @synthesize popoverContoller = _popoverContoller;
 @synthesize addActionSheet = _addActionSheet;
 @synthesize photoActionSheet = _photoActionSheet;
 @synthesize videoActionSheet = _videoActionSheet;
 @synthesize loginActionSheet = _loginActionSheet;
-@synthesize addTrololoView = _addTrololoView;
-@synthesize authorizationView = _authorizationView;
+//@synthesize addTrololoView = _addTrololoView;
+//@synthesize authorizationView = _authorizationView;
+@synthesize imagePicker = _imagePicker;
 
 #pragma mark - Lazy Instantiation
 
-- (AuthorizationView *)authorizationView {
-    if (!_authorizationView) {
-        _authorizationView = [[AuthorizationView alloc] init];
-    }
-    return _authorizationView;
-}
+//- (AuthorizationView *)authorizationView {
+//    if (!_authorizationView) {
+//        _authorizationView = [[AuthorizationView alloc] init];
+//    }
+//    return _authorizationView;
+//}
 
 - (UIActionSheet *)addActionSheet {
     if (!_addActionSheet) {
@@ -81,12 +84,12 @@
 //    return _addPhotoView;
 //}
 
-- (AddTrololoView *)addTrololoView {
-    if (!_addTrololoView) {
-        _addTrololoView = [[AddTrololoView alloc] init];
-    }
-    return _addTrololoView;
-}
+//- (AddTrololoView *)addTrololoView {
+//    if (!_addTrololoView) {
+//        _addTrololoView = [[AddTrololoView alloc] init];
+//    }
+//    return _addTrololoView;
+//}
 
 - (id)initWithViewController:(UIViewController *)viewController {
     if (self = [super init]) {
@@ -128,8 +131,11 @@
                 break;
             case 2: break;
             case 3:
-                [self.viewController.navigationController pushViewController:self.addTrololoView animated:YES];                
+            {
+                AddTrololoView *addTrololoView = [[AddTrololoView alloc] init];
+                [self.viewController.navigationController pushViewController:addTrololoView animated:YES];                
                 break;
+            }
         }        
     }
     else if ([actionSheet isEqual:self.photoActionSheet] || [actionSheet isEqual:self.videoActionSheet]) {
@@ -178,7 +184,7 @@
     else if ([actionSheet isEqual:self.loginActionSheet]) {
         switch (buttonIndex) {
             case 0:
-                [self.viewController.navigationController pushViewController:self.authorizationView animated:YES];
+                //[self.viewController.navigationController pushViewController:self.authorizationView animated:YES];
                 break;
         }
     }
@@ -192,16 +198,22 @@
     else {
         [self.popoverContoller dismissPopoverAnimated:NO];
     }
+    
     CFStringRef mediaType = (__bridge CFStringRef)[info objectForKey:UIImagePickerControllerMediaType];
+    
     if (CFStringCompare (mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-        self.addPhotoView = [[AddPhotoView alloc] init];
-        self.addPhotoView.image = image;
-        [self.viewController presentModalViewController:self.addPhotoView animated:YES];
+        //self.addPhotoView = [[AddPhotoView alloc] init];
+        //self.addPhotoView.image = image;
+        //[self.viewController presentModalViewController:self.addPhotoView animated:YES];
     }
     else if (CFStringCompare(mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
-        NSURL *videoUrl = [info objectForKey:UIImagePickerControllerMediaURL];
-        NSLog(@"videoURL : %@", videoUrl.description);
+        NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+        NSLog(@"videoURL : %@", videoURL.description);
+        
+        AddVideoView *addVideoView = [[AddVideoView alloc] init];
+        addVideoView.videoURL = videoURL;
+        [self.viewController.navigationController pushViewController:addVideoView animated:YES];
     }
 }
 

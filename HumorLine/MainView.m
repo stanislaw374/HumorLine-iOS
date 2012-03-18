@@ -12,11 +12,11 @@
 #import "MainMenu.h"
 #import "Constants.h"
 #import "DetailView.h"
-//#import "Picture.h"
 #import <QuartzCore/QuartzCore.h>
 #import "AppDelegate.h"
 #import "Post.h"
 #import "Image.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @interface MainView()
 - (void)onButtonClick:(id)sender;
@@ -26,11 +26,13 @@
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, strong) EGORefreshTableHeaderView *refreshTableHeaderView;
 @property (nonatomic) BOOL isLoading;
+@property (nonatomic, strong) NSMutableArray *players;
 - (void)setButtonContent:(UIButton *)button withPost:(Post *)post;
 - (NSManagedObjectContext *)managedObjectContext;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)reloadTableViewDataSource;
 - (void)doneReloadingTableViewDataSource;
+- (void)prepareCell:(UITableViewCell *)cell;
 @end
 
 @implementation MainView
@@ -41,6 +43,7 @@
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize refreshTableHeaderView = _refreshTableHeaderView;
 @synthesize isLoading = _isLoading;
+@synthesize players = _players;
 
 /*
  - (NSFetchedResultsController *)fetchedResultsController {
@@ -54,6 +57,13 @@
  */
 
 #pragma mark - Lazy Instantiation
+
+- (NSMutableArray *)players {
+    if (!_players) {
+        _players = [[NSMutableArray alloc] init];
+    }
+    return _players;
+}
 
 - (NSManagedObjectContext *)managedObjectContext {
     AppDelegate *delegate = [UIApplication sharedApplication].delegate;
@@ -193,10 +203,12 @@
     return result;
 }
 
+#pragma mark -
+
 - (void)onButtonClick:(id)sender {
     UIButton *button = (UIButton *)sender;
-    Picture *currentPicture = [self.dataSource objectAtIndex:button.tag];
-    self.detailView.currentPicture = currentPicture;
+    //Picture *currentPicture = [self.dataSource objectAtIndex:button.tag];
+    //self.detailView.currentPicture = currentPicture;
     [self.navigationController pushViewController:self.detailView animated:YES];
 }
 
@@ -207,19 +219,34 @@
             [button setImage:post.image.image forState:UIControlStateNormal];
             break;
         }
-        case Text:
+        case kPostTypeText:
             [button setTitle:post.text forState:UIControlStateNormal];
             break;
-        case Video:
+        case kPostTypeVideo:
+        {
+            MPMoviePlayerController *player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:post.videoURL]];
+            player.shouldAutoplay = NO;
+            //NSLog(@"video url: %@", post.videoURL);
+            player.view.frame = button.bounds;
+            //NSLog(@"bounds = %@", NSStringFromCGRect(button.bounds));
+            player.scalingMode = MPMovieScalingModeAspectFit;
+            player.view.userInteractionEnabled = NO;
+            [button addSubview:player.view];
+            [self.players addObject:player];
             break;
+        }
     }
+}
+
+- (void)prepareCell:(UITableViewCell *)cell {
+    
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
     int borderWidth = 1;
     
-    NSLog(@"%@ : %@", NSStringFromSelector(_cmd), indexPath.description);
+    //NSLog(@"%@ : %@", NSStringFromSelector(_cmd), indexPath.description);
     
     switch (indexPath.row) {
         case 0:
@@ -233,7 +260,7 @@
             [cell addSubview:button];
             button.layer.borderWidth = borderWidth;
             button.layer.borderColor = [[UIColor whiteColor] CGColor];
-            button.contentMode = UIViewContentModeScaleAspectFill;
+            button.contentMode = UIViewContentModeScaleAspectFit;
             button.tag = indexPath.row;
             [self setButtonContent:button withPost:post];
             break;
@@ -294,8 +321,9 @@
                 else {
                     [button1 setImage:nil forState:UIControlStateNormal];
                     [button1 setTitle:@"" forState:UIControlStateNormal];
-                    UIView *view = [button1 viewWithTag:-1];
-                    [view removeFromSuperview];
+//                    for (UIView *view in button1.subviews) {
+//                        [view removeFromSuperview];
+//                    }
                 }
                 [self setButtonContent:button1 withPost:post];
             }
@@ -316,8 +344,9 @@
                 else {
                     [button2 setImage:nil forState:UIControlStateNormal];
                     [button2 setTitle:@"" forState:UIControlStateNormal];
-                    UIView *view = [button2 viewWithTag:-1];
-                    [view removeFromSuperview];
+//                    for (UIView *view in button2.subviews) {
+//                        [view removeFromSuperview];
+//                    }
                 }
                 [self setButtonContent:button2 withPost:post];
             }
@@ -337,8 +366,9 @@
                 else {
                     [button3 setImage:nil forState:UIControlStateNormal];
                     [button3 setTitle:@"" forState:UIControlStateNormal];
-                    UIView *view = [button3 viewWithTag:-1];
-                    [view removeFromSuperview];
+//                    for (UIView *view in button3.subviews) {
+//                        [view removeFromSuperview];
+//                    }
                 }
                 [self setButtonContent:button3 withPost:post];
             }

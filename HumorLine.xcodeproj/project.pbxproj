@@ -16,7 +16,6 @@
 		863D8F76150CC1E3007E745D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 863D8F75150CC1E3007E745D /* AppDelegate.m */; };
 		863D8F8D150CC4E5007E745D /* MainView.m in Sources */ = {isa = PBXBuildFile; fileRef = 863D8F8B150CC4E5007E745D /* MainView.m */; };
 		863D8F8E150CC4E5007E745D /* MainView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 863D8F8C150CC4E5007E745D /* MainView.xib */; };
-		86430443150EFCB600B44122 /* Picture.m in Sources */ = {isa = PBXBuildFile; fileRef = 86430442150EFCB600B44122 /* Picture.m */; };
 		864304F1150F225900B44122 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304EE150F225900B44122 /* Default.png */; };
 		864304F2150F225900B44122 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304EF150F225900B44122 /* Icon.png */; };
 		864304F3150F225900B44122 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 864304F0150F225900B44122 /* Icon@2x.png */; };
@@ -52,10 +51,6 @@
 		86967B43150DCD49006BEE8B /* AddCommentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86967B41150DCD49006BEE8B /* AddCommentView.xib */; };
 		86967B4D150DF74B006BEE8B /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */; };
 		86B083611512F0BA0053E1FA /* ImageToDataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */; };
-		86B083651512F1110053E1FA /* Comment.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B083641512F1110053E1FA /* Comment.m */; };
-		86B083681512F1120053E1FA /* Image.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B083671512F1110053E1FA /* Image.m */; };
-		86B0836B1512F1120053E1FA /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B0836A1512F1120053E1FA /* Post.m */; };
-		86B083741512F87A0053E1FA /* EGORefreshTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B083731512F87A0053E1FA /* EGORefreshTableHeaderView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		86B0837E1512F8A40053E1FA /* blackArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 86B083761512F8A40053E1FA /* blackArrow.png */; };
 		86B0837F1512F8A40053E1FA /* blackArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 86B083771512F8A40053E1FA /* blackArrow@2x.png */; };
 		86B083801512F8A40053E1FA /* blueArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 86B083781512F8A40053E1FA /* blueArrow.png */; };
@@ -70,6 +65,10 @@
 		86B0838E15134BFB0053E1FA /* AddVideoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86B0838C15134BFB0053E1FA /* AddVideoView.xib */; };
 		86B0839015134C450053E1FA /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86B0838F15134C450053E1FA /* MediaPlayer.framework */; };
 		86B08392151353630053E1FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86B08391151353630053E1FA /* AVFoundation.framework */; };
+		86C0EAB415161BE00057C3C8 /* EGORefreshTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAB315161BE00057C3C8 /* EGORefreshTableHeaderView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		86C0EADE1516355A0057C3C8 /* Comment.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EADD1516355A0057C3C8 /* Comment.m */; };
+		86C0EAE11516355A0057C3C8 /* Image.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAE01516355A0057C3C8 /* Image.m */; };
+		86C0EAE41516355B0057C3C8 /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAE31516355B0057C3C8 /* Post.m */; };
 		86DE236A150DFBCA00156F38 /* AddPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86DE2368150DFBCA00156F38 /* AddPhotoView.m */; };
 		86DE236B150DFBCA00156F38 /* AddPhotoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86DE2369150DFBCA00156F38 /* AddPhotoView.xib */; };
 /* End PBXBuildFile section */
@@ -90,8 +89,6 @@
 		863D8F8A150CC4E5007E745D /* MainView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainView.h; sourceTree = "<group>"; };
 		863D8F8B150CC4E5007E745D /* MainView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainView.m; sourceTree = "<group>"; };
 		863D8F8C150CC4E5007E745D /* MainView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainView.xib; sourceTree = "<group>"; };
-		86430441150EFCB600B44122 /* Picture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Picture.h; path = HumorLine/Picture.h; sourceTree = "<group>"; };
-		86430442150EFCB600B44122 /* Picture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Picture.m; path = HumorLine/Picture.m; sourceTree = "<group>"; };
 		864304EE150F225900B44122 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		864304EF150F225900B44122 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		864304F0150F225900B44122 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
@@ -147,14 +144,6 @@
 		86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		86B0835F1512F0BA0053E1FA /* ImageToDataTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageToDataTransformer.h; path = HumorLine/ImageToDataTransformer.h; sourceTree = "<group>"; };
 		86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ImageToDataTransformer.m; path = HumorLine/ImageToDataTransformer.m; sourceTree = "<group>"; };
-		86B083631512F1110053E1FA /* Comment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Comment.h; path = HumorLine/Comment.h; sourceTree = "<group>"; };
-		86B083641512F1110053E1FA /* Comment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Comment.m; path = HumorLine/Comment.m; sourceTree = "<group>"; };
-		86B083661512F1110053E1FA /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Image.h; path = HumorLine/Image.h; sourceTree = "<group>"; };
-		86B083671512F1110053E1FA /* Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Image.m; path = HumorLine/Image.m; sourceTree = "<group>"; };
-		86B083691512F1120053E1FA /* Post.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Post.h; path = HumorLine/Post.h; sourceTree = "<group>"; };
-		86B0836A1512F1120053E1FA /* Post.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Post.m; path = HumorLine/Post.m; sourceTree = "<group>"; };
-		86B083721512F87A0053E1FA /* EGORefreshTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EGORefreshTableHeaderView.h; sourceTree = "<group>"; };
-		86B083731512F87A0053E1FA /* EGORefreshTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EGORefreshTableHeaderView.m; sourceTree = "<group>"; };
 		86B083761512F8A40053E1FA /* blackArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blackArrow.png; sourceTree = "<group>"; };
 		86B083771512F8A40053E1FA /* blackArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blackArrow@2x.png"; sourceTree = "<group>"; };
 		86B083781512F8A40053E1FA /* blueArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blueArrow.png; sourceTree = "<group>"; };
@@ -170,6 +159,14 @@
 		86B0838C15134BFB0053E1FA /* AddVideoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddVideoView.xib; sourceTree = "<group>"; };
 		86B0838F15134C450053E1FA /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		86B08391151353630053E1FA /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		86C0EAB215161BE00057C3C8 /* EGORefreshTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EGORefreshTableHeaderView.h; path = HumorLine/EGORefreshTableHeaderView.h; sourceTree = "<group>"; };
+		86C0EAB315161BE00057C3C8 /* EGORefreshTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EGORefreshTableHeaderView.m; path = HumorLine/EGORefreshTableHeaderView.m; sourceTree = "<group>"; };
+		86C0EADC1516355A0057C3C8 /* Comment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Comment.h; path = HumorLine/Comment.h; sourceTree = "<group>"; };
+		86C0EADD1516355A0057C3C8 /* Comment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Comment.m; path = HumorLine/Comment.m; sourceTree = "<group>"; };
+		86C0EADF1516355A0057C3C8 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Image.h; path = HumorLine/Image.h; sourceTree = "<group>"; };
+		86C0EAE01516355A0057C3C8 /* Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Image.m; path = HumorLine/Image.m; sourceTree = "<group>"; };
+		86C0EAE21516355B0057C3C8 /* Post.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Post.h; path = HumorLine/Post.h; sourceTree = "<group>"; };
+		86C0EAE31516355B0057C3C8 /* Post.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Post.m; path = HumorLine/Post.m; sourceTree = "<group>"; };
 		86DE2367150DFBCA00156F38 /* AddPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddPhotoView.h; sourceTree = "<group>"; };
 		86DE2368150DFBCA00156F38 /* AddPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddPhotoView.m; sourceTree = "<group>"; };
 		86DE2369150DFBCA00156F38 /* AddPhotoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddPhotoView.xib; sourceTree = "<group>"; };
@@ -198,7 +195,6 @@
 		863D8F56150CC1E2007E745D = {
 			isa = PBXGroup;
 			children = (
-				86B08391151353630053E1FA /* AVFoundation.framework */,
 				863D8F6C150CC1E3007E745D /* Supporting Files */,
 				864E8171150E62D6008CF1AA /* Classes */,
 				864E8172150E6309008CF1AA /* Models */,
@@ -222,6 +218,7 @@
 		863D8F64150CC1E3007E745D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				86B08391151353630053E1FA /* AVFoundation.framework */,
 				86B0838F15134C450053E1FA /* MediaPlayer.framework */,
 				86B08388151302B20053E1FA /* CoreLocation.framework */,
 				86B083861512F8C60053E1FA /* QuartzCore.framework */,
@@ -307,8 +304,6 @@
 				86967B27150DC282006BEE8B /* MainMenu.m */,
 				863D8F74150CC1E3007E745D /* AppDelegate.h */,
 				863D8F75150CC1E3007E745D /* AppDelegate.m */,
-				86430441150EFCB600B44122 /* Picture.h */,
-				86430442150EFCB600B44122 /* Picture.m */,
 				86B0835F1512F0BA0053E1FA /* ImageToDataTransformer.h */,
 				86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */,
 			);
@@ -318,12 +313,12 @@
 		864E8172150E6309008CF1AA /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				86B083691512F1120053E1FA /* Post.h */,
-				86B0836A1512F1120053E1FA /* Post.m */,
-				86B083661512F1110053E1FA /* Image.h */,
-				86B083671512F1110053E1FA /* Image.m */,
-				86B083631512F1110053E1FA /* Comment.h */,
-				86B083641512F1110053E1FA /* Comment.m */,
+				86C0EAE21516355B0057C3C8 /* Post.h */,
+				86C0EAE31516355B0057C3C8 /* Post.m */,
+				86C0EADF1516355A0057C3C8 /* Image.h */,
+				86C0EAE01516355A0057C3C8 /* Image.m */,
+				86C0EADC1516355A0057C3C8 /* Comment.h */,
+				86C0EADD1516355A0057C3C8 /* Comment.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -402,8 +397,8 @@
 		86B083711512F8490053E1FA /* EGORefreshTableHeaderView */ = {
 			isa = PBXGroup;
 			children = (
-				86B083721512F87A0053E1FA /* EGORefreshTableHeaderView.h */,
-				86B083731512F87A0053E1FA /* EGORefreshTableHeaderView.m */,
+				86C0EAB215161BE00057C3C8 /* EGORefreshTableHeaderView.h */,
+				86C0EAB315161BE00057C3C8 /* EGORefreshTableHeaderView.m */,
 			);
 			name = EGORefreshTableHeaderView;
 			sourceTree = "<group>";
@@ -527,18 +522,17 @@
 				864E816E150E624F008CF1AA /* SDWebImagePrefetcher.m in Sources */,
 				864E816F150E624F008CF1AA /* UIButton+WebCache.m in Sources */,
 				864E8170150E624F008CF1AA /* UIImageView+WebCache.m in Sources */,
-				86430443150EFCB600B44122 /* Picture.m in Sources */,
 				864304F7150F234500B44122 /* AddTrololoView.m in Sources */,
 				864304FC150F520900B44122 /* TrololoView.m in Sources */,
 				864305161510B75200B44122 /* AuthorizationView.m in Sources */,
 				8643051B1510B83700B44122 /* SignupView.m in Sources */,
 				864FAA711511BCC3001B307F /* Model.xcdatamodeld in Sources */,
 				86B083611512F0BA0053E1FA /* ImageToDataTransformer.m in Sources */,
-				86B083651512F1110053E1FA /* Comment.m in Sources */,
-				86B083681512F1120053E1FA /* Image.m in Sources */,
-				86B0836B1512F1120053E1FA /* Post.m in Sources */,
-				86B083741512F87A0053E1FA /* EGORefreshTableHeaderView.m in Sources */,
 				86B0838D15134BFB0053E1FA /* AddVideoView.m in Sources */,
+				86C0EAB415161BE00057C3C8 /* EGORefreshTableHeaderView.m in Sources */,
+				86C0EADE1516355A0057C3C8 /* Comment.m in Sources */,
+				86C0EAE11516355A0057C3C8 /* Image.m in Sources */,
+				86C0EAE41516355B0057C3C8 /* Post.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

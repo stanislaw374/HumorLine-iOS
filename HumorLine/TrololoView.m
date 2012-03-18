@@ -7,7 +7,7 @@
 //
 
 #import "TrololoView.h"
-#import "Picture.h"
+//#import "Picture.h"
 
 @interface TrololoView()
 @property (nonatomic) int currentImage;

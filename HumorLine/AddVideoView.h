@@ -7,15 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface AddVideoView : UIViewController
+@interface AddVideoView : UIViewController <CLLocationManagerDelegate>
 @property (nonatomic, strong) NSURL *videoURL;
-
-@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (unsafe_unretained, nonatomic) IBOutlet UIView *videoView;
+//@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblTitle;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
 @property (unsafe_unretained, nonatomic) IBOutlet UITextField *txtTitle;
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onCancelButtonClick:(id)sender;
-
+- (IBAction)onLocationSwitchValueChange:(id)sender;
 @end

@@ -9,4 +9,8 @@
 #ifndef HumorLine_Constants_h
 #define HumorLine_Constants_h
 
+//typedef enum { kPostTypePhoto, kPostTypeVideo, kPostTypeText } PostType;
+
+#define VIDEOS_PATH @"Videos"
+
 #endif

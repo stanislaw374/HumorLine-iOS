@@ -10,6 +10,7 @@
 #import "MainView.h"
 #import "Post.h"
 #import "Image.h"
+#import "Constants.h"
 
 @interface AppDelegate()
 @property (nonatomic, strong) UINavigationController *navigationController;
@@ -49,7 +50,7 @@
     // Override point for customization after application launch.
     
     self.window.rootViewController = self.navigationController;
-    [self.window makeKeyAndVisible];
+    [self.window makeKeyAndVisible];    
     
     return YES;
 }
@@ -125,7 +126,7 @@
     
     if (self.isFirstTimeLaunch) [self initDB];
     
-    NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
+    //NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
     
     return _managedObjectContext;
 }

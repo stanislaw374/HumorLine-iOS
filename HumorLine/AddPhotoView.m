@@ -11,6 +11,7 @@
 #import "Post.h"
 #import "Image.h"
 #import "AppDelegate.h"
+#import "Constants.h"
 
 @interface AddPhotoView()
 @property (nonatomic, strong) CLLocationManager *locationManager;

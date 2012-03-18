@@ -114,7 +114,7 @@
 }
 
 - (IBAction)onCommentButtonClick:(id)sender {
-    self.addCommentView.currentPicture = self.currentPicture;
+    //self.addCommentView.currentPicture = self.currentPicture;
     [self.navigationController pushViewController:self.addCommentView animated:YES];
 }
 
