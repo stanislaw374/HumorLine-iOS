@@ -1,19 +1,13 @@
 //
-//  Comment.m
+//  AddTextView.h
 //  HumorLine
 //
 //  Created by Yazhenskikh Stanislaw on 20.03.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "Comment.h"
-#import "Post.h"
+#import <UIKit/UIKit.h>
 
-
-@implementation Comment
-
-@dynamic text;
-@dynamic date;
-@dynamic post;
+@interface AddTextView : UIViewController
 
 @end
