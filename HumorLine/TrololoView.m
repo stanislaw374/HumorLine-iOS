@@ -111,6 +111,7 @@
         iv.autoresizingMask = self.imageView.autoresizingMask;
         iv.userInteractionEnabled = YES;
         iv.contentMode = UIViewContentModeScaleAspectFit;
+        iv.backgroundColor = [UIColor whiteColor];
         if (i) iv.hidden = YES;
         [self.imageViews addObject:iv];
         [self.view addSubview:iv];
@@ -149,7 +150,7 @@
     textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
     textField.placeholder = @"Текст";
     textField.font = [UIFont boldSystemFontOfSize:36];
-    textField.textColor = [UIColor whiteColor];
+    textField.textColor = [UIColor blackColor];
     UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
     [textField addGestureRecognizer:gesture];
     textField.backgroundColor = [UIColor clearColor];
@@ -183,11 +184,11 @@
 }
 
 - (void)saveImage {
-    NSLog(@"%@ : imageContextSize : %@", NSStringFromSelector(_cmd), NSStringFromCGSize(self.imageView.frame.size));
+    //NSLog(@"%@ : imageContextSize : %@", NSStringFromSelector(_cmd), NSStringFromCGSize(self.imageView.frame.size));
           
     UIGraphicsBeginImageContext(self.imageView.frame.size);
-    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[UIColor blackColor] CGColor]);
-    CGContextClearRect(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, self.imageView.frame.size.width, self.imageView.frame.size.height));
+    //CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [[UIColor blackColor] CGColor]);
+    //CGContextClearRect(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, self.imageView.frame.size.width, self.imageView.frame.size.height));
     for (UIImageView *iv in self.imageViews) {
         [iv.image drawInRect:CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height)];
     }
@@ -454,7 +455,7 @@
     CGContextRef context = UIGraphicsGetCurrentContext();    
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineWidth(context, 2);
-    CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
+    CGContextSetStrokeColorWithColor(context, [[UIColor blackColor] CGColor]);
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, self.lastPoint.x, self.lastPoint.y);
     CGContextAddLineToPoint(context, touchLocation.x, touchLocation.y);

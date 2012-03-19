@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface AddVideoView : UIViewController <CLLocationManagerDelegate>
+@interface AddVideoView : UIViewController <CLLocationManagerDelegate, UITextFieldDelegate>
 @property (nonatomic, strong) NSURL *videoURL;
 @property (unsafe_unretained, nonatomic) IBOutlet UIView *videoView;
 //@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -19,4 +19,5 @@
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onCancelButtonClick:(id)sender;
 - (IBAction)onLocationSwitchValueChange:(id)sender;
+- (IBAction)onTextFieldDidEndOnExit:(id)sender;
 @end

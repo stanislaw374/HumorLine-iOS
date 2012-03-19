@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="878" systemVersion="11D50b" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Comment" representedClassName="Comment" syncable="YES">
+        <attribute name="date" attributeType="Date" syncable="YES"/>
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="post" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Post" inverseName="comments" inverseEntity="Post" syncable="YES"/>
     </entity>
@@ -21,7 +22,7 @@
         <relationship name="image" optional="YES" minCount="1" maxCount="1" deletionRule="Cascade" destinationEntity="Image" inverseName="post" inverseEntity="Image" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Comment" positionX="160" positionY="192" width="128" height="75"/>
+        <element name="Comment" positionX="160" positionY="192" width="128" height="90"/>
         <element name="Image" positionX="-198" positionY="171" width="128" height="75"/>
         <element name="Post" positionX="-18" positionY="18" width="128" height="195"/>
     </elements>

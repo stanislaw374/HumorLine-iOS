@@ -9,18 +9,20 @@
 #import <UIKit/UIKit.h>
 #import "Post.h"
 
-@interface DetailView : UIViewController <UITableViewDataSource>
-
-@property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
+@interface PostsView : UIViewController <UITableViewDataSource, UIScrollViewDelegate>
+@property (nonatomic, unsafe_unretained) NSFetchedResultsController *fetchedResultsController;
+//@property (unsafe_unretained, nonatomic) Post *post;
+@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
+//@property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
 @property (unsafe_unretained, nonatomic) IBOutlet UIButton *btnContent;
-
+@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblRating;
+@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblComments;
+@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *ratingItem;
+@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *commentsItem;
+@property (nonatomic) int currentPage;
+@property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
 - (IBAction)onPlusButtonClick:(id)sender;
 - (IBAction)onCommentButtonClick:(id)sender;
 - (IBAction)onFacebookButtonClick:(id)sender;
 - (IBAction)onVKButtonClick:(id)sender;
-@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblRating;
-@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblComments;
-@property (unsafe_unretained, nonatomic) Post *post;
-@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *ratingItem;
-@property (unsafe_unretained, nonatomic) IBOutlet UIBarButtonItem *commentsItem;
 @end

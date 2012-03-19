@@ -17,7 +17,7 @@
 @property (nonatomic, strong) MainMenu *mainMenu;
 @property (nonatomic, strong) MPMoviePlayerController *player;
 @property (nonatomic, strong) CLLocationManager *locationManager;
-- (void)saveVideo;
+- (BOOL)saveVideo;
 @end
 
 @implementation AddVideoView
@@ -102,12 +102,13 @@
 }
 
 - (IBAction)onAddButtonClick:(id)sender {
-    [self saveVideo];
-    [self.navigationController popViewControllerAnimated:YES];
+    if ([self saveVideo]) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (IBAction)onLocationSwitchValueChange:(id)sender {
@@ -120,7 +121,11 @@
     }
 }
 
-- (void)saveVideo {
+- (IBAction)onTextFieldDidEndOnExit:(id)sender {
+    [sender resignFirstResponder];
+}
+
+- (BOOL)saveVideo {
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     
     Post *newPost = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
@@ -156,7 +161,13 @@
         if (error) {
             NSLog(@"Ошибка копирования : %@", error.localizedDescription);
         }
+        else {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Видео успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+            [alert show];
+            return YES;
+        }
     }    
+    return NO;
 }
 
 #pragma mark - CLLocationManagerDelegate 
@@ -166,6 +177,13 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     [self.locationManager stopUpdatingLocation];
+    [self.swAddLocation setOn:NO];
+}
+
+#pragma mark - UITextFieldDelegate
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    self.lblTitle.text = self.txtTitle.text;
+    return YES;
 }
 
 @end

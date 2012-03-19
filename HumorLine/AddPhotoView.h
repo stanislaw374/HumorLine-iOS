@@ -16,7 +16,7 @@
 @property (unsafe_unretained, nonatomic) IBOutlet UITextField *txtHeader;
 @property (unsafe_unretained, nonatomic) IBOutlet UITextField *txtSubheader;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
-@property (nonatomic, strong) UIImage *image;
+@property (nonatomic, unsafe_unretained) UIImage *image;
 @property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onCancelButtonClick:(id)sender;

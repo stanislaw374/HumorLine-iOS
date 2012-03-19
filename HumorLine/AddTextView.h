@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface AddTextView : UIViewController
-
+@interface AddTextView : UIViewController <CLLocationManagerDelegate>
+@property (unsafe_unretained, nonatomic) IBOutlet UITextView *txtText;
+@property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
+- (IBAction)onSwAddLocationValueChanged:(id)sender;
+- (IBAction)onAddButtonClick:(id)sender;
+- (IBAction)onCancelButtonClick:(id)sender;
 @end

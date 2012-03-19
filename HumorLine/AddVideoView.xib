@@ -204,7 +204,6 @@
 				<string key="NSFrame">{{0, 20}, {320, 460}}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
-				<reference key="NSNextKeyView"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">3</int>
 					<bytes key="NSWhite">MAA</bytes>
@@ -279,6 +278,23 @@
 						<int key="IBEventType">13</int>
 					</object>
 					<int key="connectionID">22</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">onTextFieldDidEndOnExit:</string>
+						<reference key="source" ref="615667864"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">20</int>
+					</object>
+					<int key="connectionID">25</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="615667864"/>
+						<reference key="destination" ref="372490531"/>
+					</object>
+					<int key="connectionID">26</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -385,7 +401,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">23</int>
+			<int key="maxID">26</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -396,6 +412,7 @@
 						<string key="onAddButtonClick:">id</string>
 						<string key="onCancelButtonClick:">id</string>
 						<string key="onLocationSwitchValueChange:">id</string>
+						<string key="onTextFieldDidEndOnExit:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="onAddButtonClick:">
@@ -408,6 +425,10 @@
 						</object>
 						<object class="IBActionInfo" key="onLocationSwitchValueChange:">
 							<string key="name">onLocationSwitchValueChange:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="onTextFieldDidEndOnExit:">
+							<string key="name">onTextFieldDidEndOnExit:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>

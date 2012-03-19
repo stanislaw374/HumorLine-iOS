@@ -12,6 +12,8 @@
 #import "AuthorizationView.h"
 #import "AddPhotoView.h"
 #import "AddVideoView.h"
+#import "PostsView.h"
+#import "AddTextView.h"
 
 @interface MainMenu()
 - (void)onLoginButtonClick;
@@ -39,6 +41,7 @@
 //@synthesize addTrololoView = _addTrololoView;
 //@synthesize authorizationView = _authorizationView;
 @synthesize imagePicker = _imagePicker;
+//@synthesize postsView = _postsView;
 
 #pragma mark - Lazy Instantiation
 
@@ -47,6 +50,13 @@
 //        _authorizationView = [[AuthorizationView alloc] init];
 //    }
 //    return _authorizationView;
+//}
+//
+//- (PostsView *)postsView {
+//    if (!_postsView) {
+//        _postsView = [[PostsView alloc] init];
+//    }
+//    return _postsView;
 //}
 
 - (UIActionSheet *)addActionSheet {
@@ -129,11 +139,17 @@
             case 1:
                 [self.videoActionSheet showFromBarButtonItem:self.viewController.navigationItem.leftBarButtonItem animated:YES];
                 break;
-            case 2: break;
+            case 2: 
+            {
+                AddTextView *addTextView = [[AddTextView alloc] init];
+                [self.viewController presentModalViewController:addTextView animated:YES];
+                break;
+            }
             case 3:
             {
                 AddTrololoView *addTrololoView = [[AddTrololoView alloc] init];
-                [self.viewController.navigationController pushViewController:addTrololoView animated:YES];                
+                //[self.viewController.navigationController pushViewController:addTrololoView animated:YES];                
+                [self.viewController presentModalViewController:addTrololoView animated:YES];
                 break;
             }
         }        
@@ -203,9 +219,9 @@
     
     if (CFStringCompare (mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-        //self.addPhotoView = [[AddPhotoView alloc] init];
-        //self.addPhotoView.image = image;
-        //[self.viewController presentModalViewController:self.addPhotoView animated:YES];
+        AddPhotoView *addPhotoView = [[AddPhotoView alloc] init];
+        addPhotoView.image = image;
+        [self.viewController presentModalViewController:addPhotoView animated:YES];
     }
     else if (CFStringCompare(mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
         NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
@@ -213,7 +229,7 @@
         
         AddVideoView *addVideoView = [[AddVideoView alloc] init];
         addVideoView.videoURL = videoURL;
-        [self.viewController.navigationController pushViewController:addVideoView animated:YES];
+        [self.viewController presentModalViewController:addVideoView animated:YES];
     }
 }
 

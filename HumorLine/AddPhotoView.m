@@ -64,6 +64,9 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.imageView.image = self.image;
+    
+    self.scrollView.layer.borderColor = [[UIColor whiteColor] CGColor];
+    self.scrollView.layer.borderWidth = 1;
 }
 
 - (void)viewDidUnload
@@ -165,6 +168,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     [self.locationManager stopUpdatingLocation];
+    [self.swAddLocation setOn:NO];
 }
 
 @end

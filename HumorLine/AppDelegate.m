@@ -193,20 +193,23 @@
 - (void)initDB {
     NSLog(@"%@", NSStringFromSelector(_cmd));
     NSData *data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:@"http://pics.livejournal.com/che_ratnik/pic/0004adqe"]];
-    //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        for (int i = 0; i < 7; i++) {            
-            Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
-            newPost.type = kPostTypePhoto;
-            newPost.likesCount = arc4random() % 100;    
-            Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
-            newPost.image = image;
-            newPost.image.image = [[UIImage alloc] initWithData:data];
-        }
-        NSError *error;
-        if (![self.managedObjectContext save:&error]) {
-            NSLog(@"Error saving: %@", error.localizedDescription);
-        }
-    //});    
+   
+    for (int i = 0; i < 7; i++) {            
+        Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+        newPost.type = kPostTypePhoto;
+        newPost.likesCount = arc4random() % 100;    
+        Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
+        newPost.image = image;
+        newPost.image.image = [[UIImage alloc] initWithData:data];
+    }
+    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+    newPost.type = kPostTypeText;
+    newPost.text = @"Хотел как лучше получилось как всегда";
+    
+    NSError *error;
+    if (![self.managedObjectContext save:&error]) {
+        NSLog(@"Error saving: %@", error.localizedDescription);
+    }
 }
 
 #pragma mark -

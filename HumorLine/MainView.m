@@ -11,17 +11,24 @@
 #import "MBProgressHUD.h"
 #import "MainMenu.h"
 #import "Constants.h"
-#import "DetailView.h"
+#import "PostsView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "AppDelegate.h"
 #import "Post.h"
 #import "Image.h"
 #import <MediaPlayer/MediaPlayer.h>
+#import "CustomBadge.h"
+
+#define kCELL_ID1 @"Cell1"
+#define kCELL_ID2 @"Cell2"
+#define kCELL_ID3 @"Cell3"
+
+enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 
 @interface MainView()
 - (void)onButtonClick:(id)sender;
 @property (nonatomic, strong) MainMenu *mainMenu;
-@property (nonatomic, strong) DetailView *detailView;
+@property (nonatomic, strong) PostsView *postsView;
 @property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, strong) EGORefreshTableHeaderView *refreshTableHeaderView;
@@ -32,13 +39,14 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)reloadTableViewDataSource;
 - (void)doneReloadingTableViewDataSource;
-- (void)prepareCell:(UITableViewCell *)cell;
+- (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+- (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @implementation MainView
 @synthesize tableView = _tableView;
 @synthesize mainMenu = _mainMenu;
-@synthesize detailView = _detailView;
+@synthesize postsView = _postsView;
 @synthesize dataSource = _dataSource;
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize refreshTableHeaderView = _refreshTableHeaderView;
@@ -57,6 +65,13 @@
  */
 
 #pragma mark - Lazy Instantiation
+
+- (PostsView *)postsView {
+    if (!_postsView) {
+        _postsView = [[PostsView alloc] init];
+    }
+    return _postsView;
+}
 
 - (NSMutableArray *)players {
     if (!_players) {
@@ -93,12 +108,12 @@
     return _fetchedResultsController;
 }
 
-- (DetailView *)detailView {
-    if (!_detailView) {
-        _detailView = [[DetailView alloc] init];
-    }
-    return _detailView;
-}
+//- (DetailView *)detailView {
+//    if (!_detailView) {
+//        _detailView = [[DetailView alloc] init];
+//    }
+//    return _detailView;
+//}
 
 - (MainMenu *)mainMenu {
     if (!_mainMenu) {
@@ -170,20 +185,27 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *kCell;
-    kCell = @"MainViewCell";
-
     UITableViewCell *cell;
-    if (indexPath.row < 2) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+    NSString *cellIdentifier;
+    
+    switch (indexPath.row) {
+        case 0:
+            cellIdentifier = kCELL_ID1;
+            break;
+        case 1:
+            cellIdentifier = kCELL_ID2;
+            break;
+        default:
+            cellIdentifier = kCELL_ID3;
     }
-    else {
-        cell = [tableView dequeueReusableCellWithIdentifier:kCell];
-        if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kCell];
-        }
+    
+    cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        [self prepareCell:cell atIndexPath:indexPath];
     }
-   
+    
+    [self clearCell:cell atIndexPath:indexPath];
     [self configureCell:cell atIndexPath:indexPath];
 
     return cell;
@@ -207,15 +229,25 @@
 
 - (void)onButtonClick:(id)sender {
     UIButton *button = (UIButton *)sender;
-    //Picture *currentPicture = [self.dataSource objectAtIndex:button.tag];
-    //self.detailView.currentPicture = currentPicture;
-    [self.navigationController pushViewController:self.detailView animated:YES];
+    self.postsView.fetchedResultsController = self.fetchedResultsController;
+    self.postsView.currentPage = button.tag - 1;
+    
+    NSLog(@"current page = %d", self.postsView.currentPage);
+    
+    [self.navigationController pushViewController:self.postsView animated:YES];
 }
 
-- (void)setButtonContent:(UIButton *)button withPost:(Post *)post {
+- (void)setButtonContent:(UIButton *)button withPost:(Post *)post {    
+    button.layer.borderWidth = 1;
+    
+    CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
+    if (badge) {
+        badge.badgeText = [NSString stringWithFormat:@"%d", post.likesCount];
+        badge.hidden = NO;
+    }
+    
     switch (post.type) {
-        case kPostTypePhoto:
-        {
+        case kPostTypePhoto: {
             [button setImage:post.image.image forState:UIControlStateNormal];
             break;
         }
@@ -238,60 +270,102 @@
     }
 }
 
-- (void)prepareCell:(UITableViewCell *)cell {
+- (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    int offset = indexPath.row;
+    if (indexPath.row > 1) {
+        offset = (indexPath.row - 2) * 3 + 3;
+    }
     
+    UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
+    if (button) {
+        [button setImage:nil forState:UIControlStateNormal];
+        [button setTitle:@"" forState:UIControlStateNormal];
+        button.layer.borderWidth = 0;
+        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
+        badge.hidden = YES;
+    }
+    
+    button = (UIButton *)[cell viewWithTag:offset + 2];
+    if (button) {
+        [button setImage:nil forState:UIControlStateNormal];
+        [button setTitle:@"" forState:UIControlStateNormal];
+        button.layer.borderWidth = 0;
+        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
+        badge.hidden = YES;
+    }
+    
+    button = (UIButton *)[cell viewWithTag:offset + 3];
+    if (button) {
+        [button setImage:nil forState:UIControlStateNormal];
+        [button setTitle:@"" forState:UIControlStateNormal];
+        button.layer.borderWidth = 0;
+        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
+        badge.hidden = YES;
+    }
 }
 
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
-    int borderWidth = 1;
-    
-    //NSLog(@"%@ : %@", NSStringFromSelector(_cmd), indexPath.description);
-    
+- (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.row) {
         case 0:
         {
-            //Picture *pic = [self.dataSource objectAtIndex:indexPath.row];
-            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
             int sx = 20, sy = 20;
+            CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
             UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, rowHeight - sx, rowHeight - sy)];            
             button.center = CGPointMake(self.tableView.frame.size.width / 2, button.center.y);
             [button addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
             [cell addSubview:button];
-            button.layer.borderWidth = borderWidth;
+            //button.layer.borderWidth = borderWidth;
             button.layer.borderColor = [[UIColor whiteColor] CGColor];
             button.contentMode = UIViewContentModeScaleAspectFit;
-            button.tag = indexPath.row;
-            [self setButtonContent:button withPost:post];
+            button.tag = indexPath.row + 1;
+            
+            [cell addSubview:button];
+            
+            CustomBadge *customBadge = [CustomBadge customBadgeWithString:@"0"];
+            customBadge.frame = CGRectMake(button.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
+            customBadge.tag = kTAG_BADGE;
+            customBadge.hidden = YES;
+            [button addSubview:customBadge];
             break;
         }
         case 1:
         {
-            //Picture *pic1 = [self.dataSource objectAtIndex:indexPath.row];
-            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
             int sx = 25, sy = 10;
             int dx = 8;
             int buttonSize = (self.tableView.frame.size.width - 2 * sx - dx) / 2;
             UIButton *button1 = [[UIButton alloc] initWithFrame:CGRectMake(sx, sy, buttonSize, buttonSize)];       
             [button1 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-            button1.layer.borderWidth = borderWidth;
+            //button1.layer.borderWidth = borderWidth;
             button1.layer.borderColor = [[UIColor whiteColor] CGColor];
             button1.contentMode = UIViewContentModeScaleAspectFit;
-            button1.tag = indexPath.row;
-            [self setButtonContent:button1 withPost:post];
+            button1.tag = indexPath.row + 1;
+            //[self setButtonContent:button1 withPost:post];
             
-            post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
+            //post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
             UIButton *button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
             //[button2 setImageWithURL:pic2.url];
             [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-            button2.layer.borderWidth = borderWidth;
+            //button2.layer.borderWidth = borderWidth;
             button2.layer.borderColor = [[UIColor whiteColor] CGColor];
             button2.contentMode = UIViewContentModeScaleAspectFit;
-            button2.tag = indexPath.row + 1;
-            [self setButtonContent:button2 withPost:post];
+            button2.tag = indexPath.row + 2;
+            //[self setButtonContent:button2 withPost:post];
             
             [cell addSubview:button1];
-            [cell addSubview:button2];            
+            [cell addSubview:button2];        
+            
+            CustomBadge *customBadge = [CustomBadge customBadgeWithString:@"0"];
+            customBadge.frame = CGRectMake(button1.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
+            customBadge.tag = kTAG_BADGE;
+            customBadge.hidden = YES;
+            [button1 addSubview:customBadge];
+            
+            customBadge = [CustomBadge customBadgeWithString:@"0"];
+            customBadge.frame = CGRectMake(button2.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
+            customBadge.tag = kTAG_BADGE;
+            customBadge.hidden = YES;
+            [button2 addSubview:customBadge];
+            
             break;
         }
         default:
@@ -301,80 +375,106 @@
             int buttonSize = (self.tableView.frame.size.width - 2 * sx - 2 * dx) / 3;
             
             int offset = (indexPath.row - 2) * 3 + 3;
-//            if (indexPath.row == 2) offset = 1;
-//            else offset = indexPath.row * 2;
+            //NSIndexPath *ip = [NSIndexPath indexPathForRow:offset inSection:0];            
+            
+            UIButton *button1 = [[UIButton alloc] initWithFrame:CGRectMake(sx, sy, buttonSize, buttonSize)];            
+            [button1 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+            button1.layer.borderColor = [[UIColor whiteColor] CGColor];
+            button1.contentMode = UIViewContentModeScaleAspectFit;
+            button1.tag = offset + 1;
+            
+            UIButton *button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
+            [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+            button2.layer.borderColor = [[UIColor whiteColor] CGColor];
+            button2.contentMode = UIViewContentModeScaleAspectFit;
+            button2.tag = offset + 2;
+            
+            UIButton *button3 = [[UIButton alloc] initWithFrame:CGRectMake(button2.frame.origin.x + button2.frame.size.width + dx, sy, buttonSize, buttonSize)];                
+            [button3 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+            button3.layer.borderColor = [[UIColor whiteColor] CGColor];
+            button3.contentMode = UIViewContentModeScaleAspectFit;
+            button3.tag = offset + 3;
+            
+            [cell addSubview:button1];
+            [cell addSubview:button2];  
+            [cell addSubview:button3]; 
+            
+            CustomBadge *customBadge1 = [CustomBadge customBadgeWithString:@"0"];
+            customBadge1.frame = CGRectMake(button1.frame.size.width - customBadge1.frame.size.width, 0, customBadge1.frame.size.width, customBadge1.frame.size.height);
+            customBadge1.tag = kTAG_BADGE;
+            customBadge1.hidden = YES;
+            [button1 addSubview:customBadge1];
+            
+            CustomBadge *customBadge2 = [CustomBadge customBadgeWithString:@"0"];
+            customBadge2.frame = CGRectMake(button2.frame.size.width - customBadge2.frame.size.width, 0, customBadge2.frame.size.width, customBadge2.frame.size.height);
+            customBadge2.tag = kTAG_BADGE;
+            customBadge2.hidden = YES;
+            [button2 addSubview:customBadge2];
+            
+            CustomBadge *customBadge3 = [CustomBadge customBadgeWithString:@"0"];
+            customBadge3.frame = CGRectMake(button3.frame.size.width - customBadge3.frame.size.width, 0, customBadge3.frame.size.width, customBadge3.frame.size.height);
+            customBadge3.tag = kTAG_BADGE;
+            customBadge3.hidden = YES;
+            [button3 addSubview:customBadge3];
+        }
+    }                            
+}
+
+- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    //CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
+    //int borderWidth = 1;
+    
+    //NSLog(@"%@ : %@", NSStringFromSelector(_cmd), indexPath.description);
+    
+    int offset = indexPath.row;
+    if (indexPath.row > 1) {
+        offset = (indexPath.row - 2) * 3 + 3;
+    }
+    switch (indexPath.row) {
+        case 0:
+        {        
+            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
+            UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
+            [self setButtonContent:button withPost:post];
+            break;
+        }
+        case 1:
+        {            
+            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
+            UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
+            [self setButtonContent:button withPost:post];
+            
+            post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
+            button = (UIButton *)[cell viewWithTag:offset + 2];
+            [self setButtonContent:button withPost:post];
+            break;
+        }
+        default:
+        {
+            //int offset = (indexPath.row - 2) * 3 + 3;
             
             NSIndexPath *ip = [NSIndexPath indexPathForRow:offset inSection:indexPath.section];
             UIButton *button1, *button2, *button3;
             Post *post;
             if (ip.row < self.fetchedResultsController.fetchedObjects.count) {            
                 post = [self.fetchedResultsController objectAtIndexPath:ip];
-                button1 = (UIButton *)[cell viewWithTag:ip.row];
-                if (!button1) {
-                    button1 = [[UIButton alloc] initWithFrame:CGRectMake(sx, sy, buttonSize, buttonSize)];            
-                    [button1 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-                    button1.layer.borderWidth = borderWidth;
-                    button1.layer.borderColor = [[UIColor whiteColor] CGColor];
-                    button1.contentMode = UIViewContentModeScaleAspectFit;
-                    button1.tag = ip.row;
-                }
-                else {
-                    [button1 setImage:nil forState:UIControlStateNormal];
-                    [button1 setTitle:@"" forState:UIControlStateNormal];
-//                    for (UIView *view in button1.subviews) {
-//                        [view removeFromSuperview];
-//                    }
-                }
+                button1 = (UIButton *)[cell viewWithTag:offset + 1];                
                 [self setButtonContent:button1 withPost:post];
             }
             
             ip = [NSIndexPath indexPathForRow:offset + 1 inSection:indexPath.section];           
-            if (ip.row < self.fetchedResultsController.fetchedObjects.count)
-            {
+            if (ip.row < self.fetchedResultsController.fetchedObjects.count) {
                 post = [self.fetchedResultsController objectAtIndexPath:ip];
-                button2 = (UIButton *)[cell viewWithTag:ip.row];
-                if (!button2) {
-                    button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
-                    [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-                    button2.layer.borderWidth = borderWidth;
-                    button2.layer.borderColor = [[UIColor whiteColor] CGColor];
-                    button2.contentMode = UIViewContentModeScaleAspectFit;
-                    button2.tag = ip.row;
-                }
-                else {
-                    [button2 setImage:nil forState:UIControlStateNormal];
-                    [button2 setTitle:@"" forState:UIControlStateNormal];
-//                    for (UIView *view in button2.subviews) {
-//                        [view removeFromSuperview];
-//                    }
-                }
+                button2 = (UIButton *)[cell viewWithTag:offset + 2];                
                 [self setButtonContent:button2 withPost:post];
             }
             
             ip = [NSIndexPath indexPathForRow:offset + 2 inSection:indexPath.section];           
             if (ip.row < self.fetchedResultsController.fetchedObjects.count) {
                 post = [self.fetchedResultsController objectAtIndexPath:ip];
-                button3 = (UIButton *)[cell viewWithTag:ip.row];
-                if (!button3) {
-                    button3 = [[UIButton alloc] initWithFrame:CGRectMake(button2.frame.origin.x + button2.frame.size.width + dx, sy, buttonSize, buttonSize)];                
-                    [button3 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-                    button3.layer.borderWidth = borderWidth;
-                    button3.layer.borderColor = [[UIColor whiteColor] CGColor];
-                    button3.contentMode = UIViewContentModeScaleAspectFit;
-                    button3.tag = ip.row;
-                }
-                else {
-                    [button3 setImage:nil forState:UIControlStateNormal];
-                    [button3 setTitle:@"" forState:UIControlStateNormal];
-//                    for (UIView *view in button3.subviews) {
-//                        [view removeFromSuperview];
-//                    }
-                }
+                button3 = (UIButton *)[cell viewWithTag:offset + 3];
                 [self setButtonContent:button3 withPost:post];
             }
-            [cell addSubview:button1];
-            [cell addSubview:button2];  
-            [cell addSubview:button3];        
         }
     }
 }

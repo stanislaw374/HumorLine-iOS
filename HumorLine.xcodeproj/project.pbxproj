@@ -44,8 +44,14 @@
 		864E8170150E624F008CF1AA /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 864E8169150E624F008CF1AA /* UIImageView+WebCache.m */; };
 		864FAA6D1511B76C001B307F /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 864FAA6C1511B76B001B307F /* CoreData.framework */; };
 		864FAA711511BCC3001B307F /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 864FAA6F1511BCC3001B307F /* Model.xcdatamodeld */; };
-		86967B24150DBF85006BEE8B /* DetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86967B22150DBF85006BEE8B /* DetailView.m */; };
-		86967B25150DBF85006BEE8B /* DetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86967B23150DBF85006BEE8B /* DetailView.xib */; };
+		868DDE3D1517B0CE0012BBEF /* Comment.m in Sources */ = {isa = PBXBuildFile; fileRef = 868DDE3C1517B0CE0012BBEF /* Comment.m */; };
+		868DDE411517B9170012BBEF /* AddTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 868DDE3F1517B9170012BBEF /* AddTextView.m */; };
+		868DDE421517B9170012BBEF /* AddTextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 868DDE401517B9170012BBEF /* AddTextView.xib */; };
+		868DDE491517B93B0012BBEF /* CustomBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 868DDE441517B93B0012BBEF /* CustomBadge.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		868DDE4A1517B93B0012BBEF /* CustomBadgeAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 868DDE461517B93B0012BBEF /* CustomBadgeAppDelegate.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		868DDE4B1517B93B0012BBEF /* CustomBadgeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 868DDE481517B93B0012BBEF /* CustomBadgeViewController.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		86967B24150DBF85006BEE8B /* PostsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86967B22150DBF85006BEE8B /* PostsView.m */; };
+		86967B25150DBF85006BEE8B /* PostsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86967B23150DBF85006BEE8B /* PostsView.xib */; };
 		86967B28150DC282006BEE8B /* MainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 86967B27150DC282006BEE8B /* MainMenu.m */; };
 		86967B42150DCD49006BEE8B /* AddCommentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86967B40150DCD49006BEE8B /* AddCommentView.m */; };
 		86967B43150DCD49006BEE8B /* AddCommentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86967B41150DCD49006BEE8B /* AddCommentView.xib */; };
@@ -66,9 +72,10 @@
 		86B0839015134C450053E1FA /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86B0838F15134C450053E1FA /* MediaPlayer.framework */; };
 		86B08392151353630053E1FA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86B08391151353630053E1FA /* AVFoundation.framework */; };
 		86C0EAB415161BE00057C3C8 /* EGORefreshTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAB315161BE00057C3C8 /* EGORefreshTableHeaderView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		86C0EADE1516355A0057C3C8 /* Comment.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EADD1516355A0057C3C8 /* Comment.m */; };
 		86C0EAE11516355A0057C3C8 /* Image.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAE01516355A0057C3C8 /* Image.m */; };
 		86C0EAE41516355B0057C3C8 /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C0EAE31516355B0057C3C8 /* Post.m */; };
+		86D6083615170ADD00CE413B /* PostView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86D6083415170ADD00CE413B /* PostView.m */; };
+		86D6083715170ADD00CE413B /* PostView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86D6083515170ADD00CE413B /* PostView.xib */; };
 		86DE236A150DFBCA00156F38 /* AddPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 86DE2368150DFBCA00156F38 /* AddPhotoView.m */; };
 		86DE236B150DFBCA00156F38 /* AddPhotoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 86DE2369150DFBCA00156F38 /* AddPhotoView.xib */; };
 /* End PBXBuildFile section */
@@ -132,9 +139,20 @@
 		864E8169150E624F008CF1AA /* UIImageView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImageView+WebCache.m"; path = "HumorLine/UIImageView+WebCache.m"; sourceTree = "<group>"; };
 		864FAA6C1511B76B001B307F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		864FAA701511BCC3001B307F /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		86967B21150DBF85006BEE8B /* DetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailView.h; sourceTree = "<group>"; };
-		86967B22150DBF85006BEE8B /* DetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailView.m; sourceTree = "<group>"; };
-		86967B23150DBF85006BEE8B /* DetailView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailView.xib; sourceTree = "<group>"; };
+		868DDE3B1517B0CE0012BBEF /* Comment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Comment.h; path = HumorLine/Comment.h; sourceTree = "<group>"; };
+		868DDE3C1517B0CE0012BBEF /* Comment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Comment.m; path = HumorLine/Comment.m; sourceTree = "<group>"; };
+		868DDE3E1517B9170012BBEF /* AddTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddTextView.h; sourceTree = "<group>"; };
+		868DDE3F1517B9170012BBEF /* AddTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddTextView.m; sourceTree = "<group>"; };
+		868DDE401517B9170012BBEF /* AddTextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddTextView.xib; sourceTree = "<group>"; };
+		868DDE431517B93B0012BBEF /* CustomBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomBadge.h; path = HumorLine/CustomBadge.h; sourceTree = "<group>"; };
+		868DDE441517B93B0012BBEF /* CustomBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomBadge.m; path = HumorLine/CustomBadge.m; sourceTree = "<group>"; };
+		868DDE451517B93B0012BBEF /* CustomBadgeAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomBadgeAppDelegate.h; path = HumorLine/CustomBadgeAppDelegate.h; sourceTree = "<group>"; };
+		868DDE461517B93B0012BBEF /* CustomBadgeAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomBadgeAppDelegate.m; path = HumorLine/CustomBadgeAppDelegate.m; sourceTree = "<group>"; };
+		868DDE471517B93B0012BBEF /* CustomBadgeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomBadgeViewController.h; path = HumorLine/CustomBadgeViewController.h; sourceTree = "<group>"; };
+		868DDE481517B93B0012BBEF /* CustomBadgeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomBadgeViewController.m; path = HumorLine/CustomBadgeViewController.m; sourceTree = "<group>"; };
+		86967B21150DBF85006BEE8B /* PostsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostsView.h; sourceTree = "<group>"; };
+		86967B22150DBF85006BEE8B /* PostsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostsView.m; sourceTree = "<group>"; };
+		86967B23150DBF85006BEE8B /* PostsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PostsView.xib; sourceTree = "<group>"; };
 		86967B26150DC282006BEE8B /* MainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainMenu.h; path = HumorLine/MainMenu.h; sourceTree = "<group>"; };
 		86967B27150DC282006BEE8B /* MainMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = HumorLine/MainMenu.m; sourceTree = "<group>"; };
 		86967B3E150DC798006BEE8B /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -161,12 +179,13 @@
 		86B08391151353630053E1FA /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		86C0EAB215161BE00057C3C8 /* EGORefreshTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EGORefreshTableHeaderView.h; path = HumorLine/EGORefreshTableHeaderView.h; sourceTree = "<group>"; };
 		86C0EAB315161BE00057C3C8 /* EGORefreshTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EGORefreshTableHeaderView.m; path = HumorLine/EGORefreshTableHeaderView.m; sourceTree = "<group>"; };
-		86C0EADC1516355A0057C3C8 /* Comment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Comment.h; path = HumorLine/Comment.h; sourceTree = "<group>"; };
-		86C0EADD1516355A0057C3C8 /* Comment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Comment.m; path = HumorLine/Comment.m; sourceTree = "<group>"; };
 		86C0EADF1516355A0057C3C8 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Image.h; path = HumorLine/Image.h; sourceTree = "<group>"; };
 		86C0EAE01516355A0057C3C8 /* Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Image.m; path = HumorLine/Image.m; sourceTree = "<group>"; };
 		86C0EAE21516355B0057C3C8 /* Post.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Post.h; path = HumorLine/Post.h; sourceTree = "<group>"; };
 		86C0EAE31516355B0057C3C8 /* Post.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Post.m; path = HumorLine/Post.m; sourceTree = "<group>"; };
+		86D6083315170ADD00CE413B /* PostView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostView.h; sourceTree = "<group>"; };
+		86D6083415170ADD00CE413B /* PostView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostView.m; sourceTree = "<group>"; };
+		86D6083515170ADD00CE413B /* PostView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PostView.xib; sourceTree = "<group>"; };
 		86DE2367150DFBCA00156F38 /* AddPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddPhotoView.h; sourceTree = "<group>"; };
 		86DE2368150DFBCA00156F38 /* AddPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddPhotoView.m; sourceTree = "<group>"; };
 		86DE2369150DFBCA00156F38 /* AddPhotoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddPhotoView.xib; sourceTree = "<group>"; };
@@ -236,8 +255,10 @@
 			children = (
 				863D8F8A150CC4E5007E745D /* MainView.h */,
 				863D8F8B150CC4E5007E745D /* MainView.m */,
-				86967B21150DBF85006BEE8B /* DetailView.h */,
-				86967B22150DBF85006BEE8B /* DetailView.m */,
+				86D6083315170ADD00CE413B /* PostView.h */,
+				86D6083415170ADD00CE413B /* PostView.m */,
+				86967B21150DBF85006BEE8B /* PostsView.h */,
+				86967B22150DBF85006BEE8B /* PostsView.m */,
 				86967B3F150DCD49006BEE8B /* AddCommentView.h */,
 				86967B40150DCD49006BEE8B /* AddCommentView.m */,
 				86DE2367150DFBCA00156F38 /* AddPhotoView.h */,
@@ -250,9 +271,10 @@
 				864305141510B75100B44122 /* AuthorizationView.m */,
 				864305181510B83600B44122 /* SignupView.h */,
 				864305191510B83600B44122 /* SignupView.m */,
-				8643051A1510B83600B44122 /* SignupView.xib */,
 				86B0838A15134BFA0053E1FA /* AddVideoView.h */,
 				86B0838B15134BFB0053E1FA /* AddVideoView.m */,
+				868DDE3E1517B9170012BBEF /* AddTextView.h */,
+				868DDE3F1517B9170012BBEF /* AddTextView.m */,
 			);
 			name = Controllers;
 			path = HumorLine;
@@ -313,12 +335,12 @@
 		864E8172150E6309008CF1AA /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				868DDE3B1517B0CE0012BBEF /* Comment.h */,
+				868DDE3C1517B0CE0012BBEF /* Comment.m */,
 				86C0EAE21516355B0057C3C8 /* Post.h */,
 				86C0EAE31516355B0057C3C8 /* Post.m */,
 				86C0EADF1516355A0057C3C8 /* Image.h */,
 				86C0EAE01516355A0057C3C8 /* Image.m */,
-				86C0EADC1516355A0057C3C8 /* Comment.h */,
-				86C0EADD1516355A0057C3C8 /* Comment.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -336,13 +358,16 @@
 			isa = PBXGroup;
 			children = (
 				863D8F8C150CC4E5007E745D /* MainView.xib */,
-				86967B23150DBF85006BEE8B /* DetailView.xib */,
+				86967B23150DBF85006BEE8B /* PostsView.xib */,
+				86D6083515170ADD00CE413B /* PostView.xib */,
 				86967B41150DCD49006BEE8B /* AddCommentView.xib */,
 				86DE2369150DFBCA00156F38 /* AddPhotoView.xib */,
 				86B0838C15134BFB0053E1FA /* AddVideoView.xib */,
+				868DDE401517B9170012BBEF /* AddTextView.xib */,
 				864304F6150F234500B44122 /* AddTrololoView.xib */,
 				864304FB150F520900B44122 /* TrololoView.xib */,
 				864305151510B75200B44122 /* AuthorizationView.xib */,
+				8643051A1510B83600B44122 /* SignupView.xib */,
 			);
 			name = Views;
 			path = HumorLine;
@@ -362,6 +387,7 @@
 		8697EDAA150DB2CC00090679 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				86D608241516E61300CE413B /* Custom Badge */,
 				86B083711512F8490053E1FA /* EGORefreshTableHeaderView */,
 				865FF410150DB53700ACDAAD /* MBProgressHud */,
 				8697EDAB150DB2DA00090679 /* SDWebImage */,
@@ -418,6 +444,19 @@
 			name = EGOTableViewRefreshHeaderView;
 			sourceTree = "<group>";
 		};
+		86D608241516E61300CE413B /* Custom Badge */ = {
+			isa = PBXGroup;
+			children = (
+				868DDE431517B93B0012BBEF /* CustomBadge.h */,
+				868DDE441517B93B0012BBEF /* CustomBadge.m */,
+				868DDE451517B93B0012BBEF /* CustomBadgeAppDelegate.h */,
+				868DDE461517B93B0012BBEF /* CustomBadgeAppDelegate.m */,
+				868DDE471517B93B0012BBEF /* CustomBadgeViewController.h */,
+				868DDE481517B93B0012BBEF /* CustomBadgeViewController.m */,
+			);
+			name = "Custom Badge";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -470,7 +509,7 @@
 			files = (
 				863D8F70150CC1E3007E745D /* InfoPlist.strings in Resources */,
 				863D8F8E150CC4E5007E745D /* MainView.xib in Resources */,
-				86967B25150DBF85006BEE8B /* DetailView.xib in Resources */,
+				86967B25150DBF85006BEE8B /* PostsView.xib in Resources */,
 				86967B43150DCD49006BEE8B /* AddCommentView.xib in Resources */,
 				86DE236B150DFBCA00156F38 /* AddPhotoView.xib in Resources */,
 				864304F1150F225900B44122 /* Default.png in Resources */,
@@ -497,6 +536,8 @@
 				86B083841512F8A40053E1FA /* whiteArrow.png in Resources */,
 				86B083851512F8A40053E1FA /* whiteArrow@2x.png in Resources */,
 				86B0838E15134BFB0053E1FA /* AddVideoView.xib in Resources */,
+				86D6083715170ADD00CE413B /* PostView.xib in Resources */,
+				868DDE421517B9170012BBEF /* AddTextView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,7 +552,7 @@
 				863D8F76150CC1E3007E745D /* AppDelegate.m in Sources */,
 				863D8F8D150CC4E5007E745D /* MainView.m in Sources */,
 				86392A22150DBEBA00472D00 /* MBProgressHUD.m in Sources */,
-				86967B24150DBF85006BEE8B /* DetailView.m in Sources */,
+				86967B24150DBF85006BEE8B /* PostsView.m in Sources */,
 				86967B28150DC282006BEE8B /* MainMenu.m in Sources */,
 				86967B42150DCD49006BEE8B /* AddCommentView.m in Sources */,
 				86DE236A150DFBCA00156F38 /* AddPhotoView.m in Sources */,
@@ -530,9 +571,14 @@
 				86B083611512F0BA0053E1FA /* ImageToDataTransformer.m in Sources */,
 				86B0838D15134BFB0053E1FA /* AddVideoView.m in Sources */,
 				86C0EAB415161BE00057C3C8 /* EGORefreshTableHeaderView.m in Sources */,
-				86C0EADE1516355A0057C3C8 /* Comment.m in Sources */,
 				86C0EAE11516355A0057C3C8 /* Image.m in Sources */,
 				86C0EAE41516355B0057C3C8 /* Post.m in Sources */,
+				86D6083615170ADD00CE413B /* PostView.m in Sources */,
+				868DDE3D1517B0CE0012BBEF /* Comment.m in Sources */,
+				868DDE411517B9170012BBEF /* AddTextView.m in Sources */,
+				868DDE491517B93B0012BBEF /* CustomBadge.m in Sources */,
+				868DDE4A1517B93B0012BBEF /* CustomBadgeAppDelegate.m in Sources */,
+				868DDE4B1517B93B0012BBEF /* CustomBadgeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
