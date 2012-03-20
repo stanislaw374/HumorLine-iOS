@@ -14,6 +14,7 @@
 #import "AddVideoView.h"
 #import "PostsView.h"
 #import "AddTextView.h"
+#import "OnMapView.h"
 
 @interface MainMenu()
 - (void)onLoginButtonClick;
@@ -202,6 +203,15 @@
             case 0:
                 //[self.viewController.navigationController pushViewController:self.authorizationView animated:YES];
                 break;
+            case 1:
+                break;
+            case 2:
+            {
+                OnMapView *onMapView = [[OnMapView alloc] init];
+                //onMapView.fetchedResultsController = self.viewController.fetchedResultsController;
+                [self.viewController.navigationController pushViewController:onMapView animated:YES];
+                break;
+            }
         }
     }
 }

@@ -9,7 +9,7 @@
 #import "MainView.h"
 #import "UIButton+WebCache.h"
 #import "MBProgressHUD.h"
-#import "MainMenu.h"
+//#import "MainMenu.h"
 #import "Constants.h"
 #import "PostsView.h"
 #import <QuartzCore/QuartzCore.h>
@@ -18,6 +18,11 @@
 #import "Image.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "CustomBadge.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "AddPhotoView.h"
+#import "AddVideoView.h"
+#import "AddTextView.h"
+#import "OnMapView.h"
 
 #define kCELL_ID1 @"Cell1"
 #define kCELL_ID2 @"Cell2"
@@ -27,13 +32,23 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 
 @interface MainView()
 - (void)onButtonClick:(id)sender;
-@property (nonatomic, strong) MainMenu *mainMenu;
-@property (nonatomic, strong) PostsView *postsView;
-@property (nonatomic, strong) NSArray *dataSource;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, strong) PostsView *postsView;
+//@property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) EGORefreshTableHeaderView *refreshTableHeaderView;
 @property (nonatomic) BOOL isLoading;
 @property (nonatomic, strong) NSMutableArray *players;
+@property (nonatomic) int rowsCount;
+@property (nonatomic) BOOL isMenuOpened;
+@property (nonatomic, strong) UIImagePickerController *imagePicker;
+@property (nonatomic, strong) UIActionSheet *photoActionSheet;
+@property (nonatomic, strong) UIActionSheet *videoActionSheet;
+@property (nonatomic, strong) AddPhotoView *addPhotoView;
+@property (nonatomic, strong) AddVideoView *addVideoView;
+@property (nonatomic, strong) AddTextView *addTextView;
+@property (nonatomic, strong) OnMapView *onMapView;
+@property (nonatomic) BOOL isMenuMaximized;
 - (void)setButtonContent:(UIButton *)button withPost:(Post *)post;
 - (NSManagedObjectContext *)managedObjectContext;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -45,26 +60,77 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 
 @implementation MainView
 @synthesize tableView = _tableView;
-@synthesize mainMenu = _mainMenu;
+@synthesize menuButton = _menuButton;
+@synthesize menu = _menu;
+@synthesize menuMaximized = _menuMaximized;
 @synthesize postsView = _postsView;
-@synthesize dataSource = _dataSource;
+//@synthesize dataSource = _dataSource;
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize refreshTableHeaderView = _refreshTableHeaderView;
 @synthesize isLoading = _isLoading;
 @synthesize players = _players;
-
-/*
- - (NSFetchedResultsController *)fetchedResultsController {
- // Set up the fetched results controller if needed.
- if (fetchedResultsController == nil) {
- 
- }
- 
- return fetchedResultsController;
- } 
- */
+@synthesize rowsCount = _rowsCount;
+@synthesize isMenuOpened = _isMenuOpened;
+@synthesize imagePicker = _imagePicker;
+@synthesize photoActionSheet = _photoActionSheet;
+@synthesize videoActionSheet = _videoActionSheet;
+@synthesize addPhotoView = _addPhotoView;
+@synthesize addVideoView = _addVideoView;
+@synthesize addTextView = _addTextView;
+@synthesize onMapView = _onMapView;
+@synthesize isMenuMaximized = _isMenuMaximized;
 
 #pragma mark - Lazy Instantiation
+
+- (OnMapView *)onMapView {
+    if (!_onMapView) {
+        _onMapView = [[OnMapView alloc] init];
+    }
+    return _onMapView;
+}
+
+- (AddPhotoView *)addPhotoView {
+    if (!_addPhotoView) {
+        _addPhotoView = [[AddPhotoView alloc] init];
+    }
+    return _addPhotoView;
+}
+
+- (AddVideoView *)addVideoView {
+    if (!_addVideoView) {
+        _addVideoView = [[AddVideoView alloc] init];
+    }
+    return _addVideoView;
+}
+
+- (AddTextView *)addTextView {
+    if (!_addTextView) {
+        _addTextView = [[AddTextView alloc] init];
+    }
+    return _addTextView;
+}
+
+- (UIActionSheet *)photoActionSheet {
+    if (!_photoActionSheet) {
+        _photoActionSheet = [[UIActionSheet alloc] initWithTitle:@"Фото" delegate:self cancelButtonTitle:@"Отмена" destructiveButtonTitle:nil otherButtonTitles:@"Выбрать из библиотеки", @"Сделать фото", nil];
+    }
+    return _photoActionSheet;
+}
+
+- (UIActionSheet *)videoActionSheet {
+    if (!_videoActionSheet) {
+        _videoActionSheet = [[UIActionSheet alloc] initWithTitle:@"Видео" delegate:self cancelButtonTitle:@"Отмена" destructiveButtonTitle:nil otherButtonTitles:@"Выбрать из библиотеки", @"Снять видео", nil];
+    }
+    return _videoActionSheet;
+}
+
+- (UIImagePickerController *)imagePicker {
+    if (!_imagePicker) {
+        _imagePicker = [[UIImagePickerController alloc] init];
+        _imagePicker.delegate = self;
+    }
+    return _imagePicker;
+}
 
 - (PostsView *)postsView {
     if (!_postsView) {
@@ -94,14 +160,14 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
         [fetchRequest setEntity:entity];
         
         // Edit the sort key as appropriate.
-        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"likesCount" ascending:NO];
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
         NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
         
         [fetchRequest setSortDescriptors:sortDescriptors];
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:[self managedObjectContext] sectionNameKeyPath:nil cacheName:@"Root"];
+        NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:[self managedObjectContext] sectionNameKeyPath:nil cacheName:@"Main"];
         //aFetchedResultsController.delegate = self;
         _fetchedResultsController = aFetchedResultsController;
     }
@@ -115,19 +181,19 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 //    return _detailView;
 //}
 
-- (MainMenu *)mainMenu {
-    if (!_mainMenu) {
-        _mainMenu = [[MainMenu alloc] initWithViewController:self];
-    }
-    return _mainMenu;
-}
+//- (MainMenu *)mainMenu {
+//    if (!_mainMenu) {
+//        _mainMenu = [[MainMenu alloc] initWithViewController:self];
+//    }
+//    return _mainMenu;
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"HumorLine";
+        //self.title = @"HumorLine";
     }
     return self;
 }
@@ -146,11 +212,10 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [self.mainMenu addAddButton];
-    [self.mainMenu addLoginButton];
+    //[self.mainMenu addAddButton];
+    //[self.mainMenu addLoginButton];
     
     self.refreshTableHeaderView = [[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0, 0 - self.tableView.frame.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height) arrowImageName:@"whiteArrow.png" textColor:[UIColor whiteColor]];
-    //self.refreshTableHeaderView = [[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0, 0 - self.tableView.frame.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height)];
     self.refreshTableHeaderView.delegate = self;
     [self.tableView addSubview:self.refreshTableHeaderView];
     
@@ -162,6 +227,9 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 {
     self.fetchedResultsController = nil;
     [self setTableView:nil];
+    [self setMenuButton:nil];
+    [self setMenu:nil];
+    [self setMenuMaximized:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;    
@@ -176,9 +244,8 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 #pragma mark - UITableViewDataSource
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {    
     id<NSFetchedResultsSectionInfo> info = [self.fetchedResultsController.sections objectAtIndex:section];
-    
     NSLog(@"Number of objects : %d", [info numberOfObjects]);
-    //[info numberOfObjects] % 3;
+    
     int result = [info numberOfObjects] / 3 + 1;
     if ([info numberOfObjects] % 3) result++;
     return result;
@@ -238,13 +305,7 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 }
 
 - (void)setButtonContent:(UIButton *)button withPost:(Post *)post {    
-    button.layer.borderWidth = 1;
-    
-    CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
-    if (badge) {
-        badge.badgeText = [NSString stringWithFormat:@"%d", post.likesCount];
-        badge.hidden = NO;
-    }
+    button.layer.borderWidth = 10;
     
     switch (post.type) {
         case kPostTypePhoto: {
@@ -264,9 +325,21 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
             player.scalingMode = MPMovieScalingModeAspectFit;
             player.view.userInteractionEnabled = NO;
             [button addSubview:player.view];
+            
             [self.players addObject:player];
             break;
         }
+    }
+    
+    CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
+    if (badge) {
+        badge.hidden = NO;
+        badge.badgeText = [NSString stringWithFormat:@"%d", post.likesCount];
+        [badge setNeedsDisplay];
+        [button bringSubviewToFront:badge];
+    }
+    else {
+        NSLog(@"Could not find badge!");
     }
 }
 
@@ -305,6 +378,7 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
 }
 
 - (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    //cell.backgroundColor = [UIColor blackColor];
     switch (indexPath.row) {
         case 0:
         {
@@ -318,6 +392,7 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
             button.layer.borderColor = [[UIColor whiteColor] CGColor];
             button.contentMode = UIViewContentModeScaleAspectFit;
             button.tag = indexPath.row + 1;
+            button.backgroundColor = [UIColor blackColor];
             
             [cell addSubview:button];
             
@@ -339,6 +414,7 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
             button1.layer.borderColor = [[UIColor whiteColor] CGColor];
             button1.contentMode = UIViewContentModeScaleAspectFit;
             button1.tag = indexPath.row + 1;
+            button1.backgroundColor = [UIColor blackColor];
             //[self setButtonContent:button1 withPost:post];
             
             //post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
@@ -349,6 +425,7 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
             button2.layer.borderColor = [[UIColor whiteColor] CGColor];
             button2.contentMode = UIViewContentModeScaleAspectFit;
             button2.tag = indexPath.row + 2;
+            button2.backgroundColor = [UIColor blackColor];
             //[self setButtonContent:button2 withPost:post];
             
             [cell addSubview:button1];
@@ -382,18 +459,21 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
             button1.layer.borderColor = [[UIColor whiteColor] CGColor];
             button1.contentMode = UIViewContentModeScaleAspectFit;
             button1.tag = offset + 1;
+            button1.backgroundColor = [UIColor blackColor];
             
             UIButton *button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
             [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
             button2.layer.borderColor = [[UIColor whiteColor] CGColor];
             button2.contentMode = UIViewContentModeScaleAspectFit;
             button2.tag = offset + 2;
+            button2.backgroundColor = [UIColor blackColor];
             
             UIButton *button3 = [[UIButton alloc] initWithFrame:CGRectMake(button2.frame.origin.x + button2.frame.size.width + dx, sy, buttonSize, buttonSize)];                
             [button3 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
             button3.layer.borderColor = [[UIColor whiteColor] CGColor];
             button3.contentMode = UIViewContentModeScaleAspectFit;
             button3.tag = offset + 3;
+            button3.backgroundColor = [UIColor blackColor];
             
             [cell addSubview:button1];
             [cell addSubview:button2];  
@@ -535,12 +615,219 @@ enum { kTAG_BADGE = 47, kTAG_VIDEO_PLAYER };
     if (error) {
         NSLog(@"Fetch error: %@", error.localizedDescription);
     }
+//    else {
+//        self.rowsCount = 0;
+//        for (int i = 0; i < self.fetchedResultsController.fetchedObjects.count - 1; i++) {
+//            int sequentalCount = 0;
+//            while (1) {
+//                
+//            }
+//        }
+//    }
 }
 
 - (void)doneReloadingTableViewDataSource {
     self.isLoading = NO;
     [self.refreshTableHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
     [self.tableView reloadData];
+}
+
+//- (IBAction)onMenu1Click:(id)sender {
+//    [UIView animateWithDuration:0.3f animations:^ {
+//        CGAffineTransform transform = CGAffineTransformMakeTranslation(0, -85);
+//        self.menuButton1.transform = transform;
+//        self.menuView.transform = transform;
+//    } completion:^(BOOL finished) {
+//        self.menuButton1.hidden = YES;
+//    }];
+//}
+//
+//- (IBAction)onMenu2Click:(id)sender {
+//    [UIView animateWithDuration:0.3f animations:^{
+//        CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 1);
+//        self.menuView.transform = transform;
+//        self.menuButton1.transform = transform;        
+//    } completion:^(BOOL finished) {
+//        self.menuButton1.hidden = NO;
+//    }];
+//}
+//
+//- (IBAction)onAddButtonClick:(id)sender {
+//    if (!self.isMenuMaximized) {
+//        self.menuViewMaximized.hidden = NO;
+//        [UIView animateWithDuration:0.5f animations:^{
+//            CGAffineTransform tr = CGAffineTransformMakeTranslation(0, -85);
+//            self.menuViewMaximized.transform = tr;
+//        } completion:^(BOOL finished) {
+//            self.isMenuMaximized = YES;
+//        }];
+//    }
+//    else {
+//        [UIView animateWithDuration:0.5f animations:^{
+//            CGAffineTransform tr = CGAffineTransformMakeTranslation(0, 1);
+//            self.menuViewMaximized.transform = tr;
+//        } completion:^(BOOL finished) {
+//            self.isMenuMaximized = NO;
+//            self.menuViewMaximized.hidden = YES;
+//        }];
+//    }
+//}
+#pragma mark - Menu
+- (IBAction)onAddButtonClick:(id)sender {
+    if (!self.isMenuMaximized) {
+        self.menuMaximized.hidden = NO;
+        CGRect frame = self.menuButton.frame;
+        frame.origin.y -= 85;
+        self.menuButton.frame = frame;
+        self.isMenuMaximized = YES;
+    }
+    else {
+        self.menuMaximized.hidden = YES;
+        CGRect frame = self.menuButton.frame;
+        frame.origin.y += 85;
+        self.menuButton.frame = frame;
+        self.isMenuMaximized = NO;
+    }
+}
+
+- (IBAction)onLoginButtonClick:(id)sender {
+}
+
+- (IBAction)onTop30ButtonClick:(id)sender {
+}
+
+- (IBAction)onMapButtonClick:(id)sender {
+    [self.navigationController pushViewController:self.onMapView animated:YES];
+}
+
+- (IBAction)onTrololoButtonClick:(id)sender {
+}
+
+- (IBAction)onPhotoButtonClick:(id)sender {
+    [self.photoActionSheet showInView:self.view];
+}
+
+- (IBAction)onVideoButtonClick:(id)sender {
+    [self.videoActionSheet showInView:self.view];
+}
+
+- (IBAction)onTextButtonClick:(id)sender {
+    [self presentModalViewController:self.addTextView animated:YES];
+}
+
+
+- (IBAction)onMenuButtonClick:(id)sender {
+    if (!self.isMenuOpened) { 
+        if (!self.isMenuMaximized) {
+            [UIView animateWithDuration:0.3f animations:^{
+                CGRect frame = self.menuButton.frame;
+                frame.origin.y -= 85;
+                self.menuButton.frame = frame;
+                frame = self.menu.frame;
+                frame.origin.y -= 85;
+                self.menu.frame = frame;
+            } completion:^(BOOL finished) {
+                [self.menuButton setImage:[UIImage imageNamed:@"menu_button_pressed"] forState:UIControlStateNormal];
+                self.isMenuOpened = YES;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.3f animations:^{
+                CGRect frame = self.menuButton.frame;
+                frame.origin.y -= 85 * 2;
+                self.menuButton.frame = frame;
+                frame = self.menu.frame;
+                frame.origin.y -= 85;
+                self.menu.frame = frame;
+                frame = self.menuMaximized.frame;
+                frame.origin.y -= 85 * 2;
+                self.menuMaximized.frame = frame;
+            } completion:^(BOOL finished) {
+                [self.menuButton setImage:[UIImage imageNamed:@"menu_button_pressed"] forState:UIControlStateNormal];
+                self.isMenuOpened = YES;
+            }];
+        }
+    }
+    else {
+        if (!self.isMenuMaximized) {
+            [UIView animateWithDuration:0.3f animations:^{
+                CGRect frame = self.menuButton.frame;
+                frame.origin.y += 85;
+                self.menuButton.frame = frame;
+                frame = self.menu.frame;
+                frame.origin.y += 85;
+                self.menu.frame = frame;
+            } completion:^(BOOL finished) {
+                [self.menuButton setImage:[UIImage imageNamed:@"menu_button"] forState:UIControlStateNormal];
+                self.isMenuOpened = NO;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.3f animations:^{
+                CGRect frame = self.menuButton.frame;
+                frame.origin.y += 85 * 2;
+                self.menuButton.frame = frame;
+                frame = self.menu.frame;
+                frame.origin.y += 85;
+                self.menu.frame = frame;
+                frame = self.menuMaximized.frame;
+                frame.origin.y += 85 * 2;
+                self.menuMaximized.frame = frame;
+            } completion:^(BOOL finished) {
+                [self.menuButton setImage:[UIImage imageNamed:@"menu_button"] forState:UIControlStateNormal];
+                self.isMenuOpened = NO;
+            }];
+        }
+    }
+}
+
+#pragma mark - UIActionSheetDelegate
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if ([actionSheet isEqual:self.photoActionSheet]) {
+        UIImagePickerControllerSourceType sourceType;
+        switch (buttonIndex) {
+            case 0:
+                sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                break;
+            case 1:
+                sourceType = UIImagePickerControllerSourceTypeCamera;
+                break;
+        }
+        if (![UIImagePickerController isSourceTypeAvailable:sourceType]) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Источник не доступен" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+            [alert show];
+        }
+        else {
+            self.imagePicker.sourceType = sourceType;
+            [self presentModalViewController:self.imagePicker animated:YES];
+        }
+    }
+}
+
+#pragma mark - UIImagePickerDelegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [self dismissModalViewControllerAnimated:NO];
+    
+    CFStringRef mediaType = (__bridge CFStringRef)[info objectForKey:UIImagePickerControllerMediaType];
+    
+    if (CFStringCompare (mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        //AddPhotoView *addPhotoView = [[AddPhotoView alloc] init];
+        self.addPhotoView.image = image;
+        [self presentModalViewController:self.addPhotoView animated:YES];
+    }
+    else if (CFStringCompare(mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
+        NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+        //NSLog(@"videoURL : %@", videoURL.description);
+        
+        //AddVideoView *addVideoView = [[AddVideoView alloc] init];
+        self.addVideoView.videoURL = videoURL;
+        [self presentModalViewController:self.addVideoView animated:YES];
+    }    
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 @end

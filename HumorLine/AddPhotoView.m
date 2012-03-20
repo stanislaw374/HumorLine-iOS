@@ -44,7 +44,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Добавить фото";
+        //self.title = @"Добавить фото";
     }
     return self;
 }
@@ -109,6 +109,7 @@
     post.type = kPostTypePhoto;
     post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
     post.image.image = image;
+    post.date = [NSDate date];
     
     if (self.swAddLocation.on) {
         post.lat = self.locationManager.location.coordinate.latitude;

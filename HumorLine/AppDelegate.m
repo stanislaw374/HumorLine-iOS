@@ -11,6 +11,7 @@
 #import "Post.h"
 #import "Image.h"
 #import "Constants.h"
+#import "SCAppUtils.h"
 
 @interface AppDelegate()
 @property (nonatomic, strong) UINavigationController *navigationController;
@@ -32,7 +33,8 @@
 - (UINavigationController *)navigationController {
     if (!_navigationController) {
         _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
-        _navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        //_navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        [SCAppUtils customizeNavigationController:_navigationController];
     }
     return _navigationController;
 }
@@ -196,6 +198,7 @@
    
     for (int i = 0; i < 7; i++) {            
         Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+        newPost.date = [NSDate date];
         newPost.type = kPostTypePhoto;
         newPost.likesCount = arc4random() % 100;    
         Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
@@ -204,6 +207,7 @@
     }
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
     newPost.type = kPostTypeText;
+    newPost.date = [NSDate date];
     newPost.text = @"Хотел как лучше получилось как всегда";
     
     NSError *error;

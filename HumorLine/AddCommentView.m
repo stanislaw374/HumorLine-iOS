@@ -10,17 +10,25 @@
 #import "MainMenu.h"
 #import "Constants.h"
 #import "UIImageView+WebCache.h"
+#import "Comment.h"
+#import "AppDelegate.h"
+#import "Image.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @interface AddCommentView()
 @property (nonatomic, strong) MainMenu *mainMenu;
+@property (nonatomic, strong) MPMoviePlayerController *player;
 @end
 
 @implementation AddCommentView
-@synthesize imageView = _imageView;
+//@synthesize imageView = _imageView;
 @synthesize textView = _textView;
 @synthesize lblWordsCount = _lblWordsCount;
+@synthesize contentView = _contentView;
 @synthesize mainMenu = _mainMenu;
 //@synthesize currentPicture = _currentPicture;
+@synthesize post = _post;
+@synthesize player = _player;
 
 - (MainMenu *)mainMenu {
     if (!_mainMenu) {
@@ -34,7 +42,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Добавить коммент";
+        //self.title = @"Добавить коммент";
     }
     return self;
 }
@@ -54,6 +62,43 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     [self.mainMenu addLoginButton];
+    
+    switch (self.post.type) {
+        case kPostTypePhoto:
+        {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:self.post.image.image];
+            imageView.contentMode = UIViewContentModeScaleAspectFit;
+            imageView.frame = CGRectMake(0, 0, self.contentView.frame.size.width, self.contentView.frame.size.height);        
+            imageView.autoresizingMask = self.contentView.autoresizingMask;
+            //NSLog(@"imageView frame = %@", NSStringFromCGRect(imageView.frame));
+            [self.contentView addSubview:imageView];
+            break;
+        }
+        case kPostTypeVideo:
+        {
+            self.player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:self.post.videoURL]];
+            self.player.shouldAutoplay = NO;
+            self.player.scalingMode = MPMovieScalingModeAspectFit;
+            self.player.view.frame = CGRectMake(0, 0, self.contentView.frame.size.width, self.contentView.frame.size.height);
+            self.player.view.autoresizingMask = self.contentView.autoresizingMask;            
+            [self.contentView addSubview:self.player.view];
+            break;
+        }
+        case kPostTypeText:
+        {
+            UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, self.contentView.frame.size.height)];
+            lbl.numberOfLines = 0;
+            lbl.lineBreakMode = UILineBreakModeWordWrap;
+            lbl.text = self.post.text;
+            lbl.autoresizingMask = self.contentView.autoresizingMask;
+            lbl.backgroundColor = [UIColor clearColor];
+            lbl.textAlignment = UITextAlignmentCenter;
+            lbl.font = [UIFont boldSystemFontOfSize:24];
+            lbl.textColor = [UIColor whiteColor];
+            [self.contentView addSubview:lbl];
+            break;
+        }
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -64,9 +109,10 @@
 
 - (void)viewDidUnload
 {
-    [self setImageView:nil];
+    //[self setImageView:nil];
     [self setTextView:nil];
     [self setLblWordsCount:nil];
+    [self setContentView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -79,13 +125,27 @@
 }
 
 - (IBAction)onAddButtonClick:(id)sender {
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    Comment *newComment = [NSEntityDescription insertNewObjectForEntityForName:@"Comment" inManagedObjectContext:appDelegate.managedObjectContext];
+    newComment.date = [NSDate date];
+    newComment.text = self.textView.text;
+    
+    [self.post addCommentsObject:newComment];
+    
+    NSError *error;
+    [appDelegate.managedObjectContext save:&error];
+    if (error) {
+        NSLog(@"Error saving : %@", error.localizedDescription);
+    }
+    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ваш комментарий добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
-    [self.navigationController popViewControllerAnimated:YES];
+    
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark - UITextViewDelegate

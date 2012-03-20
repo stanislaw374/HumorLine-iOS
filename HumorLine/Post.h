@@ -15,6 +15,7 @@ typedef enum { kPostTypePhoto, kPostTypeVideo, kPostTypeText } PostType;
 
 @interface Post : NSManagedObject
 
+@property (nonatomic, retain) NSDate *date;
 @property (nonatomic) double lat;
 @property (nonatomic) int32_t likesCount;
 @property (nonatomic) double lng;
@@ -28,7 +29,6 @@ typedef enum { kPostTypePhoto, kPostTypeVideo, kPostTypeText } PostType;
 @end
 
 @interface Post (CoreDataGeneratedAccessors)
-
 - (void)addCommentsObject:(Comment *)value;
 - (void)removeCommentsObject:(Comment *)value;
 - (void)addComments:(NSSet *)values;

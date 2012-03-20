@@ -103,7 +103,7 @@
 
 - (IBAction)onAddButtonClick:(id)sender {
     if ([self saveVideo]) {
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.presentingViewController dismissModalViewControllerAnimated:YES];
     }
 }
 
@@ -131,6 +131,7 @@
     Post *newPost = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
     newPost.type = kPostTypeVideo;
     newPost.title = self.lblTitle.text;
+    newPost.date = [NSDate date];
     
     if (self.swAddLocation.on) {
         newPost.lat = self.locationManager.location.coordinate.latitude;

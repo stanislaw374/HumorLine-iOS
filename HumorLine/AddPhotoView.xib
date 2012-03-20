@@ -82,7 +82,7 @@
 					</object>
 					<object class="IBUIScrollView" id="268771028">
 						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">306</int>
+						<int key="NSvFlags">274</int>
 						<array class="NSMutableArray" key="NSSubviews">
 							<object class="IBUIImageView" id="54673894">
 								<reference key="NSNextResponder" ref="268771028"/>
@@ -90,7 +90,7 @@
 								<string key="NSFrameSize">{280, 188}</string>
 								<reference key="NSSuperview" ref="268771028"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="882348718"/>
+								<reference key="NSNextKeyView" ref="442667862"/>
 								<string key="NSReuseIdentifierKey">_NS:567</string>
 								<int key="IBUIContentMode">1</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
@@ -102,7 +102,7 @@
 								<string key="NSFrame">{{0, 190}, {280, 21}}</string>
 								<reference key="NSSuperview" ref="268771028"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="227445811"/>
+								<reference key="NSNextKeyView" ref="882348718"/>
 								<string key="NSReuseIdentifierKey">_NS:328</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -137,7 +137,7 @@
 								<string key="NSFrame">{{0, 212}, {280, 21}}</string>
 								<reference key="NSSuperview" ref="268771028"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="442667862"/>
+								<reference key="NSNextKeyView" ref="227445811"/>
 								<string key="NSReuseIdentifierKey">_NS:328</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -336,6 +336,7 @@
 						<string key="NSFrame">{{0, 416}, {320, 44}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:371</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>

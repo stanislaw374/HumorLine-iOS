@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "Post.h"
 
 @interface AddCommentView : UIViewController <UITextViewDelegate>
-@property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
+@property (unsafe_unretained, nonatomic) Post *post;
 @property (unsafe_unretained, nonatomic) IBOutlet UITextView *textView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblWordsCount;
-//@property (unsafe_unretained, nonatomic) Picture *currentPicture;
+@property (unsafe_unretained, nonatomic) IBOutlet UIView *contentView;
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onCancelButtonClick:(id)sender;
 

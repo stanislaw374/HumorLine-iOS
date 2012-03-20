@@ -13,6 +13,7 @@
 
 @interface MainMenu : NSObject <UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
+
 - (id)initWithViewController:(UIViewController *)viewController;
 - (void)addAddButton;
 - (void)addLoginButton;

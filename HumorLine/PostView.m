@@ -52,7 +52,7 @@
             imageView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
             //imageView.userInteractionEnabled = NO;
             imageView.autoresizingMask = self.view.autoresizingMask;
-            NSLog(@"imageView frame = %@", NSStringFromCGRect(imageView.frame));
+            //NSLog(@"imageView frame = %@", NSStringFromCGRect(imageView.frame));
             [self.view addSubview:imageView];
             break;
         }

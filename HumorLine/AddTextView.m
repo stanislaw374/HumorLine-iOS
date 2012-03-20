@@ -87,6 +87,7 @@
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
     newPost.type = kPostTypeText;
     newPost.text = self.txtText.text;
+    newPost.date = [NSDate date];
     
     if (swAddLocation.on) {
         newPost.lat = self.locationManager.location.coordinate.latitude;

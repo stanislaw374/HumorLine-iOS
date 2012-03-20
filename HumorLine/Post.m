@@ -23,5 +23,6 @@
 @dynamic videoURL;
 @dynamic comments;
 @dynamic image;
+@dynamic date;
 
 @end

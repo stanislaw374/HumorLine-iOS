@@ -15,10 +15,11 @@
 #import "Image.h"
 #import "PostView.h"
 #import "Comment.h"
+#import "AppDelegate.h"
 
 @interface PostsView()
 @property (nonatomic, strong) MainMenu *mainMenu;
-@property (nonatomic, strong) AddCommentView *addCommentView;
+//@property (nonatomic, strong) AddCommentView *addCommentView;
 @property (nonatomic, strong) NSMutableArray *viewControllers;
 @property (nonatomic) int pagesCount;
 @property (nonatomic, strong) NSArray *comments;
@@ -32,7 +33,7 @@
 //@synthesize imageView;
 @synthesize btnContent;
 @synthesize mainMenu = _mainMenu;
-@synthesize addCommentView = _addCommentView;
+//@synthesize addCommentView = _addCommentView;
 //@synthesize post = _post;
 @synthesize scrollView;
 @synthesize ratingItem;
@@ -58,12 +59,12 @@
     return self.fetchedResultsController.fetchedObjects.count;
 }
 
-- (AddCommentView *)addCommentView {
-    if (!_addCommentView) {
-        _addCommentView = [[AddCommentView alloc] init];
-    }
-    return _addCommentView;
-}
+//- (AddCommentView *)addCommentView {
+//    if (!_addCommentView) {
+//        _addCommentView = [[AddCommentView alloc] init];
+//    }
+//    return _addCommentView;
+//}
 
 - (MainMenu *)mainMenu {
     if (!_mainMenu) {
@@ -77,7 +78,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Просмотр";
+        //self.title = @"Просмотр";
     }
     return self;
 }
@@ -138,14 +139,20 @@
 }
 
 - (IBAction)onPlusButtonClick:(id)sender {
-    //self.lblRating.text = [NSString stringWithFormat:@"%d", [self.lblRating.text intValue] + 1];
-    int value = [self.ratingItem.title intValue];
-    self.ratingItem.title = [NSString stringWithFormat:@"%d", value + 1];
+    Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
+    self.ratingItem.title = [NSString stringWithFormat:@"%d", ++post.likesCount];
+    
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    NSError *error;
+    if (![appDelegate.managedObjectContext save:&error]) {
+        NSLog(@"Error saving: %@", error.localizedDescription);
+    }
 }
 
 - (IBAction)onCommentButtonClick:(id)sender {
-    //self.addCommentView.currentPicture = self.currentPicture;
-    [self.navigationController pushViewController:self.addCommentView animated:YES];
+    AddCommentView *addCommentView = [[AddCommentView alloc] init];
+    addCommentView.post = [self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
+    [self presentModalViewController:addCommentView animated:YES];
 }
 
 - (IBAction)onFacebookButtonClick:(id)sender {
