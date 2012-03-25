@@ -7,14 +7,14 @@
 //
 
 #import "OnMapView.h"
-#import "MainMenu.h"
+//#import "MainMenu.h"
 #import "AppDelegate.h"
 #import "Post.h"
 #import "PostAnnotation.h"
 #import "PostsView.h"
 
 @interface OnMapView()
-@property (nonatomic, strong) MainMenu *mainMenu;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, strong) PostsView *postsView;
 - (void)addAnnotations;
@@ -22,7 +22,7 @@
 
 @implementation OnMapView
 @synthesize mapView;
-@synthesize mainMenu = _mainMenu;
+//@synthesize mainMenu = _mainMenu;
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize postsView = _postsView;
 
@@ -50,7 +50,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"На карте";
+        //self.title = @"На карте";
     }
     return self;
 }
@@ -72,8 +72,8 @@
     
     self.mapView.showsUserLocation = YES;
     
-    self.mainMenu = [[MainMenu alloc] initWithViewController:self];
-    [self.mainMenu addLoginButton];
+//    self.mainMenu = [[MainMenu alloc] initWithViewController:self];
+//    [self.mainMenu addLoginButton];
     
     NSError *error;
     if (![self.fetchedResultsController performFetch:&error]) {

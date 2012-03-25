@@ -33,7 +33,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Trololo";
+        //self.title = @"Trololo";
     }
     return self;
 }
@@ -70,10 +70,14 @@
 - (IBAction)onButtonClick:(id)sender {
     self.trololoView = [[TrololoView alloc] init];
     self.trololoView.imagesCount = ((UIButton *)sender).tag;
-    [self.navigationController pushViewController:self.trololoView animated:YES];    
+    
+    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
+    
+    [self.navigationController pushViewController:self.trololoView animated:YES];
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
+    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

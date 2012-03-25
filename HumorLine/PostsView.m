@@ -9,7 +9,7 @@
 #import "PostsView.h"
 #import "UIImageView+WebCache.h"
 #import "Constants.h"
-#import "MainMenu.h"
+//#import "MainMenu.h"
 #import "AddCommentView.h"
 #import "UIButton+WebCache.h"
 #import "Image.h"
@@ -18,7 +18,7 @@
 #import "AppDelegate.h"
 
 @interface PostsView()
-@property (nonatomic, strong) MainMenu *mainMenu;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 //@property (nonatomic, strong) AddCommentView *addCommentView;
 @property (nonatomic, strong) NSMutableArray *viewControllers;
 @property (nonatomic) int pagesCount;
@@ -32,7 +32,7 @@
 @synthesize lblComments;
 //@synthesize imageView;
 @synthesize btnContent;
-@synthesize mainMenu = _mainMenu;
+//@synthesize mainMenu = _mainMenu;
 //@synthesize addCommentView = _addCommentView;
 //@synthesize post = _post;
 @synthesize scrollView;
@@ -66,12 +66,12 @@
 //    return _addCommentView;
 //}
 
-- (MainMenu *)mainMenu {
-    if (!_mainMenu) {
-        _mainMenu = [[MainMenu alloc] initWithViewController:self];
-    }
-    return _mainMenu;
-}
+//- (MainMenu *)mainMenu {
+//    if (!_mainMenu) {
+//        _mainMenu = [[MainMenu alloc] initWithViewController:self];
+//    }
+//    return _mainMenu;
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -97,7 +97,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [self.mainMenu addLoginButton];    
+    //[self.mainMenu addLoginButton];    
 }
 
 - (void)viewWillAppear:(BOOL)animated {

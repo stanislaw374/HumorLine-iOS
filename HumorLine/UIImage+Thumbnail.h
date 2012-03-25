@@ -11,6 +11,7 @@
 @interface UIImage (Thumbnail)
 
 - (UIImage *)thumbnailOfSize:(CGSize)size;
+- (UIImage *)thumbnailByScalingToSize:(CGSize)size;
 - (UIImage *)thumbnailByScalingProportionallyAndCroppingToSize:(CGSize)size;
 - (UIImage *)thumbnailByScalingProportionallyToSize:(CGSize)targetSize;
 //- (UIImage*)imageByCropping:(UIImage *)imageToCrop toRect:(CGRect)rect;

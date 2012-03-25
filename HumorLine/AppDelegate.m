@@ -35,6 +35,7 @@
         _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
         //_navigationController.navigationBar.barStyle = UIBarStyleBlack;
         [SCAppUtils customizeNavigationController:_navigationController];
+        _navigationController.navigationBar.backgroundColor = [UIColor clearColor];
     }
     return _navigationController;
 }
@@ -209,6 +210,12 @@
     newPost.type = kPostTypeText;
     newPost.date = [NSDate date];
     newPost.text = @"Хотел как лучше получилось как всегда";
+    
+//    newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+//    newPost.type = kPostTypeVideo;
+//    newPost.date = [NSDate date];
+//    newPost.title = @"lol";
+//    newPost.videoURL = @"http://www.samkeeneinteractivedesign.com/videos/littleVid3.mp4";
     
     NSError *error;
     if (![self.managedObjectContext save:&error]) {

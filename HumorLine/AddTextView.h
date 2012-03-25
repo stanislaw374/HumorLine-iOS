@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface AddTextView : UIViewController <CLLocationManagerDelegate>
+@interface AddTextView : UIViewController <CLLocationManagerDelegate, UITextViewDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITextView *txtText;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
 - (IBAction)onSwAddLocationValueChanged:(id)sender;

@@ -24,7 +24,6 @@
 - (IBAction)onPhotoButtonClick:(id)sender;
 - (IBAction)onVideoButtonClick:(id)sender;
 - (IBAction)onTextButtonClick:(id)sender;
-
 - (IBAction)onMenuButtonClick:(id)sender;
 
 @end

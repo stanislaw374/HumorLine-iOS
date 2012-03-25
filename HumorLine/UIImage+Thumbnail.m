@@ -142,4 +142,8 @@
 //    return cropped;
 //}
 
+- (UIImage *)thumbnailByScalingToSize:(CGSize)size {
+    return nil;
+}
+
 @end

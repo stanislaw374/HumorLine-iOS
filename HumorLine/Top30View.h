@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "EGORefreshTableHeaderView.h"
 
-@interface Top30View : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface Top30View : UIViewController <UITableViewDataSource, UITableViewDelegate, EGORefreshTableHeaderDelegate, UIScrollViewDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
 @end

@@ -7,7 +7,7 @@
 //
 
 #import "AddCommentView.h"
-#import "MainMenu.h"
+//#import "MainMenu.h"
 #import "Constants.h"
 #import "UIImageView+WebCache.h"
 #import "Comment.h"
@@ -15,8 +15,10 @@
 #import "Image.h"
 #import <MediaPlayer/MediaPlayer.h>
 
+static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий";
+
 @interface AddCommentView()
-@property (nonatomic, strong) MainMenu *mainMenu;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 @property (nonatomic, strong) MPMoviePlayerController *player;
 @end
 
@@ -25,17 +27,17 @@
 @synthesize textView = _textView;
 @synthesize lblWordsCount = _lblWordsCount;
 @synthesize contentView = _contentView;
-@synthesize mainMenu = _mainMenu;
+//@synthesize mainMenu = _mainMenu;
 //@synthesize currentPicture = _currentPicture;
 @synthesize post = _post;
 @synthesize player = _player;
 
-- (MainMenu *)mainMenu {
-    if (!_mainMenu) {
-        _mainMenu = [[MainMenu alloc] initWithViewController:self];
-    }
-    return _mainMenu;
-}
+//- (MainMenu *)mainMenu {
+//    if (!_mainMenu) {
+//        _mainMenu = [[MainMenu alloc] initWithViewController:self];
+//    }
+//    return _mainMenu;
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -61,7 +63,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [self.mainMenu addLoginButton];
+    //[self.mainMenu addLoginButton];
     
     switch (self.post.type) {
         case kPostTypePhoto:
@@ -149,6 +151,12 @@
 }
 
 #pragma mark - UITextViewDelegate
+- (void)textViewDidBeginEditing:(UITextView *)textView {
+    if ([textView.text isEqualToString:kTEXTVIEW_PLACEHOLDER]) {
+        textView.text = @"";
+    }
+}
+
 - (void)textViewDidChange:(UITextView *)textView {
     //NSLog(@"%@", NSStringFromSelector(_cmd));
     

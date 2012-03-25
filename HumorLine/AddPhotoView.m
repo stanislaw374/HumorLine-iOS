@@ -12,6 +12,7 @@
 #import "Image.h"
 #import "AppDelegate.h"
 #import "Constants.h"
+#import "KeyboardListener.h"
 
 @interface AddPhotoView()
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -65,8 +66,11 @@
     // Do any additional setup after loading the view from its nib.
     self.imageView.image = self.image;
     
-    self.scrollView.layer.borderColor = [[UIColor whiteColor] CGColor];
-    self.scrollView.layer.borderWidth = 1;
+//    self.scrollView.layer.borderColor = [[UIColor whiteColor] CGColor];
+//    self.scrollView.layer.borderWidth = 1;
+    
+    self.imageView.layer.borderColor = [UIColor whiteColor].CGColor;
+    self.imageView.layer.borderWidth = 1;
 }
 
 - (void)viewDidUnload
@@ -160,6 +164,20 @@
         self.lblSubheader.text = textField.text;
     }
     return YES;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    if (![self.view isKindOfClass:[UIScrollView class]]) {
+        NSLog(@"self.view is not UIScrollView O_O");
+    }
+    
+//    [KeyboardListener setScrollView:(UIScrollView *)self.view];
+//    [KeyboardListener setActiveView:textField];    
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+//    [KeyboardListener unsetScrollView];
+//    [KeyboardListener unsetActiveView];
 }
 
 #pragma mark - CLLocationManagerDelegate
