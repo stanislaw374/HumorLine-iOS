@@ -2,20 +2,18 @@
 //  Post.h
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 18.03.12.
+//  Created by Yazhenskikh Stanislaw on 26.03.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-typedef enum { kPostTypePhoto, kPostTypeVideo, kPostTypeText } PostType;
-
-@class Comment, Image;
+@class Comment, Image, Like;
 
 @interface Post : NSManagedObject
 
-@property (nonatomic, retain) NSDate *date;
+@property (nonatomic) NSTimeInterval date;
 @property (nonatomic) double lat;
 @property (nonatomic) int32_t likesCount;
 @property (nonatomic) double lng;
@@ -26,11 +24,17 @@ typedef enum { kPostTypePhoto, kPostTypeVideo, kPostTypeText } PostType;
 @property (nonatomic, retain) NSString * videoURL;
 @property (nonatomic, retain) NSSet *comments;
 @property (nonatomic, retain) Image *image;
+@property (nonatomic, retain) NSSet *likes;
 @end
 
 @interface Post (CoreDataGeneratedAccessors)
+
 - (void)addCommentsObject:(Comment *)value;
 - (void)removeCommentsObject:(Comment *)value;
 - (void)addComments:(NSSet *)values;
 - (void)removeComments:(NSSet *)values;
+- (void)addLikesObject:(Like *)value;
+- (void)removeLikesObject:(Like *)value;
+- (void)addLikes:(NSSet *)values;
+- (void)removeLikes:(NSSet *)values;
 @end
