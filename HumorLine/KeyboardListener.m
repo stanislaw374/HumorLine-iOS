@@ -36,7 +36,7 @@ static UIView *_activeView = nil;
     _activeView = weakView;
 }
 
-+ (void)unsetActiveView:(UIView *)view {
++ (void)unsetActiveView {
     _activeView = nil;
 }
 

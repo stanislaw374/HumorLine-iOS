@@ -11,6 +11,6 @@
 
 @interface PostView : UIViewController
 
-@property (nonatomic, unsafe_unretained) Post *post;
+@property (nonatomic, strong) Post *post;
 
 @end

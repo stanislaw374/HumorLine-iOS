@@ -23,6 +23,7 @@
 @property (nonatomic, strong) NSMutableArray *viewControllers;
 @property (nonatomic) int pagesCount;
 @property (nonatomic, strong) NSArray *comments;
+@property (nonatomic) BOOL like;
 - (void)loadScrollViewWithPage:(int)page;
 - (void)initUIForCurrentPage;
 @end
@@ -41,9 +42,11 @@
 @synthesize fetchedResultsController = _fetchedResultsController;
 @synthesize currentPage = _currentPage;
 @synthesize tableView;
+@synthesize lblLikes;
 @synthesize pagesCount = _pagesCount;
 @synthesize viewControllers = _viewControllers;
 @synthesize comments = _comments;
+@synthesize like = _like;
 
 - (NSMutableArray *)viewControllers {
     if (!_viewControllers) {
@@ -127,6 +130,8 @@
     [self setBtnContent:nil];
     [self setScrollView:nil];
     [self setTableView:nil];
+    [self setLblLikes:nil];
+    [self setLblComments:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -139,20 +144,33 @@
 }
 
 - (IBAction)onPlusButtonClick:(id)sender {
-    Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-    self.ratingItem.title = [NSString stringWithFormat:@"%d", ++post.likesCount];
-    
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    NSError *error;
-    if (![appDelegate.managedObjectContext save:&error]) {
-        NSLog(@"Error saving: %@", error.localizedDescription);
+    if (!self.like) {    
+        Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
+        
+        //self.ratingItem.title = [NSString stringWithFormat:@"%d", ++post.likesCount];
+        
+        self.lblLikes.text = [NSString stringWithFormat:@"%d", ++post.likesCount];
+        
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        NSError *error;
+        if (![appDelegate.managedObjectContext save:&error]) {
+            NSLog(@"Error saving: %@", error.localizedDescription);
+        }
+        self.like = YES;
     }
 }
 
 - (IBAction)onCommentButtonClick:(id)sender {
     AddCommentView *addCommentView = [[AddCommentView alloc] init];
     addCommentView.post = [self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-    [self presentModalViewController:addCommentView animated:YES];
+    //[self presentModalViewController:addCommentView animated:YES];
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+    [UIView setAnimationDuration:0.75];
+    [self.navigationController pushViewController:addCommentView animated:NO];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:self.navigationController.view cache:NO];
+    [UIView commitAnimations];
 }
 
 - (IBAction)onFacebookButtonClick:(id)sender {
@@ -164,6 +182,7 @@
 #pragma mark - UITableViewDataSource
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
+    NSLog(@"%d", post.comments.count);
     return post.comments.count;
 }
 
@@ -184,15 +203,18 @@
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView_ {
-    int pageWidth = scrollView_.frame.size.width;
-    int page = floor((scrollView_.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-    self.currentPage = page;
-    
-    [self loadScrollViewWithPage:self.currentPage - 1];
-    [self loadScrollViewWithPage:self.currentPage];
-    [self loadScrollViewWithPage:self.currentPage + 1];
-    
-    [self initUIForCurrentPage];
+    if ([self.scrollView isEqual:scrollView_]) {
+            
+        int pageWidth = scrollView_.frame.size.width;
+        int page = floor((scrollView_.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+        self.currentPage = page;
+        
+        [self loadScrollViewWithPage:self.currentPage - 1];
+        [self loadScrollViewWithPage:self.currentPage];
+        [self loadScrollViewWithPage:self.currentPage + 1];
+        
+        [self initUIForCurrentPage];
+    }
 }
 
 - (void)loadScrollViewWithPage:(int)page {
@@ -223,12 +245,16 @@
 
 - (void)initUIForCurrentPage {
     Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-    self.ratingItem.title = [NSString stringWithFormat:@"%d", post.likesCount];
-    self.commentsItem.title = [NSString stringWithFormat:@"%d", post.comments.count];
+    //self.ratingItem.title = [NSString stringWithFormat:@"%d", post.likesCount];
+    //self.commentsItem.title = [NSString stringWithFormat:@"%d", post.comments.count];
+    
+    self.lblLikes.text = [NSString stringWithFormat:@"%d", post.likesCount];
     
     NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
     NSArray *descs = [[NSArray alloc] initWithObjects:desc, nil];
     self.comments = [post.comments sortedArrayUsingDescriptors:descs];
+    
+    self.lblComments.text = [NSString stringWithFormat:@"%d", post.comments.count];
     
     [self.tableView reloadData];
 }

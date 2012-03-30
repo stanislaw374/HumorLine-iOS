@@ -2,18 +2,21 @@
 //  Post.h
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 26.03.12.
+//  Created by Yazhenskikh Stanislaw on 28.03.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-@class Comment, Image, Like;
+enum { kPostTypeImage = 0, kPostTypeVideo, kPostTypeText } PostType;
+
+@class Comment, Image;
 
 @interface Post : NSManagedObject
 
-@property (nonatomic) NSTimeInterval date;
+@property (nonatomic, retain) NSDate *date;
+@property (nonatomic, retain) NSString * imageURL;
 @property (nonatomic) double lat;
 @property (nonatomic) int32_t likesCount;
 @property (nonatomic) double lng;
@@ -22,9 +25,9 @@
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic) int16_t type;
 @property (nonatomic, retain) NSString * videoURL;
+@property (nonatomic) int64_t postID;
 @property (nonatomic, retain) NSSet *comments;
 @property (nonatomic, retain) Image *image;
-@property (nonatomic, retain) NSSet *likes;
 @end
 
 @interface Post (CoreDataGeneratedAccessors)
@@ -33,8 +36,4 @@
 - (void)removeCommentsObject:(Comment *)value;
 - (void)addComments:(NSSet *)values;
 - (void)removeComments:(NSSet *)values;
-- (void)addLikesObject:(Like *)value;
-- (void)removeLikesObject:(Like *)value;
-- (void)addLikes:(NSSet *)values;
-- (void)removeLikes:(NSSet *)values;
 @end

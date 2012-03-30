@@ -27,6 +27,8 @@
 #import "VideoView.h"
 #import "Top30View.h"
 #import "AddTrololoView.h"
+#import "AddNewView.h"
+#import "SCAppUtils.h"
 
 #define kCELL1 @"MainCell1"
 #define kCELL2 @"MainCell4"
@@ -52,8 +54,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @property (nonatomic, strong) UIImagePickerController *imagePicker;
 @property (nonatomic, strong) UIActionSheet *photoActionSheet;
 @property (nonatomic, strong) UIActionSheet *videoActionSheet;
+@property (nonatomic, strong) UIActionSheet *loginActionSheet;
 @property (nonatomic) BOOL isMenuMaximized;
 @property (nonatomic, strong) UIPopoverController *popoverWithImagePicker;
+@property (nonatomic, strong) Vkontakte *vkontakte;
 //@property (nonatomic, strong) EGORefreshTableHeaderView *tableHeaderView;
 
 - (void)onButtonClick:(id)sender withEvent:(UIEvent *)event;
@@ -72,6 +76,11 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)clearContentView:(UIView *)contentView;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)configureContentView:(UIView *)contentView withOffset:(int)offset;
+
+// Авторизация
+- (void)loginWithFacebook;
+- (void)loginWithVK;
+
 @end
 
 @implementation MainView
@@ -99,6 +108,8 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @synthesize addTrololoView = _addTrololoView;
 //@synthesize tableHeaderView = _tableHeaderView;
 @synthesize popoverWithImagePicker = _popoverWithImagePicker;
+@synthesize loginActionSheet = _loginActionSheet;
+@synthesize vkontakte = _vkontakte;
 
 #pragma mark - Lazy Instantiation
 
@@ -158,6 +169,13 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     return _videoActionSheet;
 }
 
+- (UIActionSheet *)loginActionSheet {
+    if (!_loginActionSheet) {
+        _loginActionSheet = [[UIActionSheet alloc] initWithTitle:@"Авторизация" delegate:self cancelButtonTitle:@"Отмена" destructiveButtonTitle:nil otherButtonTitles:@"Facebook", @"ВКонтакте", nil];
+    }
+    return _loginActionSheet;
+}
+
 - (UIImagePickerController *)imagePicker {
     if (!_imagePicker) {
         _imagePicker = [[UIImagePickerController alloc] init];
@@ -182,7 +200,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 }
 
 - (NSManagedObjectContext *)managedObjectContext {
-    AppDelegate *delegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     return delegate.managedObjectContext;
 }
 
@@ -209,14 +227,24 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     return _fetchedResultsController;
 }
 
+- (Vkontakte *)vkontakte {
+    if (!_vkontakte) {
+        _vkontakte = [Vkontakte sharedInstance];
+        _vkontakte.delegate = self;
+    }
+    return _vkontakte;
+}
+
 #pragma mark -
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
-        //self.title = @"HumorLine";
+        // Custom initialization        
+        //self.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemMostRecent tag:1];
+        //self.title = @"Новое";
+        //self.tabBarItem.image = [UIImage imageNamed:@"icon_new.png"];
     }
     return self;
 }
@@ -386,7 +414,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:offset];
     
     switch (post.type) {
-        case kPostTypePhoto:
+        case kPostTypeImage:
         {
             UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
             imageView.image = post.image.image;
@@ -438,11 +466,8 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat result;
     switch (indexPath.row) {
-        case 0: result = 300; break;
-        default: result = 160;
-    }
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        result *= 2;
+        case 0: result = 310; break;
+        default: result = 155;
     }
     return result;
 }
@@ -804,34 +829,49 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 
 #pragma mark - Menu
 - (IBAction)onAddButtonClick:(id)sender {
-    if (!self.isMenuMaximized) {
-        self.menuMaximized.hidden = NO;
-        CGRect frame = self.menuButton.frame;
-        frame.origin.y -= 85;
-        self.menuButton.frame = frame;
-        self.isMenuMaximized = YES;
-    }
-    else {
-        self.menuMaximized.hidden = YES;
-        CGRect frame = self.menuButton.frame;
-        frame.origin.y += 85;
-        self.menuButton.frame = frame;
-        self.isMenuMaximized = NO;
-    }
+//    if (!self.isMenuMaximized) {
+//        self.menuMaximized.hidden = NO;
+//        CGRect frame = self.menuButton.frame;
+//        frame.origin.y -= 85;
+//        self.menuButton.frame = frame;
+//        self.isMenuMaximized = YES;
+//    }
+//    else {
+//        self.menuMaximized.hidden = YES;
+//        CGRect frame = self.menuButton.frame;
+//        frame.origin.y += 85;
+//        self.menuButton.frame = frame;
+//        self.isMenuMaximized = NO;
+//    }
+    
+    AddNewView *addNewView = [[AddNewView alloc] init];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:addNewView];
+    [SCAppUtils customizeNavigationController:navigationController];
+    [self presentModalViewController:navigationController animated:YES];
+    
+//    [UIView beginAnimations:nil context:NULL];
+//    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+//    [UIView setAnimationDuration:0.75];
+//    [self.navigationController pushViewController:addNewView animated:NO];
+//    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.navigationController.view cache:NO];
+//    [UIView commitAnimations];
 }
 
 - (IBAction)onLoginButtonClick:(id)sender {
     [self onMenuButtonClick:nil];
+    [self.loginActionSheet showInView:self.view];
 }
 
 - (IBAction)onTop30ButtonClick:(id)sender {
-    [self onMenuButtonClick:nil];
-    [self.navigationController pushViewController:self.top30View animated:YES];
+    //[self onMenuButtonClick:nil];
+    
+    [self.navigationController pushViewController:self.top30View animated:NO];
 }
 
 - (IBAction)onMapButtonClick:(id)sender {
     [self onMenuButtonClick:nil];
-    [self.navigationController pushViewController:self.onMapView animated:YES];
+    OnMapView *onMapView = [[OnMapView alloc] init];
+    [self.navigationController pushViewController:onMapView animated:NO];
 }
 
 - (IBAction)onTrololoButtonClick:(id)sender {
@@ -921,9 +961,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 }
 
 #pragma mark - UIActionSheetDelegate
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    UIImagePickerControllerSourceType sourceType;
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {    
     if ([actionSheet isEqual:self.photoActionSheet] || [actionSheet isEqual:self.videoActionSheet]) {
+        UIImagePickerControllerSourceType sourceType;
+        
         switch (buttonIndex) {
             case 0:
                 sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
@@ -955,6 +996,17 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
             }
         }
     }
+    else if ([actionSheet isEqual:self.loginActionSheet]) {
+        switch (buttonIndex) {
+            case 0:
+                [self loginWithFacebook];
+                break;
+            case 1:
+                [self loginWithVK];
+                break;
+            default: return;
+        }
+    }
 }
 
 #pragma mark - UIImagePickerDelegate
@@ -970,21 +1022,62 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     
     if (CFStringCompare (mediaType, kUTTypeImage, 0) == kCFCompareEqualTo) {
         UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-        //AddPhotoView *addPhotoView = [[AddPhotoView alloc] init];
-        self.addPhotoView.image = image;
-        [self presentModalViewController:self.addPhotoView animated:YES];
+        AddPhotoView *addPhotoView = [[AddPhotoView alloc] init];
+        addPhotoView.image = image;
+        [self presentModalViewController:addPhotoView animated:YES];
     }
     else if (CFStringCompare(mediaType, kUTTypeMovie, 0) == kCFCompareEqualTo) {
         NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
         //NSLog(@"videoURL : %@", videoURL.description);
         
         AddVideoView *addVideoView = [[AddVideoView alloc] init];
-        self.addVideoView.videoURL = videoURL;
-        [self presentModalViewController:self.addVideoView animated:YES];
+        addVideoView.videoURL = videoURL;
+        [self presentModalViewController:addVideoView animated:YES];
     }    
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+#pragma mark - Sign in
+- (void)loginWithFacebook {
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    Facebook *facebook = appDelegate.facebook;    
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:@"FBAccessTokenKey"] 
+        && [defaults objectForKey:@"FBExpirationDateKey"]) {
+        facebook.accessToken = [defaults objectForKey:@"FBAccessTokenKey"];
+        facebook.expirationDate = [defaults objectForKey:@"FBExpirationDateKey"];
+    }
+    
+    if (![facebook isSessionValid]) {
+        [facebook authorize:nil];
+    }
+}
+
+- (void)loginWithVK {
+    if (![self.vkontakte isAuthorized]) 
+    {
+        [self.vkontakte authenticate];
+    }
+    else
+    {
+        [self.vkontakte logout];
+    }
+}
+
+#pragma mark - VkontakteDelegate
+- (void)vkontakteDidFailedWithError:(NSError *)error {
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)showVkontakteAuthController:(UIViewController *)controller {
+    [self presentModalViewController:controller animated:YES];
+}
+
+- (void)vkontakteAuthControllerDidCancelled {
     [self dismissModalViewControllerAnimated:YES];
 }
 

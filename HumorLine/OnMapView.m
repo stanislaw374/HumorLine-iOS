@@ -12,12 +12,14 @@
 #import "Post.h"
 #import "PostAnnotation.h"
 #import "PostsView.h"
+#import "MainView.h"
 
 @interface OnMapView()
 //@property (nonatomic, strong) MainMenu *mainMenu;
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, strong) PostsView *postsView;
 - (void)addAnnotations;
+- (void)showPosts;
 @end
 
 @implementation OnMapView
@@ -35,7 +37,7 @@
 
 - (NSFetchedResultsController *)fetchedResultsController {
     if (!_fetchedResultsController) {
-        AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
         
         NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
@@ -45,12 +47,39 @@
     return _fetchedResultsController;
 }
 
+- (void)addAnnotations {
+    int i = 0;
+    for (Post *post in self.fetchedResultsController.fetchedObjects) {        
+        if (post.lat && post.lng) {
+            PostAnnotation *annotation = [[PostAnnotation alloc] init];
+            
+            AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+            NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Post"];            
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(lat == $lat) AND (lng == $lng)"];
+            predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:post.lat], @"lat", [NSNumber numberWithDouble:post.lng], @"lng", nil]];
+            
+            [request setPredicate:predicate];
+            
+            NSError *error;
+            int count = [appDelegate.managedObjectContext countForFetchRequest:request error:&error];
+            
+            annotation.title = [NSString stringWithFormat:@"Количество постов: %d", count];       
+            //annotation.title = @"Title";
+            annotation.coordinate = CLLocationCoordinate2DMake(post.lat, post.lng);
+            annotation.post = post;
+            annotation.index = i++;
+            [self.mapView addAnnotation:annotation];
+        }
+    }
+}
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
         //self.title = @"На карте";
+        //self.tabBarItem.image = [UIImage imageNamed:@"icon_map.png"];
     }
     return self;
 }
@@ -70,10 +99,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    self.mapView.showsUserLocation = YES;
-    
-//    self.mainMenu = [[MainMenu alloc] initWithViewController:self];
-//    [self.mainMenu addLoginButton];
+    self.navigationItem.hidesBackButton = YES;
     
     NSError *error;
     if (![self.fetchedResultsController performFetch:&error]) {
@@ -103,23 +129,83 @@
     self.mapView.centerCoordinate = userLocation.coordinate;
 }
 
-- (void)addAnnotations {
-    int i = 0;
-    for (Post *post in self.fetchedResultsController.fetchedObjects) {        
-        if (post.lat && post.lng) {
-            PostAnnotation *annotation = [[PostAnnotation alloc] init];
-            annotation.coordinate = CLLocationCoordinate2DMake(post.lat, post.lng);
-            annotation.post = post;
-            annotation.index = i++;
-            [self.mapView addAnnotation:annotation];
-        }
+- (MKAnnotationView *)mapView:(MKMapView *)mapView_ viewForAnnotation:(id<MKAnnotation>)annotation {
+    static NSString *kReuseIdentifier = @"Annotation";
+    MKAnnotationView *view = [mapView_ dequeueReusableAnnotationViewWithIdentifier:kReuseIdentifier];
+    if (!view) {
+        view = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:kReuseIdentifier];
+        view.canShowCallout = YES;
+        view.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
     }
+    else {
+        view.annotation = annotation;
+    }
+    return view;
 }
 
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    self.postsView.fetchedResultsController = self.fetchedResultsController;
-    self.postsView.currentPage = ((PostAnnotation *)view.annotation).index;
-    [self.navigationController pushViewController:self.postsView animated:YES];
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+
+//    NSError *error;
+//    int count = [appDelegate.managedObjectContext countForFetchRequest:request error:&error];
+//    self.postsView.fetchedResultsController = self.fetchedResultsController;
+//    self.postsView.currentPage = ((PostAnnotation *)view.annotation).index;
+//    [self.navigationController pushViewController:self.postsView animated:YES];
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    PostAnnotation *annotation = view.annotation;
+    
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(lat == $lat) AND (lng == $lng)"];
+    predicate = [predicate predicateWithSubstitutionVariables:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:annotation.coordinate.latitude], @"lat", [NSNumber numberWithDouble:annotation.coordinate.longitude], @"lng", nil]];
+    [request setPredicate:predicate];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
+    [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    
+    NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
+    
+    NSError *error;
+    [fetchedResultsController performFetch:&error];
+    
+    NSLog(@"Fetched %d objects", fetchedResultsController.fetchedObjects.count);
+    
+    PostsView *postsView = [[PostsView alloc] init];
+    postsView.fetchedResultsController = fetchedResultsController;
+    postsView.currentPage = 0;
+    [self.navigationController pushViewController:postsView animated:YES];
+}
+
+- (void)showPosts {
+    
+}
+
+- (IBAction)onTop30ButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];
+    
+    [mainView onTop30ButtonClick:nil];
+}
+
+- (IBAction)onAddButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];
+
+    [mainView onAddButtonClick:nil];
+}
+
+- (IBAction)onNewButtonClick:(id)sender {
+    [self.navigationController popViewControllerAnimated:NO];
+}
+
+- (IBAction)onSigninButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];
+    [mainView onLoginButtonClick:nil];
 }
 
 @end

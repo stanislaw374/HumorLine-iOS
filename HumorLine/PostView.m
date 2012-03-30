@@ -45,7 +45,7 @@
     NSLog(@"%@", NSStringFromSelector(_cmd));
     
     switch (self.post.type) {
-        case kPostTypePhoto:
+        case kPostTypeImage:
         {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self.post.image.image];
             imageView.contentMode = UIViewContentModeScaleAspectFit;

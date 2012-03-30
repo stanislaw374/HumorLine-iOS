@@ -2,7 +2,7 @@
 //  Comment.m
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 20.03.12.
+//  Created by Yazhenskikh Stanislaw on 28.03.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -12,8 +12,9 @@
 
 @implementation Comment
 
-@dynamic text;
 @dynamic date;
+@dynamic text;
+@dynamic commentID;
 @dynamic post;
 
 @end

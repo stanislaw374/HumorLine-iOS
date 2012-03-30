@@ -12,10 +12,15 @@
 #import "Image.h"
 #import "Constants.h"
 #import "SCAppUtils.h"
+#import "Config.h"
+#import <RestKit/RestKit.h>
+#import "Top30View.h"
+#import "OnMapView.h"
+
 
 @interface AppDelegate()
-@property (nonatomic, strong) UINavigationController *navigationController;
-@property (nonatomic, strong) MainView *mainView;
+//@property (nonatomic, strong) UINavigationController *navigationController;
+//@property (nonatomic, strong) MainView *mainView;
 @property (nonatomic) BOOL isFirstTimeLaunch;
 - (void)initDB;
 @end
@@ -23,28 +28,35 @@
 @implementation AppDelegate
 
 @synthesize window = _window;
-@synthesize navigationController = _navigationController;
-@synthesize mainView = _mainView;
+//@synthesize navigationController = _navigationController; 
+//@synthesize mainView = _mainView;
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize isFirstTimeLaunch = _isFirstTimeLaunch;
+@synthesize facebook = _facebook;
 
-- (UINavigationController *)navigationController {
-    if (!_navigationController) {
-        _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
-        //_navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        [SCAppUtils customizeNavigationController:_navigationController];
-        _navigationController.navigationBar.backgroundColor = [UIColor clearColor];
-    }
-    return _navigationController;
-}
+//- (UINavigationController *)navigationController {
+//    if (!_navigationController) {
+//        _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
+//        [SCAppUtils customizeNavigationController:_navigationController];
+//        _navigationController.navigationBar.backgroundColor = [UIColor clearColor];
+//    }
+//    return _navigationController;
+//}
+////
+//- (MainView *)mainView {
+//    if (!_mainView) {
+//        _mainView = [[MainView alloc] initWithNibName:@"MainView" bundle:nil];
+//    }
+//    return _mainView;
+//}
 
-- (MainView *)mainView {
-    if (!_mainView) {
-        _mainView = [[MainView alloc] initWithNibName:@"MainView" bundle:nil];
+- (Facebook *)facebook {
+    if (!_facebook) {
+        _facebook = [[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self];
     }
-    return _mainView;
+    return _facebook;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -52,10 +64,46 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     
-    self.window.rootViewController = self.navigationController;
+    MainView *mainView = [[MainView alloc] init];
+//    Top30View *top30View = [[Top30View alloc] init];
+//    OnMapView *onMapView = [[OnMapView alloc] init];   
+//    SigninView *signinView = [[SigninView alloc] init];
+    
+    //UITabBarController *tabBarController = [[UITabBarController alloc] init];
+    //tabBarController.viewControllers = [NSArray arrayWithObjects:top30View, onMapView, mainView, signinView, nil];
+    
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mainView];
+    [SCAppUtils customizeNavigationController:navigationController];
+    
+    self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];    
     
+
+//    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
+//    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;
+//    
+//    NSString *databaseName = @"RKHumorLine.sqlite";
+//    
+//    objectManager.objectStore = [RKManagedObjectStore objectStoreWithStoreFilename:databaseName];
+//    
+//    RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForEntityWithName:@"RKPost"];
+//    [postMapping setPrimaryKeyAttribute:@"postID"];
+//    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
+//    //postMa
+//    //postMapping mapAttributes:@"", nil
+    
     return YES;
+}
+
+// Pre iOS 4.2 support
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    return [self.facebook handleOpenURL:url]; 
+}
+
+// For iOS 4.2+ support
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    return [self.facebook handleOpenURL:url]; 
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -64,6 +112,14 @@
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
+}
+
+#pragma mark - FacebookSessionDelegate
+- (void)fbDidLogin {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[self.facebook accessToken] forKey:@"FBAccessTokenKey"];
+    [defaults setObject:[self.facebook expirationDate] forKey:@"FBExpirationDateKey"];
+    [defaults synchronize];    
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -200,7 +256,7 @@
     for (int i = 0; i < 7; i++) {            
         Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
         newPost.date = [NSDate date];
-        newPost.type = kPostTypePhoto;
+        newPost.type = kPostTypeImage;
         newPost.likesCount = arc4random() % 100;    
         Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
         newPost.image = image;

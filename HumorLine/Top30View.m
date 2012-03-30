@@ -14,6 +14,7 @@
 #import "Post.h"
 #import "Image.h"
 #import "PostsView.h"
+#import "MainView.h"
 
 enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL_FRAME2 = 4, kCELL_BADGE, kCELL_IMAGE_VIEW, kCELL_VIDEO_VIEW, kCELL_TEXT_VIEW };
 
@@ -43,7 +44,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 
 - (NSFetchedResultsController *)fetchedResultsController {
     if (!_fetchedResultsController) {
-        AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
         NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"likesCount" ascending:NO];
@@ -59,6 +60,8 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        //self.title = @"Top 30";        
+        //self.tabBarItem.image = [UIImage imageNamed:@"icon_top.png"];
     }
     return self;
 }
@@ -76,9 +79,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
+    // Do any additional setup after loading the view from its nib.    
    
+    self.navigationItem.hidesBackButton = YES;
+    
     self.refreshTableHeaderView = [[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0, 0 - self.tableView.frame.size.height, self.tableView.frame.size.width, self.tableView.frame.size.height) arrowImageName:@"whiteArrow.png" textColor:[UIColor whiteColor]];
     self.refreshTableHeaderView.delegate = self;
     [self.tableView addSubview:self.refreshTableHeaderView];
@@ -105,14 +109,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat height = 0;
     if (!indexPath.row) {
-        height = 300;
+        height = 310;
     }
     else {
-        height = 160;
-    }
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        height *= 2;
+        height = 155;
     }
     
     return height;
@@ -265,7 +265,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:offset];
         
     switch (post.type) {
-        case kPostTypePhoto:
+        case kPostTypeImage:
         {
             UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
             imageView.image = post.image.image;
@@ -336,4 +336,27 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     return [NSDate date];
 }
 
+- (IBAction)onMapButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];    
+    [mainView onMapButtonClick:nil];
+}
+
+- (IBAction)onAddButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];
+    
+    [mainView onAddButtonClick:nil];
+}
+
+- (IBAction)onNewButtonClick:(id)sender {
+    [self.navigationController popViewControllerAnimated:NO];
+}
+
+- (IBAction)onSigninButtonClick:(id)sender {
+    MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
+    [self.navigationController popViewControllerAnimated:NO];
+    
+    [mainView onLoginButtonClick:nil];
+}
 @end

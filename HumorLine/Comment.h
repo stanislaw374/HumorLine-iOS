@@ -2,7 +2,7 @@
 //  Comment.h
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 20.03.12.
+//  Created by Yazhenskikh Stanislaw on 28.03.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -13,8 +13,9 @@
 
 @interface Comment : NSManagedObject
 
+@property (nonatomic, retain) NSDate *date;
 @property (nonatomic, retain) NSString * text;
-@property (nonatomic, retain) NSDate * date;
+@property (nonatomic) int64_t commentID;
 @property (nonatomic, retain) Post *post;
 
 @end

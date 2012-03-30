@@ -9,6 +9,7 @@
 #import "AddTextView.h"
 #import "AppDelegate.h"
 #import "Post.h"
+#import "KeyboardListener.h"
 
 @interface AddTextView()
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -52,6 +53,9 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    ((UIScrollView *)self.view).contentSize = self.view.frame.size;
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
 }
 
 - (void)viewDidUnload
@@ -82,7 +86,7 @@
 }
 
 - (IBAction)onAddButtonClick:(id)sender {
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
     newPost.type = kPostTypeText;
@@ -98,7 +102,8 @@
     if ([appDelegate.managedObjectContext save:&error]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Текст успешно добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
         [alert show];
-        [self.presentingViewController dismissModalViewControllerAnimated:YES];
+        //[self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:YES];
     }
     else {
         NSLog(@"Error saving to CoreData: %@", error.localizedDescription);
@@ -106,7 +111,7 @@
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark - CLLocationManagerDelegate
@@ -126,6 +131,16 @@
         return NO;
     }
     return YES;
+}
+
+- (void)textViewDidBeginEditing:(UITextView *)textView {
+    [KeyboardListener setScrollView:(UIScrollView *)self.view];
+    [KeyboardListener setActiveView:textView];
+}
+
+- (void)textViewDidEndEditing:(UITextView *)textView {
+    [KeyboardListener unsetScrollView];
+    [KeyboardListener unsetActiveView];
 }
 
 @end

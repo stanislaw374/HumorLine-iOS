@@ -11,22 +11,22 @@
 #import "TrololoView.h"
 
 @interface AddTrololoView()
-@property (nonatomic, strong) MainMenu *mainMenu;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 @property (nonatomic, strong) TrololoView *trololoView;
 @end
 
 @implementation AddTrololoView
-@synthesize mainMenu = _mainMenu;
+//@synthesize mainMenu = _mainMenu;
 @synthesize trololoView = _trololoView;
 
 #pragma mark - Lazy Instantiation
 
-- (MainMenu *)mainMenu {
-    if (!_mainMenu) {
-        _mainMenu = [[MainMenu alloc] initWithViewController:self];
-    }
-    return _mainMenu;
-}
+//- (MainMenu *)mainMenu {
+//    if (!_mainMenu) {
+//        _mainMenu = [[MainMenu alloc] initWithViewController:self];
+//    }
+//    return _mainMenu;
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -51,7 +51,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [self.mainMenu addLoginButton];
+    //[self.mainMenu addLoginButton];
 }
 
 - (void)viewDidUnload

@@ -12,4 +12,10 @@
 @interface OnMapView : UIViewController <MKMapViewDelegate>
 
 @property (unsafe_unretained, nonatomic) IBOutlet MKMapView *mapView;
+
+- (IBAction)onTop30ButtonClick:(id)sender;
+- (IBAction)onAddButtonClick:(id)sender;
+- (IBAction)onNewButtonClick:(id)sender;
+- (IBAction)onSigninButtonClick:(id)sender;
+
 @end

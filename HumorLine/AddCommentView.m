@@ -14,8 +14,9 @@
 #import "AppDelegate.h"
 #import "Image.h"
 #import <MediaPlayer/MediaPlayer.h>
+#import "KeyboardListener.h"
 
-static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий";
+static NSString *kTEXTVIEW_PLACEHOLDER = @"Текст комментария...";
 
 @interface AddCommentView()
 //@property (nonatomic, strong) MainMenu *mainMenu;
@@ -64,12 +65,13 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     //[self.mainMenu addLoginButton];
+
     
     switch (self.post.type) {
-        case kPostTypePhoto:
+        case kPostTypeImage:
         {
             UIImageView *imageView = [[UIImageView alloc] initWithImage:self.post.image.image];
-            imageView.contentMode = UIViewContentModeScaleAspectFit;
+            imageView.contentMode = UIViewContentModeScaleAspectFill;
             imageView.frame = CGRectMake(0, 0, self.contentView.frame.size.width, self.contentView.frame.size.height);        
             imageView.autoresizingMask = self.contentView.autoresizingMask;
             //NSLog(@"imageView frame = %@", NSStringFromCGRect(imageView.frame));
@@ -80,7 +82,7 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
         {
             self.player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:self.post.videoURL]];
             self.player.shouldAutoplay = NO;
-            self.player.scalingMode = MPMovieScalingModeAspectFit;
+            self.player.scalingMode = MPMovieScalingModeAspectFill;
             self.player.view.frame = CGRectMake(0, 0, self.contentView.frame.size.width, self.contentView.frame.size.height);
             self.player.view.autoresizingMask = self.contentView.autoresizingMask;            
             [self.contentView addSubview:self.player.view];
@@ -101,12 +103,16 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
             break;
         }
     }
+    
+    ((UIScrollView *)self.view).contentSize = self.view.frame.size;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    //[self.imageView setImageWithURL:kIMAGEURL];
-    //[self.imageView setImageWithURL:self.currentPicture.url];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Отмена" style:UIBarButtonItemStyleBordered target:self action:@selector(onCancelButtonClick:)];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Отправить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
 }
 
 - (void)viewDidUnload
@@ -127,7 +133,7 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
 }
 
 - (IBAction)onAddButtonClick:(id)sender {
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     Comment *newComment = [NSEntityDescription insertNewObjectForEntityForName:@"Comment" inManagedObjectContext:appDelegate.managedObjectContext];
     newComment.date = [NSDate date];
     newComment.text = self.textView.text;
@@ -143,11 +149,22 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ваш комментарий добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
     
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    [self onCancelButtonClick:nil];
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    self.navigationItem.leftBarButtonItem = nil;
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+    [UIView setAnimationDuration:0.75];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:self.navigationController.view cache:NO];
+    [UIView commitAnimations];
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDelay:0.375];
+    [self.navigationController popViewControllerAnimated:NO];
+    [UIView commitAnimations];
 }
 
 #pragma mark - UITextViewDelegate
@@ -155,21 +172,29 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Введите комментарий
     if ([textView.text isEqualToString:kTEXTVIEW_PLACEHOLDER]) {
         textView.text = @"";
     }
-}
-
-- (void)textViewDidChange:(UITextView *)textView {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    int count = textView.text.length;
-    self.lblWordsCount.text = [NSString stringWithFormat:@"%d / 300", count];
+    [KeyboardListener setScrollView:(UIScrollView *)self.view];
+    [KeyboardListener setActiveView:textView];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if (self.textView.text.length >= 140) {
+        return NO;
+    }
     if ([text isEqualToString:@"\n"]) {
         [textView resignFirstResponder];
         return NO;
     }
     else return YES;
+}
+
+- (void)textViewDidChange:(UITextView *)textView {    
+    int count = textView.text.length;
+    self.lblWordsCount.text = [NSString stringWithFormat:@"%d", 140 - count];
+}
+
+- (void)textViewDidEndEditing:(UITextView *)textView {
+    [KeyboardListener unsetActiveView];
+    [KeyboardListener unsetScrollView];
 }
 
 @end

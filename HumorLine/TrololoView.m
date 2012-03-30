@@ -14,6 +14,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "UIImage+Thumbnail.h"
 #import "Trollface.h"
+#import "SCAppUtils.h"
+#import "KeyboardListener.h"
 
 @interface TrololoView()
 @property (nonatomic) int currentImage;
@@ -23,26 +25,34 @@
 @property (nonatomic, strong) UIPopoverController *popover;
 @property (nonatomic, strong) NSMutableArray *imageViews;
 @property (nonatomic, strong) UIImageView *currentImageView;
+//@property (nonatomic, strong) UIScrollView *currentScrollView;
 @property (nonatomic) BOOL isPreviewing;
 @property (nonatomic) CGPoint lastPoint;
 @property (nonatomic) BOOL mouseSwiped;
 @property (nonatomic) BOOL isGesture;
-@property (nonatomic, strong) UIButton *selectedButton;
+//@property (nonatomic, strong) UIButton *selectedButton;
+@property (nonatomic, unsafe_unretained) UIView *selectedView;
 //@property (nonatomic, strong) UIPopoverController *popoverWithTrollfaces;
 @property (nonatomic) BOOL isEditing;
 - (void)updateUI;
 - (void)viewDragged:(UIPanGestureRecognizer *)gesture;
 - (void)viewPinched:(UIPinchGestureRecognizer *)gesture;
 - (void)viewRotated:(UIRotationGestureRecognizer *)gesture;
+//- (void)viewTapped:(UITapGestureRecognizer *)gesture;
 - (void)onTextFieldDidEndOnExit:(id)sender;
 - (BOOL)saveImage;
-- (void)selectButton:(UIButton *)button;
-- (void)deselectButton:(UIButton *)button;
+//- (void)selectButton:(UIButton *)button;
+//- (void)deselectButton:(UIButton *)button;
 - (void)onButtonClick:(id)sender;
 - (void)showTrollfacePicker;
+- (void)selectView:(UIView *)view;
+- (void)deselectView;
+- (void)onButtonTouchDown:(UIButton *)sender;
+- (void)onMenuDeleteButtonClick;
 @end
 
 @implementation TrololoView
+//@synthesize currentScrollView = _currentScrollView;
 @synthesize imageView;
 @synthesize imagesCount = _imagesCount;
 @synthesize faceButton = _faceButton;
@@ -62,9 +72,10 @@
 @synthesize lastPoint = _lastPoint;
 @synthesize mouseSwiped = _mouseSwiped;
 @synthesize isGesture = _isGesture;
-@synthesize selectedButton = _selectedButton;
+//@synthesize selectedButton = _selectedButton;
 //@synthesize popoverWithTrollfaces = _popoverWithTrollfaces;
 @synthesize isEditing = _isEditing;
+@synthesize selectedView = _selectedView;
 
 - (NSMutableArray *)imageViews {
     if (!_imageViews) {
@@ -115,11 +126,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-        
+    
     self.currentImage = 0;    
     
     [self updateUI];
@@ -128,6 +135,7 @@
     
     for (int i = 0; i < self.imagesCount; i++) {
         UIImageView *iv = [[UIImageView alloc] initWithFrame:self.imageView.frame];
+        //iv.contentSize = iv.frame.size;
         iv.clipsToBounds = YES;
         iv.autoresizingMask = self.imageView.autoresizingMask;
         iv.userInteractionEnabled = YES;
@@ -140,7 +148,13 @@
     }
     self.currentImageView = [self.imageViews objectAtIndex:0];
     [self.view bringSubviewToFront:self.trollfacePicker];
+    
+    //UIScrollView *scrollView = (UIScrollView *)self.view;
+    //scrollView.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height - 44);
+    //scrollView.userInteractionEnabled = YES;
+    //scrollView.scrollEnabled = NO;
 }
+
 
 - (void)viewDidUnload
 {
@@ -166,53 +180,40 @@
     self.trollfacePicker.hidden = !self.trollfacePicker.hidden;
 }
 
-- (IBAction)onRageButtonClick:(id)sender {
-    if (!self.isEditing) {
-        int trollfaceNumber = arc4random() % [Trollface all].count;
-        UIImage *trollface = [[Trollface all] objectAtIndex:trollfaceNumber];
-        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, trollface.size.width, trollface.size.height)];
-        btn.layer.borderColor = [UIColor redColor].CGColor;
-        [btn setImage:trollface forState:UIControlStateNormal];
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            btn.transform = CGAffineTransformMakeScale(0.5, 0.5);
-        }
-        
-        btn.autoresizingMask = 
-        UIViewAutoresizingFlexibleWidth | 
-        UIViewAutoresizingFlexibleHeight |
-        UIViewAutoresizingFlexibleBottomMargin | 
-        UIViewAutoresizingFlexibleLeftMargin | 
-        UIViewAutoresizingFlexibleRightMargin | 
-        UIViewAutoresizingFlexibleTopMargin;
-        
-        btn.contentMode = UIViewContentModeScaleToFill;
-        
-        UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
-        [btn addGestureRecognizer:gesture];
-        
-        UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
-        [btn addGestureRecognizer:pinchGesture];
-        
-        UIRotationGestureRecognizer *rotationGesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(viewRotated:)];
-        [btn addGestureRecognizer:rotationGesture];
-        
-        [btn addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchDown];
-        
-        [btn setUserInteractionEnabled:YES];
-        
-        [self.currentImageView addSubview:btn];
-    }
-    else {
-        [self showTrollfacePicker];
-    }
+- (IBAction)onRageButtonClick:(id)sender {    
+    FacePickerView *faceView = [[FacePickerView alloc] init];
+    faceView.delegate = self;
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:faceView];
+    [SCAppUtils customizeNavigationController:navigationController];
+    [self presentModalViewController:navigationController animated:YES];
+    
+//    if (!self.selectedView) {
+//        int trollfaceNumber = arc4random() % [Trollface all].count;
+//        UIImage *trollface = [[Trollface all] objectAtIndex:trollfaceNumber];
+//        
+//    }
+//    else {
+//        [self showTrollfacePicker];
+//    }
 }
 
-- (void)onButtonClick:(id)sender {
-    if (self.isEditing) {
-        UIButton *button = (UIButton *)sender;
-        [self selectButton:button];
-    }    
+//- (void)onButtonClick:(id)sender {
+//    if (self.isEditing) {
+//        UIButton *button = (UIButton *)sender;
+//        [self selectButton:button];
+//    }    
+//}
+
+- (void)onButtonTouchDown:(UIButton *)sender {
+    [self selectView:sender];
+    
+    [sender becomeFirstResponder];
+    
+    UIMenuController *menu = [UIMenuController sharedMenuController];
+    menu.menuItems = [NSArray arrayWithObjects:
+                      [[UIMenuItem alloc] initWithTitle:@"Удалить" action:@selector(onMenuDeleteButtonClick)], nil];
+    [menu setTargetRect:CGRectMake(sender.center.x, sender.center.y, 1, 1) inView:sender];
+    [menu setMenuVisible:YES animated:YES];
 }
 
 - (IBAction)onPhotoButtonClick:(id)sender {
@@ -231,17 +232,22 @@
     textView.text = @"Текст";
     textView.font = [UIFont boldSystemFontOfSize:24];
     textView.textColor = [UIColor blackColor];
+    
     UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
     [textView addGestureRecognizer:gesture];
+    gesture.delegate = self;
+    
     textView.backgroundColor = [UIColor clearColor];
     //[textView addTarget:self action:@selector(onTextFieldDidEndOnExit:) forControlEvents:UIControlEventEditingDidEndOnExit];
     textView.delegate = self;
     
     UIRotationGestureRecognizer *rotationGesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(viewRotated:)];
     [textView addGestureRecognizer:rotationGesture];
+    rotationGesture.delegate = self;
     
     UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
     [textView addGestureRecognizer:pinchGesture];
+    pinchGesture.delegate = self;
     
     [self.currentImageView addSubview:textView];
 }
@@ -277,8 +283,8 @@
 }
 
 - (BOOL)saveImage {          
-    UIGraphicsBeginImageContext(self.imageView.bounds.size);
-    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [UIColor whiteColor].CGColor);
+    UIGraphicsBeginImageContext(CGSizeMake(self.currentImageView.frame.size.width, self.currentImageView.frame.size.height));
+    CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [UIColor blackColor].CGColor);
     CGContextFillRect(UIGraphicsGetCurrentContext(), self.imageView.bounds);
 //    for (UIImageView *iv in self.imageViews) {
 //        [iv.image drawInRect:CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height)];
@@ -294,7 +300,7 @@
 //            }
 //        }        
 //    }
-    UIView *viewToSave = [[UIView alloc] initWithFrame:self.imageView.bounds];
+    UIView *viewToSave = [[UIView alloc] initWithFrame:self.currentImageView.bounds];
     for (UIImageView *iv in self.imageViews) {
         CGRect frame = CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height);
         iv.frame = frame;
@@ -304,11 +310,11 @@
     UIImage *imageToSave = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    //UIImageWriteToSavedPhotosAlbum(imageToSave, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+    UIImageWriteToSavedPhotosAlbum(imageToSave, self, nil, nil);
     
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    newPost.type = kPostTypePhoto;
+    newPost.type = kPostTypeImage;
     newPost.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
     newPost.image.image = imageToSave;
     newPost.date = [NSDate date];
@@ -436,16 +442,16 @@
 
 - (IBAction)onEditingSwitchValueChange:(id)sender {
     self.isEditing = !self.isEditing;
-    if (self.isEditing) {
-        //self.faceButton.enabled = YES;
-        self.photoButton.enabled = YES;
-        self.textButton.enabled = YES;
-    }
-    else {
-        //self.faceButton.enabled = NO;
-        self.photoButton.enabled = NO;
-        self.textButton.enabled = NO;
-    }
+//    if (self.isEditing) {
+//        //self.faceButton.enabled = YES;
+//        //self.photoButton.enabled = YES;
+//        //self.textButton.enabled = YES;
+//    }
+//    else {
+//        //self.faceButton.enabled = NO;
+//        self.photoButton.enabled = NO;
+//        self.textButton.enabled = NO;
+//    }
 }
 
 - (void)updateUI {
@@ -512,27 +518,42 @@
     }
 }
 
-- (void)selectButton:(UIButton *)button {
-    //UIButton *t = self.selectedButton;
-    //[self deselectButton:nil];
+//- (void)selectButton:(UIButton *)button {
+//    //UIButton *t = self.selectedButton;
+//    //[self deselectButton:nil];
+//    
+//    //if (![t isEqual:button]) {
+//        self.selectedButton = button;
+//        self.selectedButton.layer.borderWidth = 4;
+//        self.selectedButton.layer.borderColor = [UIColor redColor].CGColor;
+//    //}
+//}
+//
+//- (void)deselectButton:(UIButton *)button {
+//    if (self.selectedButton) {
+//        self.selectedButton.layer.borderWidth = 0;
+//        self.selectedButton = nil;
+//    }
+//}
+
+- (void)selectView:(UIView *)view {
+    [self deselectView];
     
-    //if (![t isEqual:button]) {
-        self.selectedButton = button;
-        self.selectedButton.layer.borderWidth = 4;
-        self.selectedButton.layer.borderColor = [UIColor redColor].CGColor;
-    //}
+    self.selectedView = view;
+    self.selectedView.layer.borderColor = [UIColor redColor].CGColor;
+    self.selectedView.layer.borderWidth = 4;
 }
 
-- (void)deselectButton:(UIButton *)button {
-    if (self.selectedButton) {
-        self.selectedButton.layer.borderWidth = 0;
-        self.selectedButton = nil;
+- (void)deselectView {
+    if (self.selectedView) {
+        self.selectedView.layer.borderWidth = 0;
+        self.selectedView = nil;
     }
 }
 
 #pragma mark - Gestures
 - (void)viewDragged:(UIPanGestureRecognizer *)gesture {
-    if (!self.isEditing) return;
+    //if (!self.isEditing) return;
     
     UIView *view = (UIView *)gesture.view;
 	CGPoint translation = [gesture translationInView:view];
@@ -552,7 +573,7 @@
 }
 
 - (void)viewPinched:(UIPinchGestureRecognizer *)gesture {     
-    if (self.isEditing) {
+     {
     
         NSLog(@"%@", NSStringFromSelector(_cmd));
         UIView *view = (UIView *)[gesture view];
@@ -575,7 +596,8 @@
 }
 
 - (void)viewRotated:(UIRotationGestureRecognizer *)gesture {
-    if (self.isEditing) {
+    NSLog(@"%@", NSStringFromSelector(_cmd));    
+     {
         CGFloat angle = gesture.rotation;
         UIView *view = (UIView *)[gesture view];
         
@@ -591,6 +613,11 @@
     }
 }
 
+//- (void)viewTapped:(UITapGestureRecognizer *)gesture {
+//    UIView *view = gesture.view;
+//    [self selectView:view];
+//}
+
 #pragma mark - UIImagePickerViewControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
@@ -601,23 +628,39 @@
     }
     
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
-    UIImageView *imageView_ = [[UIImageView alloc] initWithFrame:self.imageView.bounds];
-    imageView_.image = image;
-    imageView_.contentMode = UIViewContentModeScaleToFill;
-    [imageView_ setUserInteractionEnabled:YES];
+    
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, image.size.width, image.size.height)];
+    btn.adjustsImageWhenHighlighted = NO;
+    
+    [btn setImage:image forState:UIControlStateNormal];
+    
+    //UIImageView *imageView_ = [[UIImageView alloc] initWithFrame:self.imageView.bounds];
+    //imageView_.image = image;
+    //imageView_.contentMode = UIViewContentModeScaleToFill;
+    //[imageView_ setUserInteractionEnabled:YES];
 
-    [self.currentImageView addSubview:imageView_];
+    //[self.currentImageView addSubview:imageView_];
     
     UIRotationGestureRecognizer *rotationGesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(viewRotated:)];
-    [imageView_ addGestureRecognizer:rotationGesture];
+    //[imageView_ addGestureRecognizer:rotationGesture];
+    [btn addGestureRecognizer:rotationGesture];
+    rotationGesture.delegate = self;
     
     UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
-    [imageView_ addGestureRecognizer:pinchGesture];
+    //[imageView_ addGestureRecognizer:pinchGesture];
+    [btn addGestureRecognizer:pinchGesture];
+    pinchGesture.delegate = self;
     
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
-    [imageView_ addGestureRecognizer:panGestureRecognizer];
+    //[imageView_ addGestureRecognizer:panGestureRecognizer];
+    [btn addGestureRecognizer:panGestureRecognizer];
+    panGestureRecognizer.delegate = self;
     
-    // Быдлокод
+    [btn addTarget:self action:@selector(onButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
+    
+    [self.currentImageView addSubview:btn];
+    
+    // Быдлокод O_O
     [self onPreviewButtonClick:nil];
     [self onPreviewButtonClick:nil];
     //------------------------------
@@ -638,6 +681,14 @@
 //    [textField resignFirstResponder];
 //}
 
+- (void)textViewDidBeginEditing:(UITextView *)textView {
+    textView.layer.borderWidth = 1;
+    textView.layer.borderColor = [UIColor redColor].CGColor;
+    
+    //[KeyboardListener setScrollView:self.currentImageView];
+    //[KeyboardListener setActiveView:textView];
+}
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if ([text isEqualToString:@"\n"]) {
         [textView resignFirstResponder];
@@ -646,8 +697,18 @@
     return YES;
 }
 
+- (void)textViewDidEndEditing:(UITextView *)textView {
+    textView.layer.borderWidth = 0;
+    
+    [KeyboardListener setScrollView:nil];
+    [KeyboardListener setActiveView:nil];
+}
+
 #pragma mark - UIResponder
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self deselectView];
+    self.trollfacePicker.hidden = YES;
+    
     if (self.editing) {
         //if (self.isGesture) return;
         
@@ -658,7 +719,7 @@
         
         //NSLog(@"%@ subviews count = %d", NSStringFromSelector(_cmd), self.currentImageView.subviews.count);
         
-        [self deselectButton:nil];
+        //[self deselectButton:nil];
     }
 }
 
@@ -671,18 +732,18 @@
     //if (CGPointEqualToPoint(self.lastPoint, touchLocation)) return;
     
     UIGraphicsBeginImageContext(self.currentImageView.frame.size);
-    CGSize imageSize = self.currentImageView.image.size;
+    //CGSize imageSize = self.currentImageView.image.size;
     CGSize imageViewSize = self.currentImageView.frame.size;
-    int x = 0, y = 0;
-    if (imageSize.width < imageViewSize.width) {
-        x = (imageViewSize.width - imageSize.width) / 2;
-    }
-    if (imageSize.height < imageViewSize.height) {
-        y = (imageViewSize.height - imageSize.height) / 2;
-    }
+//    int x = 0, y = 0;
+//    if (imageSize.width < imageViewSize.width) {
+//        x = (imageViewSize.width - imageSize.width) / 2;
+//    }
+//    if (imageSize.height < imageViewSize.height) {
+//        y = (imageViewSize.height - imageSize.height) / 2;
+//    }
     //NSLog(@"x = %d, y = %d", x, y);
     //UIImage *imageToDraw = self.currentImageView.image thumb
-    [self.currentImageView.image drawInRect:CGRectMake(0, 0, imageViewSize.width, imageViewSize.height)];
+    //[self.currentImageView.image drawInRect:CGRectMake(0, 0, imageViewSize.width, imageViewSize.height)];
     CGContextRef context = UIGraphicsGetCurrentContext();    
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineWidth(context, 2);
@@ -737,8 +798,55 @@
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    [self.selectedButton setImage:[[Trollface all] objectAtIndex:row] forState:UIControlStateNormal];
+    UIButton *btn = (UIButton *)self.selectedView;
+    UIImage *image = [[Trollface all] objectAtIndex:row];
+    [btn setImage:image forState:UIControlStateNormal];
+    //btn.frame = CGRectMake(btn.frame.origin.x, btn.frame.origin.y, image.size.width, image.size.height);
+//    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+//        btn.transform = CGAffineTransformMakeScale(0.5, 0.5);
+//    }
     NSLog(@"%@", NSStringFromSelector(_cmd));
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
+#pragma mark - FacePickerViewDelegate
+- (void)facePickerDidPickFace:(UIImage *)face {
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    btn.adjustsImageWhenHighlighted = NO;
+    btn.layer.borderColor = [UIColor redColor].CGColor;
+    [btn setImage:face forState:UIControlStateNormal];
+    
+    btn.autoresizingMask = 
+    UIViewAutoresizingFlexibleWidth | 
+    UIViewAutoresizingFlexibleHeight |
+    UIViewAutoresizingFlexibleBottomMargin | 
+    UIViewAutoresizingFlexibleLeftMargin | 
+    UIViewAutoresizingFlexibleRightMargin | 
+    UIViewAutoresizingFlexibleTopMargin;
+    
+    btn.contentMode = UIViewContentModeScaleToFill;
+    
+    UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
+    [btn addGestureRecognizer:gesture];
+    gesture.delegate = self;
+    
+    UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
+    [btn addGestureRecognizer:pinchGesture];
+    pinchGesture.delegate = self;
+    
+    UIRotationGestureRecognizer *rotationGesture = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(viewRotated:)];
+    [btn addGestureRecognizer:rotationGesture];
+    rotationGesture.delegate = self;
+    
+    [btn addTarget:self action:@selector(onButtonTouchDown:) forControlEvents:UIControlEventTouchDown];
+    
+    [btn setUserInteractionEnabled:YES];
+    
+    [self.currentImageView addSubview:btn];
 }
 
 @end

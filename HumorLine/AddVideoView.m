@@ -12,9 +12,10 @@
 #import "AppDelegate.h"
 #import "Post.h"
 #import "Constants.h"
+#import "KeyboardListener.h"
 
 @interface AddVideoView()
-@property (nonatomic, strong) MainMenu *mainMenu;
+//@property (nonatomic, strong) MainMenu *mainMenu;
 @property (nonatomic, strong) MPMoviePlayerController *player;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 - (BOOL)saveVideo;
@@ -27,7 +28,7 @@
 @synthesize txtTitle;
 @synthesize videoURL = _videoURL;
 @synthesize videoView;
-@synthesize mainMenu = _mainMenu;
+//@synthesize mainMenu = _mainMenu;
 @synthesize player = _player;
 @synthesize locationManager = _locationManager;
 
@@ -67,10 +68,14 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    self.title = @"Добавить видео";
+    //self.title = @"Добавить видео";
     
-    self.mainMenu = [[MainMenu alloc] initWithViewController:self];
-    [self.mainMenu addLoginButton];
+    //self.mainMenu = [[MainMenu alloc] initWithViewController:self];
+    //[self.mainMenu addLoginButton];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
+    
+    ((UIScrollView *)self.view).contentSize = self.view.frame.size;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -103,12 +108,14 @@
 
 - (IBAction)onAddButtonClick:(id)sender {
     if ([self saveVideo]) {
-        [self.presentingViewController dismissModalViewControllerAnimated:YES];
+        //[self.presentingViewController dismissModalViewControllerAnimated:YES];
+        //[self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:YES];
     }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (IBAction)onLocationSwitchValueChange:(id)sender {
@@ -126,7 +133,7 @@
 }
 
 - (BOOL)saveVideo {
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     
     Post *newPost = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
     newPost.type = kPostTypeVideo;
@@ -185,6 +192,16 @@
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     self.lblTitle.text = self.txtTitle.text;
     return YES;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    [KeyboardListener setScrollView:(UIScrollView *)self.view];
+    [KeyboardListener setActiveView:textField];
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    [KeyboardListener unsetScrollView];
+    [KeyboardListener unsetActiveView];
 }
 
 @end

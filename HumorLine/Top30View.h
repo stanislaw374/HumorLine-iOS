@@ -11,4 +11,10 @@
 
 @interface Top30View : UIViewController <UITableViewDataSource, UITableViewDelegate, EGORefreshTableHeaderDelegate, UIScrollViewDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
+
+- (IBAction)onMapButtonClick:(id)sender;
+- (IBAction)onAddButtonClick:(id)sender;
+- (IBAction)onNewButtonClick:(id)sender;
+- (IBAction)onSigninButtonClick:(id)sender;
+
 @end

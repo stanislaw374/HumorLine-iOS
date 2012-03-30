@@ -69,8 +69,13 @@
 //    self.scrollView.layer.borderColor = [[UIColor whiteColor] CGColor];
 //    self.scrollView.layer.borderWidth = 1;
     
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
+    
     self.imageView.layer.borderColor = [UIColor whiteColor].CGColor;
     self.imageView.layer.borderWidth = 1;
+    
+    UIScrollView *scrollView_ = (UIScrollView *)self.view;
+    scrollView_.contentSize = self.view.frame.size;
 }
 
 - (void)viewDidUnload
@@ -108,9 +113,9 @@
 
 - (IBAction)onAddButtonClick:(id)sender {
     UIImage *image = [self renderView:self.scrollView];
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     Post *post = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    post.type = kPostTypePhoto;
+    post.type = kPostTypeImage;
     post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
     post.image.image = image;
     post.date = [NSDate date];
@@ -128,12 +133,14 @@
     else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
         [alert show];
-        [self.presentingViewController dismissModalViewControllerAnimated:YES];
+        
+        //[self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:YES];
     }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (IBAction)onBgClick:(id)sender {
@@ -171,13 +178,13 @@
         NSLog(@"self.view is not UIScrollView O_O");
     }
     
-//    [KeyboardListener setScrollView:(UIScrollView *)self.view];
-//    [KeyboardListener setActiveView:textField];    
+    [KeyboardListener setScrollView:(UIScrollView *)self.view];
+    [KeyboardListener setActiveView:textField];    
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-//    [KeyboardListener unsetScrollView];
-//    [KeyboardListener unsetActiveView];
+    [KeyboardListener unsetScrollView];
+    [KeyboardListener unsetActiveView];
 }
 
 #pragma mark - CLLocationManagerDelegate

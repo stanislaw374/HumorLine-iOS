@@ -9,6 +9,7 @@
 #import "PostAnnotation.h"
 
 @implementation PostAnnotation
+@synthesize title = _title;
 @synthesize coordinate = _coordinate;
 @synthesize post = _post;
 @synthesize index = _index;

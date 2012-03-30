@@ -15,7 +15,7 @@
     return [AVPlayerLayer class];
 }
 
-- (AVPlayer*)player
+- (AVPlayer *)player
 {
     return [(AVPlayerLayer*)[self layer] player];
 }
