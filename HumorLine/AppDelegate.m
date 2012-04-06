@@ -13,10 +13,9 @@
 #import "Constants.h"
 #import "SCAppUtils.h"
 #import "Config.h"
-#import <RestKit/RestKit.h>
 #import "Top30View.h"
 #import "OnMapView.h"
-
+#import "RKPost.h"
 
 @interface AppDelegate()
 //@property (nonatomic, strong) UINavigationController *navigationController;
@@ -36,22 +35,6 @@
 @synthesize isFirstTimeLaunch = _isFirstTimeLaunch;
 @synthesize facebook = _facebook;
 
-//- (UINavigationController *)navigationController {
-//    if (!_navigationController) {
-//        _navigationController = [[UINavigationController alloc] initWithRootViewController:self.mainView];
-//        [SCAppUtils customizeNavigationController:_navigationController];
-//        _navigationController.navigationBar.backgroundColor = [UIColor clearColor];
-//    }
-//    return _navigationController;
-//}
-////
-//- (MainView *)mainView {
-//    if (!_mainView) {
-//        _mainView = [[MainView alloc] initWithNibName:@"MainView" bundle:nil];
-//    }
-//    return _mainView;
-//}
-
 - (Facebook *)facebook {
     if (!_facebook) {
         _facebook = [[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self];
@@ -65,12 +48,6 @@
     // Override point for customization after application launch.
     
     MainView *mainView = [[MainView alloc] init];
-//    Top30View *top30View = [[Top30View alloc] init];
-//    OnMapView *onMapView = [[OnMapView alloc] init];   
-//    SigninView *signinView = [[SigninView alloc] init];
-    
-    //UITabBarController *tabBarController = [[UITabBarController alloc] init];
-    //tabBarController.viewControllers = [NSArray arrayWithObjects:top30View, onMapView, mainView, signinView, nil];
     
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mainView];
     [SCAppUtils customizeNavigationController:navigationController];
@@ -82,15 +59,18 @@
 //    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
 //    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;
 //    
-//    NSString *databaseName = @"RKHumorLine.sqlite";
 //    
-//    objectManager.objectStore = [RKManagedObjectStore objectStoreWithStoreFilename:databaseName];
-//    
-//    RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForEntityWithName:@"RKPost"];
-//    [postMapping setPrimaryKeyAttribute:@"postID"];
+//    RKObjectMapping *postMapping = [RKObjectMapping mappingForClass:[RKPost class]];
 //    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
-//    //postMa
-//    //postMapping mapAttributes:@"", nil
+//    [postMapping mapKeyPath:@"created_at" toAttribute:@"createdAt"];
+//    [postMapping mapKeyPath:@"image_url" toAttribute:@"imageURL"];
+//    [postMapping mapKeyPath:@"video_url" toAttribute:@"videoURL"];
+//    [postMapping mapKeyPath:@"post_type" toAttribute:@"postType"];
+//    [postMapping mapAttributes:@"title", @"text", @"lat", @"lng", nil];
+//    
+//    [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
+//    
+//    [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];
     
     return YES;
 }
@@ -185,7 +165,7 @@
     
     if (self.isFirstTimeLaunch) [self initDB];
     
-    //NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
+    NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
     
     return _managedObjectContext;
 }

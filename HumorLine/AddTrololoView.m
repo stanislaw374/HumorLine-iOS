@@ -71,8 +71,6 @@
     self.trololoView = [[TrololoView alloc] init];
     self.trololoView.imagesCount = ((UIButton *)sender).tag;
     
-    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
-    
     [self.navigationController pushViewController:self.trololoView animated:YES];
 }
 

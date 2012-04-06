@@ -29,6 +29,8 @@
 #import "AddTrololoView.h"
 #import "AddNewView.h"
 #import "SCAppUtils.h"
+#import "Config.h"
+#import "RKPost.h"
 
 #define kCELL1 @"MainCell1"
 #define kCELL2 @"MainCell4"
@@ -60,6 +62,8 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @property (nonatomic, strong) Vkontakte *vkontakte;
 //@property (nonatomic, strong) EGORefreshTableHeaderView *tableHeaderView;
 
+@property (nonatomic, strong) NSArray *posts;
+
 - (void)onButtonClick:(id)sender withEvent:(UIEvent *)event;
 //- (void)setButtonContent:(UIButton *)button withPost:(Post *)post;
 //- (NSManagedObjectContext *)managedObjectContext;
@@ -69,7 +73,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 //- (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 //- (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 
-// Т
 - (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)prepareContentView:(UIView *)contentView;
 - (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -77,9 +80,11 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)configureContentView:(UIView *)contentView withOffset:(int)offset;
 
-// Авторизация
+// 
 - (void)loginWithFacebook;
 - (void)loginWithVK;
+
+- (void)loadPosts;
 
 @end
 
@@ -110,6 +115,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @synthesize popoverWithImagePicker = _popoverWithImagePicker;
 @synthesize loginActionSheet = _loginActionSheet;
 @synthesize vkontakte = _vkontakte;
+@synthesize posts = _posts;
 
 #pragma mark - Lazy Instantiation
 
@@ -234,6 +240,16 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     }
     return _vkontakte;
 }
+
+//- (void)loadPosts {
+//    RKObjectManager *objectManager = [RKObjectManager sharedManager];
+//    objectManager.client.baseURL = CLIENT_BASE_URL;
+//    [objectManager loadObjectsAtResourcePath:@"/posts" delegate:self block:^(RKObjectLoader *loader) {
+//        if ([objectManager.acceptMIMEType isEqualToString:RKMIMETypeJSON]) {
+//            loader.objectMapping = [objectManager.mappingProvider objectMappingForClass:[RKPost class]];
+//        }
+//    }];     
+//}
 
 #pragma mark -
 
@@ -819,6 +835,8 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 //            }
 //        }
 //    }
+    
+    //[self loadPosts];
 }
 
 - (void)doneReloadingTableViewDataSource {
@@ -1080,6 +1098,22 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)vkontakteAuthControllerDidCancelled {
     [self dismissModalViewControllerAnimated:YES];
 }
+
+//#pragma mark - RKObjectLoaderDelegate
+//- (void)request:(RKRequest *)request didLoadResponse:(RKResponse *)response  {
+//    NSLog(@"Posts response: %@", [response bodyAsString]);
+//}
+//
+//- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
+//    self.posts = objects;
+//    [self.tableView reloadData];
+//}
+//
+//- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
+//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//    [alert show];
+//    NSLog(@"Load error: %@", error);
+//}
 
 @end
 

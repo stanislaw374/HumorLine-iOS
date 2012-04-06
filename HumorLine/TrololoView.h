@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "FacePickerView.h"
 
-@interface TrololoView : UIViewController <UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UITextViewDelegate, UIGestureRecognizerDelegate, FacePickerViewDelegate>
+@interface TrololoView : UIViewController <UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UITextViewDelegate, UIGestureRecognizerDelegate, FacePickerViewDelegate, UIAlertViewDelegate>
 @property (nonatomic) int imagesCount;
 
 @property (unsafe_unretained, nonatomic) IBOutlet UIButton *faceButton;

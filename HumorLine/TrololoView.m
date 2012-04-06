@@ -21,6 +21,7 @@
 @property (nonatomic) int currentImage;
 @property (nonatomic, strong) UIActionSheet *addRageSheet;
 @property (nonatomic, strong) UIActionSheet *addPhotoSheet;
+@property (nonatomic, strong) UIAlertView *saveAlert;
 //@property (nonatomic, unsafe_unretained) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, strong) UIPopoverController *popover;
 @property (nonatomic, strong) NSMutableArray *imageViews;
@@ -40,7 +41,8 @@
 - (void)viewRotated:(UIRotationGestureRecognizer *)gesture;
 //- (void)viewTapped:(UITapGestureRecognizer *)gesture;
 - (void)onTextFieldDidEndOnExit:(id)sender;
-- (BOOL)saveImage;
+- (BOOL)saveImageToLine;
+- (BOOL)saveImageToPhotosAlbum;
 //- (void)selectButton:(UIButton *)button;
 //- (void)deselectButton:(UIButton *)button;
 - (void)onButtonClick:(id)sender;
@@ -49,11 +51,15 @@
 - (void)deselectView;
 - (void)onButtonTouchDown:(UIButton *)sender;
 - (void)onMenuDeleteButtonClick;
+- (void)onSaveButtonClick;
+- (UIImage *)prepareImageToSave;
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo;
 @end
 
 @implementation TrololoView
 //@synthesize currentScrollView = _currentScrollView;
 @synthesize imageView;
+@synthesize saveAlert = _saveAlert;
 @synthesize imagesCount = _imagesCount;
 @synthesize faceButton = _faceButton;
 @synthesize photoButton = _photoButton;
@@ -98,6 +104,13 @@
     }
     return _addPhotoSheet;
 }
+
+- (UIAlertView *)saveAlert {
+    if (!_saveAlert) {
+        _saveAlert = [[UIAlertView alloc] initWithTitle:@"Сохранить" message:@"" delegate:self cancelButtonTitle:@"Отмена" otherButtonTitles:@"В фотоальбом", @"В ленте", nil];
+    }
+    return _saveAlert;
+}
 //
 //- (UIPanGestureRecognizer *)panGestureRecognizer {
 //    return [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
@@ -128,6 +141,7 @@
     // Do any additional setup after loading the view from its nib.
     
     self.currentImage = 0;    
+    self.isEditing = YES;
     
     [self updateUI];
     
@@ -149,12 +163,8 @@
     self.currentImageView = [self.imageViews objectAtIndex:0];
     [self.view bringSubviewToFront:self.trollfacePicker];
     
-    //UIScrollView *scrollView = (UIScrollView *)self.view;
-    //scrollView.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height - 44);
-    //scrollView.userInteractionEnabled = YES;
-    //scrollView.scrollEnabled = NO;
-}
-
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(onSaveButtonClick)];
+} 
 
 - (void)viewDidUnload
 {
@@ -264,42 +274,36 @@
 
 - (IBAction)onNextButtonClick:(id)sender {
     if (self.currentImage < self.imagesCount - 1) {
-        ((UIView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = YES;
-        self.currentImage++;
-        ((UIImageView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = NO;
-        [self.imageViews objectAtIndex:self.currentImage];        
-        self.currentImageView = [self.imageViews objectAtIndex:self.currentImage];
-        [self updateUI];
+        if (self.isPreviewing) { [self onPreviewButtonClick:nil]; }
+        else {
+            ((UIView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = YES;
+            self.currentImage++;
+            ((UIImageView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = NO;
+            [self.imageViews objectAtIndex:self.currentImage];        
+            self.currentImageView = [self.imageViews objectAtIndex:self.currentImage];
+            [self updateUI];
+        }
     }
     else {
         if (!self.isPreviewing) [self onPreviewButtonClick:nil];
-        if ([self saveImage]) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [alert show];
-            //[self.presentingViewController dismissModalViewControllerAnimated:YES];
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        }
+//        if ([self saveImage]) {
+//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+//            [alert show];
+//            //[self.presentingViewController dismissModalViewControllerAnimated:YES];
+//            [self.navigationController popToRootViewControllerAnimated:YES];
+//        }
     }
 }
 
-- (BOOL)saveImage {          
+- (void)onSaveButtonClick {
+    [self deselectView];
+    [self.saveAlert show];
+}
+
+- (UIImage *)prepareImageToSave {
     UIGraphicsBeginImageContext(CGSizeMake(self.currentImageView.frame.size.width, self.currentImageView.frame.size.height));
     CGContextSetFillColorWithColor(UIGraphicsGetCurrentContext(), [UIColor blackColor].CGColor);
     CGContextFillRect(UIGraphicsGetCurrentContext(), self.imageView.bounds);
-//    for (UIImageView *iv in self.imageViews) {
-//        [iv.image drawInRect:CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height)];
-//        for (UIView *subview in iv.subviews) {
-//            if ([subview isKindOfClass:[UIButton class]]) {
-//                UIButton *btn = (UIButton *)subview;
-//                [btn.imageView.image drawInRect:CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height)];
-//            }
-//            if ([subview isKindOfClass:[UITextView class]]) {
-//                UITextView *textView = (UITextView *)subview;
-//                //[textView.layer drawInContext:UIGraphicsGetCurrentContext()];
-//                [textView.layer renderInContext:UIGraphicsGetCurrentContext()];
-//            }
-//        }        
-//    }
     UIView *viewToSave = [[UIView alloc] initWithFrame:self.currentImageView.bounds];
     for (UIImageView *iv in self.imageViews) {
         CGRect frame = CGRectMake(iv.frame.origin.x - self.imageView.frame.origin.x, iv.frame.origin.y - self.imageView.frame.origin.y, iv.frame.size.width, iv.frame.size.height);
@@ -308,9 +312,27 @@
     }
     [viewToSave.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *imageToSave = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    UIGraphicsEndImageContext();    
     
+    return imageToSave;
+}
+
+- (BOOL)saveImageToPhotosAlbum {
+    UIImage *imageToSave = [self prepareImageToSave];
     UIImageWriteToSavedPhotosAlbum(imageToSave, self, nil, nil);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо сохранено в фотоальбоме" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    [self.navigationController popViewControllerAnimated:YES];
+    return YES;
+}
+
+- (void)               image: (UIImage *) image
+    didFinishSavingWithError: (NSError *) error
+                 contextInfo: (void *) contextInfo {    
+}
+
+- (BOOL)saveImageToLine {          
+    UIImage *imageToSave = [self prepareImageToSave];    
     
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
@@ -324,10 +346,10 @@
         NSLog(@"Error saving: %@", error.localizedDescription);
         return NO;
     }
-    else {
-        UIImageWriteToSavedPhotosAlbum(imageToSave, self, nil, nil); 
-        return YES;
-    } 
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо сохранено в ленте" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    [self.navigationController popViewControllerAnimated:YES];
+    return YES;
 }
 
 //- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
@@ -456,15 +478,8 @@
 
 - (void)updateUI {
     //self.title = [NSString stringWithFormat:@"%d / %d", self.currentImage + 1, self.imagesCount];
-    NSString *text;
-    if (self.currentImage < self.imagesCount - 1) {
-        text = [NSString stringWithFormat:@"Далее %d/%d", self.currentImage + 2, self.imagesCount];
-    }
-    else {
-        text = @"Сохранить";
-    }
-    [self.nextButton setTitle:text forState:UIControlStateNormal];
-    self.nextItem.title = text;
+    //UIImage *image = (self.currentImage < self.imagesCount - 1) ? [UIImage imageNamed:@"next_button.png"] : [UIImage imageNamed:@"save_button.png"];
+    //[self.nextButton setImage:image forState:UIControlStateNormal];
 }
 
 #pragma mark - UIActionSheetDelegate
@@ -707,7 +722,7 @@
 #pragma mark - UIResponder
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [self deselectView];
-    self.trollfacePicker.hidden = YES;
+    //self.trollfacePicker.hidden = YES;
     
     if (self.editing) {
         //if (self.isGesture) return;
@@ -743,7 +758,7 @@
 //    }
     //NSLog(@"x = %d, y = %d", x, y);
     //UIImage *imageToDraw = self.currentImageView.image thumb
-    //[self.currentImageView.image drawInRect:CGRectMake(0, 0, imageViewSize.width, imageViewSize.height)];
+    [self.currentImageView.image drawInRect:CGRectMake(0, 0, imageViewSize.width, imageViewSize.height)];
     CGContextRef context = UIGraphicsGetCurrentContext();    
     CGContextSetLineCap(context, kCGLineCapRound);
     CGContextSetLineWidth(context, 2);
@@ -847,6 +862,23 @@
     [btn setUserInteractionEnabled:YES];
     
     [self.currentImageView addSubview:btn];
+}
+
+#pragma mark - UIAlertViewDelegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSLog(@"%d", buttonIndex);
+    
+    if ([alertView isEqual:self.saveAlert]) {
+        switch (buttonIndex) {
+            case 1:
+                [self saveImageToPhotosAlbum];
+                break;
+            case 2:
+                [self saveImageToLine];
+                break;
+            default: return;
+        }
+    }
 }
 
 @end
