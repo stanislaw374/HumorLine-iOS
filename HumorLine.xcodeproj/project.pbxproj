@@ -51,8 +51,6 @@
 		86538495152307A50038DCA5 /* libRestKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8653848C152306E40038DCA5 /* libRestKit.a */; };
 		86538497152307D00038DCA5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86538496152307D00038DCA5 /* Security.framework */; };
 		86538499152307E00038DCA5 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 86538498152307E00038DCA5 /* libxml2.dylib */; };
-		866070AF15230ADA00851807 /* RKComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 866070AE15230ADA00851807 /* RKComment.m */; };
-		866070B215230ADA00851807 /* RKPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 866070B115230ADA00851807 /* RKPost.m */; };
 		866070B515230F6F00851807 /* Image.m in Sources */ = {isa = PBXBuildFile; fileRef = 866070B415230F6F00851807 /* Image.m */; };
 		866070BB15230F7000851807 /* Comment.m in Sources */ = {isa = PBXBuildFile; fileRef = 866070BA15230F7000851807 /* Comment.m */; };
 		866070BE1523102900851807 /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 866070BD1523102900851807 /* Post.m */; };
@@ -118,6 +116,9 @@
 		86A97D9B151C73B0008EB8F8 /* trollface1.png in Resources */ = {isa = PBXBuildFile; fileRef = 86A97D99151C73B0008EB8F8 /* trollface1.png */; };
 		86A97D9C151C73B0008EB8F8 /* trollface2.png in Resources */ = {isa = PBXBuildFile; fileRef = 86A97D9A151C73B0008EB8F8 /* trollface2.png */; };
 		86A97DA1151C73E2008EB8F8 /* Trollface.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A97DA0151C73E2008EB8F8 /* Trollface.m */; };
+		86AA79B4152EB8A800D51A8C /* RKPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 86AA79B3152EB8A700D51A8C /* RKPost.m */; };
+		86AA79BF152EEAC800D51A8C /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86AA79BE152EEAC800D51A8C /* CoreMedia.framework */; };
+		86AA79C2152EF26000D51A8C /* RKPost+Image.m in Sources */ = {isa = PBXBuildFile; fileRef = 86AA79C1152EF26000D51A8C /* RKPost+Image.m */; };
 		86B083611512F0BA0053E1FA /* ImageToDataTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */; };
 		86B0837E1512F8A40053E1FA /* blackArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 86B083761512F8A40053E1FA /* blackArrow.png */; };
 		86B0837F1512F8A40053E1FA /* blackArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 86B083771512F8A40053E1FA /* blackArrow@2x.png */; };
@@ -253,10 +254,6 @@
 		86538481152306E30038DCA5 /* RestKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RestKit.xcodeproj; path = ../../../Dropbox/Dev/iOS/Libs/RestKit/RestKit.xcodeproj; sourceTree = "<group>"; };
 		86538496152307D00038DCA5 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		86538498152307E00038DCA5 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
-		866070AD15230ADA00851807 /* RKComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKComment.h; path = HumorLine/RKComment.h; sourceTree = "<group>"; };
-		866070AE15230ADA00851807 /* RKComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKComment.m; path = HumorLine/RKComment.m; sourceTree = "<group>"; };
-		866070B015230ADA00851807 /* RKPost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPost.h; path = HumorLine/RKPost.h; sourceTree = "<group>"; };
-		866070B115230ADA00851807 /* RKPost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPost.m; path = HumorLine/RKPost.m; sourceTree = "<group>"; };
 		866070B315230F6F00851807 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Image.h; path = HumorLine/Image.h; sourceTree = "<group>"; };
 		866070B415230F6F00851807 /* Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Image.m; path = HumorLine/Image.m; sourceTree = "<group>"; };
 		866070B915230F7000851807 /* Comment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Comment.h; path = HumorLine/Comment.h; sourceTree = "<group>"; };
@@ -345,6 +342,11 @@
 		86A97D9A151C73B0008EB8F8 /* trollface2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trollface2.png; sourceTree = "<group>"; };
 		86A97D9F151C73E2008EB8F8 /* Trollface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Trollface.h; path = HumorLine/Trollface.h; sourceTree = "<group>"; };
 		86A97DA0151C73E2008EB8F8 /* Trollface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Trollface.m; path = HumorLine/Trollface.m; sourceTree = "<group>"; };
+		86AA79B2152EB8A700D51A8C /* RKPost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPost.h; path = HumorLine/RKPost.h; sourceTree = "<group>"; };
+		86AA79B3152EB8A700D51A8C /* RKPost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPost.m; path = HumorLine/RKPost.m; sourceTree = "<group>"; };
+		86AA79BE152EEAC800D51A8C /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		86AA79C0152EF26000D51A8C /* RKPost+Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RKPost+Image.h"; path = "HumorLine/RKPost+Image.h"; sourceTree = "<group>"; };
+		86AA79C1152EF26000D51A8C /* RKPost+Image.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "RKPost+Image.m"; path = "HumorLine/RKPost+Image.m"; sourceTree = "<group>"; };
 		86B0835F1512F0BA0053E1FA /* ImageToDataTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageToDataTransformer.h; path = HumorLine/ImageToDataTransformer.h; sourceTree = "<group>"; };
 		86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ImageToDataTransformer.m; path = HumorLine/ImageToDataTransformer.m; sourceTree = "<group>"; };
 		86B083761512F8A40053E1FA /* blackArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blackArrow.png; sourceTree = "<group>"; };
@@ -403,6 +405,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86AA79BF152EEAC800D51A8C /* CoreMedia.framework in Frameworks */,
 				86538499152307E00038DCA5 /* libxml2.dylib in Frameworks */,
 				86538497152307D00038DCA5 /* Security.framework in Frameworks */,
 				86A7BD071522EC88006A3E8D /* SystemConfiguration.framework in Frameworks */,
@@ -461,20 +464,21 @@
 		863D8F64150CC1E3007E745D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				86AA79BE152EEAC800D51A8C /* CoreMedia.framework */,
+				86B08391151353630053E1FA /* AVFoundation.framework */,
+				86A7BD041522EC7B006A3E8D /* CFNetwork.framework */,
+				864FAA6C1511B76B001B307F /* CoreData.framework */,
+				863D8F69150CC1E3007E745D /* CoreGraphics.framework */,
+				86B08388151302B20053E1FA /* CoreLocation.framework */,
+				863D8F67150CC1E3007E745D /* Foundation.framework */,
 				86538498152307E00038DCA5 /* libxml2.dylib */,
+				86972CA81518378D00496F0E /* MapKit.framework */,
+				86B0838F15134C450053E1FA /* MediaPlayer.framework */,
+				86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */,
+				86B083861512F8C60053E1FA /* QuartzCore.framework */,
 				86538496152307D00038DCA5 /* Security.framework */,
 				86A7BD061522EC87006A3E8D /* SystemConfiguration.framework */,
-				86A7BD041522EC7B006A3E8D /* CFNetwork.framework */,
-				86972CA81518378D00496F0E /* MapKit.framework */,
-				86B08391151353630053E1FA /* AVFoundation.framework */,
-				86B0838F15134C450053E1FA /* MediaPlayer.framework */,
-				86B08388151302B20053E1FA /* CoreLocation.framework */,
-				86B083861512F8C60053E1FA /* QuartzCore.framework */,
-				864FAA6C1511B76B001B307F /* CoreData.framework */,
-				86967B4C150DF74B006BEE8B /* MobileCoreServices.framework */,
 				863D8F65150CC1E3007E745D /* UIKit.framework */,
-				863D8F67150CC1E3007E745D /* Foundation.framework */,
-				863D8F69150CC1E3007E745D /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -591,13 +595,13 @@
 		864E8171150E62D6008CF1AA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				863D8F74150CC1E3007E745D /* AppDelegate.h */,
+				863D8F75150CC1E3007E745D /* AppDelegate.m */,
 				86A7BCB31522BE0A006A3E8D /* Config.h */,
 				86F4583D151F1FA00085CBEB /* KeyboardListener.h */,
 				86F4583E151F1FA00085CBEB /* KeyboardListener.m */,
 				86967B26150DC282006BEE8B /* MainMenu.h */,
 				86967B27150DC282006BEE8B /* MainMenu.m */,
-				863D8F74150CC1E3007E745D /* AppDelegate.h */,
-				863D8F75150CC1E3007E745D /* AppDelegate.m */,
 				86B0835F1512F0BA0053E1FA /* ImageToDataTransformer.h */,
 				86B083601512F0BA0053E1FA /* ImageToDataTransformer.m */,
 				86972CAA15183E4900496F0E /* PostAnnotation.h */,
@@ -613,18 +617,18 @@
 		864E8172150E6309008CF1AA /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				86AA79B2152EB8A700D51A8C /* RKPost.h */,
+				86AA79B3152EB8A700D51A8C /* RKPost.m */,
 				866070BC1523102900851807 /* Post.h */,
 				866070BD1523102900851807 /* Post.m */,
 				866070B915230F7000851807 /* Comment.h */,
 				866070BA15230F7000851807 /* Comment.m */,
 				866070B315230F6F00851807 /* Image.h */,
 				866070B415230F6F00851807 /* Image.m */,
-				866070B015230ADA00851807 /* RKPost.h */,
-				866070B115230ADA00851807 /* RKPost.m */,
-				866070AD15230ADA00851807 /* RKComment.h */,
-				866070AE15230ADA00851807 /* RKComment.m */,
 				86A97D9F151C73E2008EB8F8 /* Trollface.h */,
 				86A97DA0151C73E2008EB8F8 /* Trollface.m */,
+				86AA79C0152EF26000D51A8C /* RKPost+Image.h */,
+				86AA79C1152EF26000D51A8C /* RKPost+Image.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1033,8 +1037,6 @@
 				86A97DA1151C73E2008EB8F8 /* Trollface.m in Sources */,
 				86F4583F151F1FA00085CBEB /* KeyboardListener.m in Sources */,
 				86A7BCE21522E490006A3E8D /* Model.xcdatamodeld in Sources */,
-				866070AF15230ADA00851807 /* RKComment.m in Sources */,
-				866070B215230ADA00851807 /* RKPost.m in Sources */,
 				866070B515230F6F00851807 /* Image.m in Sources */,
 				866070BB15230F7000851807 /* Comment.m in Sources */,
 				866070BE1523102900851807 /* Post.m in Sources */,
@@ -1043,6 +1045,8 @@
 				86C9BCFA152C6E5D007DA09A /* NSString+Gender.m in Sources */,
 				86C9BCFB152C6E5D007DA09A /* Vkontakte.m in Sources */,
 				86C9BCFC152C6E5D007DA09A /* VkontakteViewController.m in Sources */,
+				86AA79B4152EB8A800D51A8C /* RKPost.m in Sources */,
+				86AA79C2152EF26000D51A8C /* RKPost+Image.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

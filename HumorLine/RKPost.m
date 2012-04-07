@@ -2,23 +2,27 @@
 //  RKPost.m
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 28.03.12.
+//  Created by Yazhenskikh Stanislaw on 06.04.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import "RKPost.h"
+#import <AVFoundation/AVFoundation.h>
 
 @implementation RKPost
-@synthesize postID = _postID;
-@synthesize createdAt = _createdAt;
-@synthesize imageURL = _imageURL;
-@synthesize likes = _likes;
-@synthesize lat = _lat;
-@synthesize lng = _lng;
-@synthesize text = _text;
-@synthesize title = _title;
-@synthesize type = _type;
-@synthesize videoURL = _videoURL;
-@synthesize comments = _comments;
+
+@dynamic postID;
+@dynamic createdAt;
+@dynamic imageURL;
+@dynamic videoURL;
+@dynamic title;
+@dynamic text;
+@dynamic likes;
+@dynamic type;
+@dynamic lat;
+@dynamic lng;
+//@synthesize image = _image;
+
+
 
 @end

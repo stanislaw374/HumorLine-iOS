@@ -16,6 +16,7 @@
 #import "Top30View.h"
 #import "OnMapView.h"
 #import "RKPost.h"
+#import <RestKit/RestKit.h>
 
 @interface AppDelegate()
 //@property (nonatomic, strong) UINavigationController *navigationController;
@@ -44,33 +45,37 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
+    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;    
+    
+    RKManagedObjectStore *mos = [RKManagedObjectStore objectStoreWithStoreFilename:@"RKHumorLine.sqlite"];
+    objectManager.objectStore = mos;
+    
+    RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForClass:[RKPost class]];
+    postMapping.primaryKeyAttribute = @"postID";
+    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
+    [postMapping mapKeyPath:@"created_at" toAttribute:@"createdAt"];
+    [postMapping mapKeyPath:@"image_url" toAttribute:@"imageURL"];
+    [postMapping mapKeyPath:@"video_url" toAttribute:@"videoURL"];
+    [postMapping mapKeyPath:@"post_type" toAttribute:@"type"];
+    [postMapping mapKeyPath:@"lat" toAttribute:@"lat"];
+    [postMapping mapKeyPath:@"lng" toAttribute:@"lng"];
+    [postMapping mapKeyPath:@"title" toAttribute:@"title"];
+    [postMapping mapKeyPath:@"text" toAttribute:@"text"];
+    
+    [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
+    
+    [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];        
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     
     MainView *mainView = [[MainView alloc] init];
-    
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mainView];
     [SCAppUtils customizeNavigationController:navigationController];
     
     self.window.rootViewController = navigationController;
-    [self.window makeKeyAndVisible];    
-    
-
-//    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
-//    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;
-//    
-//    
-//    RKObjectMapping *postMapping = [RKObjectMapping mappingForClass:[RKPost class]];
-//    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
-//    [postMapping mapKeyPath:@"created_at" toAttribute:@"createdAt"];
-//    [postMapping mapKeyPath:@"image_url" toAttribute:@"imageURL"];
-//    [postMapping mapKeyPath:@"video_url" toAttribute:@"videoURL"];
-//    [postMapping mapKeyPath:@"post_type" toAttribute:@"postType"];
-//    [postMapping mapAttributes:@"title", @"text", @"lat", @"lng", nil];
-//    
-//    [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
-//    
-//    [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];
+    [self.window makeKeyAndVisible];  
     
     return YES;
 }
@@ -163,7 +168,7 @@
         [_managedObjectContext setPersistentStoreCoordinator: coordinator];
     }
     
-    if (self.isFirstTimeLaunch) [self initDB];
+    //if (self.isFirstTimeLaunch) [self initDB];
     
     NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
     

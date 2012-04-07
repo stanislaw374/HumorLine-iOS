@@ -2,20 +2,27 @@
 //  RKPost.h
 //  HumorLine
 //
-//  Created by Yazhenskikh Stanislaw on 28.03.12.
+//  Created by Yazhenskikh Stanislaw on 06.04.12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-@interface RKPost : NSObject 
-@property (nonatomic, strong) NSNumber *postID;
-@property (nonatomic, strong) NSDate *createdAt;
-@property (nonatomic, strong) NSString *imageURL;
-@property (nonatomic, strong) NSNumber *likes;
-@property (nonatomic, strong) NSNumber *lat;
-@property (nonatomic, strong) NSNumber *lng;
-@property (nonatomic, strong) NSString *text;
-@property (nonatomic, strong) NSString *title;
-@property (nonatomic, strong) NSString *type;
-@property (nonatomic, strong) NSString *videoURL;
-@property (nonatomic, strong) NSSet *comments;
+#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+
+
+@interface RKPost : NSManagedObject
+
+@property (nonatomic, retain) NSNumber * postID;
+@property (nonatomic, retain) NSDate * createdAt;
+@property (nonatomic, retain) NSString * imageURL;
+@property (nonatomic, retain) NSString * videoURL;
+@property (nonatomic, retain) NSString * title;
+@property (nonatomic, retain) NSString * text;
+@property (nonatomic, retain) NSNumber * likes;
+@property (nonatomic, retain) NSString * type;
+@property (nonatomic, retain) NSNumber * lat;
+@property (nonatomic, retain) NSNumber * lng;
+
+//@property (nonatomic, strong, readonly) UIImage *image;
+
 @end

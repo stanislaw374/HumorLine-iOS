@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "EGORefreshTableHeaderView.h"
 #import "Vkontakte.h"
+#import <RestKit/RestKit.h>
 
-@interface MainView : UIViewController <UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate, EGORefreshTableHeaderDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, VkontakteDelegate>
+@interface MainView : UIViewController <UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate, EGORefreshTableHeaderDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, VkontakteDelegate, RKObjectLoaderDelegate>
 
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
 @property (unsafe_unretained, nonatomic) IBOutlet UIButton *menuButton;

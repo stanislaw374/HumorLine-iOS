@@ -9,7 +9,6 @@
 #import "MainView.h"
 #import "UIButton+WebCache.h"
 #import "MBProgressHUD.h"
-//#import "MainMenu.h"
 #import "Constants.h"
 #import "PostsView.h"
 #import <QuartzCore/QuartzCore.h>
@@ -31,6 +30,7 @@
 #import "SCAppUtils.h"
 #import "Config.h"
 #import "RKPost.h"
+#import "RKPost+Image.h"
 
 #define kCELL1 @"MainCell1"
 #define kCELL2 @"MainCell4"
@@ -60,18 +60,11 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @property (nonatomic) BOOL isMenuMaximized;
 @property (nonatomic, strong) UIPopoverController *popoverWithImagePicker;
 @property (nonatomic, strong) Vkontakte *vkontakte;
-//@property (nonatomic, strong) EGORefreshTableHeaderView *tableHeaderView;
 
 @property (nonatomic, strong) NSArray *posts;
+@property (nonatomic) int page;
 
 - (void)onButtonClick:(id)sender withEvent:(UIEvent *)event;
-//- (void)setButtonContent:(UIButton *)button withPost:(Post *)post;
-//- (NSManagedObjectContext *)managedObjectContext;
-//- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
-- (void)reloadTableViewDataSource;
-- (void)doneReloadingTableViewDataSource;
-//- (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
-//- (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 
 - (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)prepareContentView:(UIView *)contentView;
@@ -80,12 +73,13 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)configureContentView:(UIView *)contentView withOffset:(int)offset;
 
-// 
 - (void)loginWithFacebook;
 - (void)loginWithVK;
 
-- (void)loadPosts;
-
+- (void)reloadTableViewDataSource;
+- (void)doneReloadingTableViewDataSource;
+- (void)loadData;
+- (void)loadObjectsFromDataStore;
 @end
 
 @implementation MainView
@@ -116,6 +110,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @synthesize loginActionSheet = _loginActionSheet;
 @synthesize vkontakte = _vkontakte;
 @synthesize posts = _posts;
+@synthesize page = _page;
 
 #pragma mark - Lazy Instantiation
 
@@ -205,6 +200,13 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     return _players;
 }
 
+- (NSArray *)posts {
+    if (!_posts) {
+        _posts = [[NSArray alloc] init];
+    }
+    return _posts;
+}
+
 - (NSManagedObjectContext *)managedObjectContext {
     AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     return delegate.managedObjectContext;
@@ -241,15 +243,22 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     return _vkontakte;
 }
 
-//- (void)loadPosts {
-//    RKObjectManager *objectManager = [RKObjectManager sharedManager];
-//    objectManager.client.baseURL = CLIENT_BASE_URL;
-//    [objectManager loadObjectsAtResourcePath:@"/posts" delegate:self block:^(RKObjectLoader *loader) {
-//        if ([objectManager.acceptMIMEType isEqualToString:RKMIMETypeJSON]) {
-//            loader.objectMapping = [objectManager.mappingProvider objectMappingForClass:[RKPost class]];
-//        }
-//    }];     
-//}
+- (void)loadData {
+    self.isLoading = YES;    
+    RKObjectManager *objectManager = [RKObjectManager sharedManager];
+    [objectManager loadObjectsAtResourcePath:[NSString stringWithFormat:@"/posts.json?page=%d", self.page++] delegate:self block:^(RKObjectLoader *loader) {
+        loader.objectMapping = [objectManager.mappingProvider objectMappingForClass:[RKPost class]];
+    }];         
+}
+
+- (void)loadObjectsFromDataStore {
+    NSFetchRequest *request = [RKPost fetchRequest];
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO];
+    [request setSortDescriptors:[NSArray arrayWithObject:sort]];
+    self.posts = [RKPost objectsWithFetchRequest:request];
+    
+    [self doneReloadingTableViewDataSource];
+}
 
 #pragma mark -
 
@@ -279,15 +288,15 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    //[self.mainMenu addAddButton];
-    //[self.mainMenu addLoginButton];
+    
+    self.page = 1;
     
     self.refreshTableHeaderView = [[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0, 0 - self.tableView.frame.size.height, self.tableView.bounds.size.width, self.tableView.bounds.size.height) arrowImageName:@"whiteArrow.png" textColor:[UIColor whiteColor]];
     self.refreshTableHeaderView.delegate = self;
     [self.tableView addSubview:self.refreshTableHeaderView];
     
     [self reloadTableViewDataSource];
-    [self doneReloadingTableViewDataSource];
+    //[self doneReloadingTableViewDataSource];
 }
 
 - (void)viewDidUnload
@@ -310,7 +319,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 
 #pragma mark - UITableViewDataSource
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {    
-    return self.fetchedResultsController.fetchedObjects.count / 2 + 1;
+    //return self.fetchedResultsController.fetchedObjects.count / 2 + 1;
+    int result = self.posts.count / 2;
+    if (result > 0) result++;
+    return result;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -326,10 +338,15 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
         NSArray *nibs = [[NSBundle mainBundle] loadNibNamed:cellIdentifier owner:self options:nil];
         cell = [nibs objectAtIndex:0];
         [self prepareCell:cell atIndexPath:indexPath];
-    }
     
+    }
+        
     [self clearCell:cell atIndexPath:indexPath];
     [self configureCell:cell atIndexPath:indexPath];
+    
+    if (!self.isLoading && indexPath.row == self.posts.count / 2) {
+        [self loadData];
+    }
 
     return cell;
 }
@@ -345,12 +362,12 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     imageView.tag = kCELL_IMAGE_VIEW;
     [contentView addSubview:imageView];
     
-    VideoView *videoView = [[VideoView alloc] initWithFrame:contentView.bounds];
-    videoView.autoresizingMask = contentView.autoresizingMask;
-    videoView.contentMode = UIViewContentModeScaleAspectFill;
-    videoView.hidden = YES;
-    videoView.tag = kCELL_VIDEO_VIEW;
-    [contentView addSubview:videoView];
+//    VideoView *videoView = [[VideoView alloc] initWithFrame:contentView.bounds];
+//    videoView.autoresizingMask = contentView.autoresizingMask;
+//    videoView.contentMode = UIViewContentModeScaleAspectFill;
+//    videoView.hidden = YES;
+//    videoView.tag = kCELL_VIDEO_VIEW;
+//    [contentView addSubview:videoView];
     
     UILabel *textView = [[UILabel alloc] initWithFrame:contentView.bounds];
     textView.backgroundColor = [UIColor blackColor];
@@ -361,11 +378,10 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     textView.numberOfLines = 0;
     textView.hidden = YES;
     textView.textAlignment = UITextAlignmentCenter;
-    [contentView addSubview:textView];
+    [contentView addSubview:textView];    
     
-    //CustomBadge *badge = [[CustomBadge alloc] initWithFrame:CGRectMake(contentView.frame.size.width - 25, 0, 25, 25)];
     CustomBadge *badge = [CustomBadge customBadgeWithString:@""];
-    //badge.autoresizingMask = contentView.autoresizingMask & !UIViewAutoresizingFlexibleWidth & !UIViewAutoresizingFlexibleHeight;
+    
     int x = 0;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         x = contentView.frame.size.width - 25;
@@ -377,7 +393,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     badge.tag = kCELL_BADGE;    
     
     [contentView addSubview:badge];
-    //[badge setNeedsLayout];
     [badge setNeedsDisplay];
     
     NSLog(@"Badge frame = %@", NSStringFromCGRect(badge.frame));
@@ -399,9 +414,9 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
     imageView.image = nil;
     imageView.hidden = YES;
-    VideoView *videoView = (VideoView *)[contentView viewWithTag:kCELL_VIDEO_VIEW];
-    videoView.hidden = YES;
-    videoView.player = nil;
+//    VideoView *videoView = (VideoView *)[contentView viewWithTag:kCELL_VIDEO_VIEW];
+//    videoView.hidden = YES;
+//    videoView.player = nil;
     UILabel *textView = (UILabel *)[contentView viewWithTag:kCELL_TEXT_VIEW];
     textView.text = @"";
     textView.hidden = YES;
@@ -427,36 +442,55 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)configureContentView:(UIView *)contentView withOffset:(int)offset {
     contentView.hidden = NO;
     
-    Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:offset];
+    RKPost *post = (RKPost *)[self.posts objectAtIndex:offset];
     
-    switch (post.type) {
-        case kPostTypeImage:
-        {
-            UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
-            imageView.image = post.image.image;
-            imageView.hidden = NO;
-            break;
+    if ([post.type isEqualToString:@"image"] || [post.type isEqualToString:@"video"]) {
+        UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
+        imageView.hidden = NO;
+        
+        if ([post hasImage]) {
+            imageView.image = [post image];
         }
-        case kPostTypeVideo:
-        {
-            VideoView *videoView = (VideoView *)[contentView viewWithTag:kCELL_VIDEO_VIEW];
-            AVPlayer *player = [AVPlayer playerWithURL:[NSURL URLWithString:post.videoURL]];
-            videoView.player = player;
-            videoView.hidden = NO;
-            [videoView setUserInteractionEnabled:NO];
-            break;
+        else {
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:contentView animated:YES];                
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{               
+                UIImage *image = [post image];   
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    imageView.image = image;
+                    [hud hide:YES];            
+                });
+            });
         }
-        case kPostTypeText:
-        {
-            UILabel *textView = (UILabel *)[contentView viewWithTag:kCELL_TEXT_VIEW];
-            textView.text = post.text;
-            textView.hidden = NO;
-            break;
-        }
+    }
+//    else if ([post.type isEqualToString:@"video"]) {
+////        VideoView *videoView = (VideoView *)[contentView viewWithTag:kCELL_VIDEO_VIEW];
+////        AVPlayer *player = [AVPlayer playerWithURL:[NSURL URLWithString:post.videoURL]];
+////        videoView.player = player;
+////        videoView.hidden = NO;
+////        [videoView setUserInteractionEnabled:NO];
+//        UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
+//        imageView.hidden = NO;
+//        
+//        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:contentView animated:YES];
+//        
+//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//            UIImage *image = [post image];
+//                
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    imageView.image = previewImage;
+//                    [hud hide:YES];
+//                });                
+//            }
+//        });
+//    }
+    else if ([post.type isEqualToString:@"text"]) {
+        UILabel *textView = (UILabel *)[contentView viewWithTag:kCELL_TEXT_VIEW];
+        textView.text = post.text;
+        textView.hidden = NO;
     }
     
     CustomBadge *badge = (CustomBadge *)[contentView viewWithTag:kCELL_BADGE];
-    badge.badgeText = [NSString stringWithFormat:@"%d", post.likesCount];
+    badge.badgeText = [NSString stringWithFormat:@"%d", [post.likes intValue]];
     [badge setNeedsDisplay];
 }
 
@@ -471,7 +505,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
         [self configureContentView:contentView withOffset:offset];
     }
     contentView = (UIView *)[cell viewWithTag:kCELL_CONTENT_VIEW2];
-    if (contentView && offset + 1 < self.fetchedResultsController.fetchedObjects.count) {
+    if (contentView && offset + 1 < self.posts.count) {
         [self configureContentView:contentView withOffset:offset + 1];
         UIImageView *frame = (UIImageView *)[cell viewWithTag:kCELL_FRAME2];
         frame.hidden = NO;
@@ -511,289 +545,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     [self.navigationController pushViewController:postsView animated:YES];
 }
 
-//- (void)setButtonContent:(UIButton *)button withPost:(Post *)post {    
-//    button.layer.borderWidth = 10;
-//    
-//    switch (post.type) {
-//        case kPostTypePhoto: {
-//            [button setImage:post.image.image forState:UIControlStateNormal];
-//            break;
-//        }
-//        case kPostTypeText:
-//            [button setTitle:post.text forState:UIControlStateNormal];
-//            break;
-//        case kPostTypeVideo:
-//        {
-////            MPMoviePlayerController *player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:post.videoURL]];
-////            player.shouldAutoplay = NO;
-////            player.view.frame = button.bounds;
-////            player.scalingMode = MPMovieScalingModeAspectFit;
-////            player.view.userInteractionEnabled = NO;
-////            [button addSubview:player.view];
-////            [self.players addObject:player];
-//
-//            AVPlayer *player = [AVPlayer playerWithURL:[NSURL URLWithString:post.videoURL]];          
-//            VideoView *videoView = [[VideoView alloc] initWithFrame:button.bounds];
-//            videoView.autoresizingMask = button.autoresizingMask;
-//            [videoView setPlayer:player];
-//            videoView.userInteractionEnabled = NO;
-//            [button addSubview:videoView];            
-//            
-//            break;
-//        }
-//    }
-//    
-//    CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
-//    if (badge) {
-//        badge.hidden = NO;
-//        badge.badgeText = [NSString stringWithFormat:@"%d", post.likesCount];
-//        [badge setNeedsDisplay];
-//        [button bringSubviewToFront:badge];
-//    }
-//    else {
-//        NSLog(@"Could not find badge!");
-//    }
-//}
-
-//- (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-//    int offset = indexPath.row;
-//    if (indexPath.row > 1) {
-//        offset = (indexPath.row - 2) * 3 + 3;
-//    }
-//    
-//    UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
-//    if (button) {
-//        [button setImage:nil forState:UIControlStateNormal];
-//        [button setTitle:@"" forState:UIControlStateNormal];
-//        button.layer.borderWidth = 0;
-//        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
-//        badge.hidden = YES;
-//    }
-//    
-//    button = (UIButton *)[cell viewWithTag:offset + 2];
-//    if (button) {
-//        [button setImage:nil forState:UIControlStateNormal];
-//        [button setTitle:@"" forState:UIControlStateNormal];
-//        button.layer.borderWidth = 0;
-//        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
-//        badge.hidden = YES;
-//    }
-//    
-//    button = (UIButton *)[cell viewWithTag:offset + 3];
-//    if (button) {
-//        [button setImage:nil forState:UIControlStateNormal];
-//        [button setTitle:@"" forState:UIControlStateNormal];
-//        button.layer.borderWidth = 0;
-//        CustomBadge *badge = (CustomBadge *)[button viewWithTag:kTAG_BADGE];
-//        badge.hidden = YES;
-//    }
-//}
-//
-//- (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-//    //cell.backgroundColor = [UIColor blackColor];
-//    switch (indexPath.row) {
-//        case 0:
-//        {
-//            int sx = 20, sy = 20;
-//            CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
-//            UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, rowHeight - sx, rowHeight - sy)];            
-//            button.center = CGPointMake(self.tableView.frame.size.width / 2, button.center.y);
-//            [button addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            [cell addSubview:button];
-//            //button.layer.borderWidth = borderWidth;
-//            button.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button.contentMode = UIViewContentModeScaleAspectFit;
-//            button.tag = indexPath.row + 1;
-//            button.backgroundColor = [UIColor blackColor];
-//            
-//            [cell addSubview:button];
-//            
-//            CustomBadge *customBadge = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge.frame = CGRectMake(button.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
-//            customBadge.tag = kTAG_BADGE;
-//            customBadge.hidden = YES;
-//            [button addSubview:customBadge];
-//            break;
-//        }
-//        case 1:
-//        {
-//            int sx = 25, sy = 10;
-//            int dx = 8;
-//            int buttonSize = (self.tableView.frame.size.width - 2 * sx - dx) / 2;
-//            UIButton *button1 = [[UIButton alloc] initWithFrame:CGRectMake(sx, sy, buttonSize, buttonSize)];       
-//            [button1 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            //button1.layer.borderWidth = borderWidth;
-//            button1.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button1.contentMode = UIViewContentModeScaleAspectFit;
-//            button1.tag = indexPath.row + 1;
-//            button1.backgroundColor = [UIColor blackColor];
-//            //[self setButtonContent:button1 withPost:post];
-//            
-//            //post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
-//            UIButton *button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
-//            //[button2 setImageWithURL:pic2.url];
-//            [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            //button2.layer.borderWidth = borderWidth;
-//            button2.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button2.contentMode = UIViewContentModeScaleAspectFit;
-//            button2.tag = indexPath.row + 2;
-//            button2.backgroundColor = [UIColor blackColor];
-//            //[self setButtonContent:button2 withPost:post];
-//            
-//            [cell addSubview:button1];
-//            [cell addSubview:button2];        
-//            
-//            CustomBadge *customBadge = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge.frame = CGRectMake(button1.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
-//            customBadge.tag = kTAG_BADGE;
-//            customBadge.hidden = YES;
-//            [button1 addSubview:customBadge];
-//            
-//            customBadge = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge.frame = CGRectMake(button2.frame.size.width - customBadge.frame.size.width, 0, customBadge.frame.size.width, customBadge.frame.size.height);
-//            customBadge.tag = kTAG_BADGE;
-//            customBadge.hidden = YES;
-//            [button2 addSubview:customBadge];
-//            
-//            break;
-//        }
-//        default:
-//        {
-//            int sx = 30, sy = 10;
-//            int dx = 8;
-//            int buttonSize = (self.tableView.frame.size.width - 2 * sx - 2 * dx) / 3;
-//            
-//            int offset = (indexPath.row - 2) * 3 + 3;
-//            //NSIndexPath *ip = [NSIndexPath indexPathForRow:offset inSection:0];            
-//            
-//            UIButton *button1 = [[UIButton alloc] initWithFrame:CGRectMake(sx, sy, buttonSize, buttonSize)];            
-//            [button1 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            button1.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button1.contentMode = UIViewContentModeScaleAspectFit;
-//            button1.tag = offset + 1;
-//            button1.backgroundColor = [UIColor blackColor];
-//            
-//            UIButton *button2 = [[UIButton alloc] initWithFrame:CGRectMake(button1.frame.origin.x + button1.frame.size.width + dx, sy, buttonSize, buttonSize)];
-//            [button2 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            button2.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button2.contentMode = UIViewContentModeScaleAspectFit;
-//            button2.tag = offset + 2;
-//            button2.backgroundColor = [UIColor blackColor];
-//            
-//            UIButton *button3 = [[UIButton alloc] initWithFrame:CGRectMake(button2.frame.origin.x + button2.frame.size.width + dx, sy, buttonSize, buttonSize)];                
-//            [button3 addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//            button3.layer.borderColor = [[UIColor whiteColor] CGColor];
-//            button3.contentMode = UIViewContentModeScaleAspectFit;
-//            button3.tag = offset + 3;
-//            button3.backgroundColor = [UIColor blackColor];
-//            
-//            [cell addSubview:button1];
-//            [cell addSubview:button2];  
-//            [cell addSubview:button3]; 
-//            
-//            CustomBadge *customBadge1 = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge1.frame = CGRectMake(button1.frame.size.width - customBadge1.frame.size.width, 0, customBadge1.frame.size.width, customBadge1.frame.size.height);
-//            customBadge1.tag = kTAG_BADGE;
-//            customBadge1.hidden = YES;
-//            [button1 addSubview:customBadge1];
-//            
-//            CustomBadge *customBadge2 = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge2.frame = CGRectMake(button2.frame.size.width - customBadge2.frame.size.width, 0, customBadge2.frame.size.width, customBadge2.frame.size.height);
-//            customBadge2.tag = kTAG_BADGE;
-//            customBadge2.hidden = YES;
-//            [button2 addSubview:customBadge2];
-//            
-//            CustomBadge *customBadge3 = [CustomBadge customBadgeWithString:@"0"];
-//            customBadge3.frame = CGRectMake(button3.frame.size.width - customBadge3.frame.size.width, 0, customBadge3.frame.size.width, customBadge3.frame.size.height);
-//            customBadge3.tag = kTAG_BADGE;
-//            customBadge3.hidden = YES;
-//            [button3 addSubview:customBadge3];
-//        }
-//    }                            
-//}
-//
-//- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-//    //CGFloat rowHeight = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
-//    //int borderWidth = 1;
-//    
-//    //NSLog(@"%@ : %@", NSStringFromSelector(_cmd), indexPath.description);
-//    
-//    int offset = indexPath.row;
-//    if (indexPath.row > 1) {
-//        offset = (indexPath.row - 2) * 3 + 3;
-//    }
-//    switch (indexPath.row) {
-//        case 0:
-//        {        
-//            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
-//            UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
-//            [self setButtonContent:button withPost:post];
-//            break;
-//        }
-//        case 1:
-//        {            
-//            Post *post = [self.fetchedResultsController objectAtIndexPath:indexPath];
-//            UIButton *button = (UIButton *)[cell viewWithTag:offset + 1];
-//            [self setButtonContent:button withPost:post];
-//            
-//            post = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section]];
-//            button = (UIButton *)[cell viewWithTag:offset + 2];
-//            [self setButtonContent:button withPost:post];
-//            break;
-//        }
-//        default:
-//        {
-//            //int offset = (indexPath.row - 2) * 3 + 3;
-//            
-//            NSIndexPath *ip = [NSIndexPath indexPathForRow:offset inSection:indexPath.section];
-//            UIButton *button1, *button2, *button3;
-//            Post *post;
-//            if (ip.row < self.fetchedResultsController.fetchedObjects.count) {            
-//                post = [self.fetchedResultsController objectAtIndexPath:ip];
-//                button1 = (UIButton *)[cell viewWithTag:offset + 1];                
-//                [self setButtonContent:button1 withPost:post];
-//            }
-//            
-//            ip = [NSIndexPath indexPathForRow:offset + 1 inSection:indexPath.section];           
-//            if (ip.row < self.fetchedResultsController.fetchedObjects.count) {
-//                post = [self.fetchedResultsController objectAtIndexPath:ip];
-//                button2 = (UIButton *)[cell viewWithTag:offset + 2];                
-//                [self setButtonContent:button2 withPost:post];
-//            }
-//            
-//            ip = [NSIndexPath indexPathForRow:offset + 2 inSection:indexPath.section];           
-//            if (ip.row < self.fetchedResultsController.fetchedObjects.count) {
-//                post = [self.fetchedResultsController objectAtIndexPath:ip];
-//                button3 = (UIButton *)[cell viewWithTag:offset + 3];
-//                [self setButtonContent:button3 withPost:post];
-//            }
-//        }
-//    }
-//}
-
-#pragma mark - NSFetchedResultsControllerDelegate
-//
-//- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-//    [self.tableView beginUpdates];
-//}
-//
-//- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
-//    NSLog(@"%@", NSStringFromSelector(_cmd));
-//    
-//    switch (type) {
-//        case NSFetchedResultsChangeUpdate:
-//        {
-//            UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-//            [self configureCell:cell atIndexPath:indexPath];
-//            break;        
-//        }
-//    }
-//}
-//
-//- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-//    [self.tableView endUpdates];
-//}
-
 #pragma mark - Scrolling
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     [self.refreshTableHeaderView egoRefreshScrollViewDidScroll:scrollView];
@@ -819,13 +570,14 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 
 #pragma mark - DataSource Reloading
 - (void)reloadTableViewDataSource {
-    self.isLoading = YES;
     
-    NSError *error;
-    [self.fetchedResultsController performFetch:&error];
-    if (error) {
-        NSLog(@"Fetch error: %@", error.localizedDescription);
-    }
+    self.page = 1;
+    
+//    NSError *error;
+//    [self.fetchedResultsController performFetch:&error];
+//    if (error) {
+//        NSLog(@"Fetch error: %@", error.localizedDescription);
+//    }
 //    else {
 //        self.rowsCount = 0;
 //        for (int i = 0; i < self.fetchedResultsController.fetchedObjects.count - 1; i++) {
@@ -836,13 +588,13 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 //        }
 //    }
     
-    //[self loadPosts];
+    [self loadData];
 }
 
 - (void)doneReloadingTableViewDataSource {
-    self.isLoading = NO;
     [self.refreshTableHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
     [self.tableView reloadData];
+    self.isLoading = NO;
 }
 
 #pragma mark - Menu
@@ -1099,21 +851,17 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     [self dismissModalViewControllerAnimated:YES];
 }
 
-//#pragma mark - RKObjectLoaderDelegate
-//- (void)request:(RKRequest *)request didLoadResponse:(RKResponse *)response  {
-//    NSLog(@"Posts response: %@", [response bodyAsString]);
-//}
-//
-//- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
-//    self.posts = objects;
-//    [self.tableView reloadData];
-//}
-//
-//- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-//    [alert show];
-//    NSLog(@"Load error: %@", error);
-//}
+#pragma mark - RKObjectLoaderDelegate
+- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
+    NSLog(@"%@ : %d", NSStringFromSelector(_cmd), [objects count]);
+    [self loadObjectsFromDataStore];
+}
+
+- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), error);
+}
 
 @end
 
