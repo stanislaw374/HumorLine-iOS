@@ -35,17 +35,17 @@
     return _postsView;
 }
 
-- (NSFetchedResultsController *)fetchedResultsController {
-    if (!_fetchedResultsController) {
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
-        
-        NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-        [fetchRequest setSortDescriptors:[[NSArray alloc] initWithObjects:desc, nil]];
-        _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:@"Map"];
-    }
-    return _fetchedResultsController;
-}
+//- (NSFetchedResultsController *)fetchedResultsController {
+//    if (!_fetchedResultsController) {
+//        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+//        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
+//        
+//        NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
+//        [fetchRequest setSortDescriptors:[[NSArray alloc] initWithObjects:desc, nil]];
+//        _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:@"Map"];
+//    }
+//    return _fetchedResultsController;
+//}
 
 - (void)addAnnotations {
     int i = 0;
@@ -61,9 +61,9 @@
             [request setPredicate:predicate];
             
             NSError *error;
-            int count = [appDelegate.managedObjectContext countForFetchRequest:request error:&error];
+            //int count = [appDelegate.managedObjectContext countForFetchRequest:request error:&error];
             
-            annotation.title = [NSString stringWithFormat:@"Количество постов: %d", count];       
+            //annotation.title = [NSString stringWithFormat:@"Количество постов: %d", count];       
             //annotation.title = @"Title";
             annotation.coordinate = CLLocationCoordinate2DMake(post.lat, post.lng);
             annotation.post = post;
@@ -167,17 +167,17 @@
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
     [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
     
-    NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
+    //NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
     
     NSError *error;
-    [fetchedResultsController performFetch:&error];
-    
-    NSLog(@"Fetched %d objects", fetchedResultsController.fetchedObjects.count);
-    
-    PostsView *postsView = [[PostsView alloc] init];
-    postsView.fetchedResultsController = fetchedResultsController;
-    postsView.currentPage = 0;
-    [self.navigationController pushViewController:postsView animated:YES];
+//    [fetchedResultsController performFetch:&error];
+//    
+//    NSLog(@"Fetched %d objects", fetchedResultsController.fetchedObjects.count);
+//    
+//    PostsView *postsView = [[PostsView alloc] init];
+//    postsView.fetchedResultsController = fetchedResultsController;
+//    postsView.currentPage = 0;
+//    [self.navigationController pushViewController:postsView animated:YES];
 }
 
 - (void)showPosts {
@@ -205,7 +205,7 @@
 - (IBAction)onSigninButtonClick:(id)sender {
     MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
     [self.navigationController popViewControllerAnimated:NO];
-    [mainView onLoginButtonClick:nil];
+    //[mainView onLoginButtonClick:nil];
 }
 
 @end

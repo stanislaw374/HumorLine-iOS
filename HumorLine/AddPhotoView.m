@@ -114,29 +114,29 @@
 - (IBAction)onAddButtonClick:(id)sender {
     UIImage *image = [self renderView:self.scrollView];
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    Post *post = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    post.type = kPostTypeImage;
-    post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
-    post.image.image = image;
-    post.date = [NSDate date];
-    
-    if (self.swAddLocation.on) {
-        post.lat = self.locationManager.location.coordinate.latitude;
-        post.lng = self.locationManager.location.coordinate.longitude;
-    }
-    
-    NSError *error;    
-    if (![appDelegate.managedObjectContext save:&error]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ошибка добавления фото" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-        [alert show];
-    }
-    else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [alert show];
-        
-        //[self.navigationController popViewControllerAnimated:YES];
-        [self.navigationController popToRootViewControllerAnimated:YES];
-    }
+//    Post *post = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
+//    post.type = kPostTypeImage;
+//    post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
+//    post.image.image = image;
+//    post.date = [NSDate date];
+////    
+//    if (self.swAddLocation.on) {
+//        post.lat = self.locationManager.location.coordinate.latitude;
+//        post.lng = self.locationManager.location.coordinate.longitude;
+//    }
+//    
+//    NSError *error;    
+//    if (![appDelegate.managedObjectContext save:&error]) {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ошибка добавления фото" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
+//        [alert show];
+//    }
+//    else {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+//        [alert show];
+//        
+//        //[self.navigationController popViewControllerAnimated:YES];
+//        [self.navigationController popToRootViewControllerAnimated:YES];
+//    }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {

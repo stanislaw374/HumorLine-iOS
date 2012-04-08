@@ -134,14 +134,14 @@ static NSString *kTEXTVIEW_PLACEHOLDER = @"Текст комментария..."
 
 - (IBAction)onAddButtonClick:(id)sender {
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    Comment *newComment = [NSEntityDescription insertNewObjectForEntityForName:@"Comment" inManagedObjectContext:appDelegate.managedObjectContext];
-    newComment.date = [NSDate date];
-    newComment.text = self.textView.text;
+    //Comment *newComment = [NSEntityDescription insertNewObjectForEntityForName:@"Comment" inManagedObjectContext:appDelegate.managedObjectContext];
+    //newComment.date = [NSDate date];
+    //newComment.text = self.textView.text;
     
-    [self.post addCommentsObject:newComment];
+    //[self.post addCommentsObject:newComment];
     
     NSError *error;
-    [appDelegate.managedObjectContext save:&error];
+    //[appDelegate.managedObjectContext save:&error];
     if (error) {
         NSLog(@"Error saving : %@", error.localizedDescription);
     }

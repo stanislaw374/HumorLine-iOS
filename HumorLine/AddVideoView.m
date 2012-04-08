@@ -135,46 +135,46 @@
 - (BOOL)saveVideo {
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     
-    Post *newPost = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    newPost.type = kPostTypeVideo;
-    newPost.title = self.lblTitle.text;
-    newPost.date = [NSDate date];
+//    Post *newPost = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
+//    newPost.type = kPostTypeVideo;
+//    newPost.title = self.lblTitle.text;
+//    newPost.date = [NSDate date];
+//    
+//    if (self.swAddLocation.on) {
+//        newPost.lat = self.locationManager.location.coordinate.latitude;
+//        newPost.lng = self.locationManager.location.coordinate.longitude;
+//    }
+//    
+//    NSString *videosPath = [[appDelegate applicationDocumentsDirectory] stringByAppendingPathComponent:VIDEOS_PATH];
+//    
+//    if (![[NSFileManager defaultManager] fileExistsAtPath:videosPath]) {
+//        NSError *error;
+//        [[NSFileManager defaultManager] createDirectoryAtPath:videosPath withIntermediateDirectories:NO attributes:nil error:&error];
+//    }
     
-    if (self.swAddLocation.on) {
-        newPost.lat = self.locationManager.location.coordinate.latitude;
-        newPost.lng = self.locationManager.location.coordinate.longitude;
-    }
-    
-    NSString *videosPath = [[appDelegate applicationDocumentsDirectory] stringByAppendingPathComponent:VIDEOS_PATH];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:videosPath]) {
-        NSError *error;
-        [[NSFileManager defaultManager] createDirectoryAtPath:videosPath withIntermediateDirectories:NO attributes:nil error:&error];
-    }
-    
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.dateFormat = @"yyyy-MM-dd_HH_mm_ss";
-    NSString *videoName = [[df stringFromDate:[NSDate date]] stringByAppendingPathExtension:@"MOV"];
-    NSString *videoPath = [videosPath stringByAppendingPathComponent:videoName];
-    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];   
-    
-    newPost.videoURL = videoURL.absoluteString;
-    
-    NSError *error;
-    if (![appDelegate.managedObjectContext save:&error]) {
-        NSLog(@"Error saving! : %@", error.localizedDescription);
-    }
-    else {
-        [[NSFileManager defaultManager] copyItemAtURL:self.videoURL toURL:videoURL error:&error];
-        if (error) {
-            NSLog(@"Ошибка копирования : %@", error.localizedDescription);
-        }
-        else {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Видео успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [alert show];
-            return YES;
-        }
-    }    
+//    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+//    df.dateFormat = @"yyyy-MM-dd_HH_mm_ss";
+//    NSString *videoName = [[df stringFromDate:[NSDate date]] stringByAppendingPathExtension:@"MOV"];
+//    NSString *videoPath = [videosPath stringByAppendingPathComponent:videoName];
+//    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];   
+//    
+//    newPost.videoURL = videoURL.absoluteString;
+//    
+//    NSError *error;
+//    if (![appDelegate.managedObjectContext save:&error]) {
+//        NSLog(@"Error saving! : %@", error.localizedDescription);
+//    }
+//    else {
+//        [[NSFileManager defaultManager] copyItemAtURL:self.videoURL toURL:videoURL error:&error];
+//        if (error) {
+//            NSLog(@"Ошибка копирования : %@", error.localizedDescription);
+//        }
+//        else {
+//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Видео успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+//            [alert show];
+//            return YES;
+//        }
+//    }    
     return NO;
 }
 

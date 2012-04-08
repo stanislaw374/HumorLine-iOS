@@ -153,9 +153,9 @@
         
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         NSError *error;
-        if (![appDelegate.managedObjectContext save:&error]) {
-            NSLog(@"Error saving: %@", error.localizedDescription);
-        }
+//        if (![appDelegate.managedObjectContext save:&error]) {
+//            NSLog(@"Error saving: %@", error.localizedDescription);
+//        }
         self.like = YES;
     }
 }

@@ -42,18 +42,18 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @synthesize refreshTableHeaderView = _refreshTableHeaderView;
 @synthesize isLoading = _isLoading;
 
-- (NSFetchedResultsController *)fetchedResultsController {
-    if (!_fetchedResultsController) {
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
-        NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"likesCount" ascending:NO];
-        [fetchRequest setSortDescriptors:[NSArray arrayWithObject:desc]];
-        [fetchRequest setFetchLimit:30];
-        _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:@"Top30"];
-    }
-    return _fetchedResultsController;
-}
+//- (NSFetchedResultsController *)fetchedResultsController {
+//    if (!_fetchedResultsController) {
+//        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+//        
+//        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Post"];
+//        NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"likesCount" ascending:NO];
+//        [fetchRequest setSortDescriptors:[NSArray arrayWithObject:desc]];
+//        [fetchRequest setFetchLimit:30];
+//        _fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:appDelegate.managedObjectContext sectionNameKeyPath:nil cacheName:@"Top30"];
+//    }
+//    return _fetchedResultsController;
+//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -357,6 +357,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     MainView *mainView = (MainView *)[self.navigationController.viewControllers objectAtIndex:0];
     [self.navigationController popViewControllerAnimated:NO];
     
-    [mainView onLoginButtonClick:nil];
+    //[mainView onLoginButtonClick:nil];
 }
 @end

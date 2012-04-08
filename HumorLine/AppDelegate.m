@@ -19,10 +19,8 @@
 #import <RestKit/RestKit.h>
 
 @interface AppDelegate()
-//@property (nonatomic, strong) UINavigationController *navigationController;
-//@property (nonatomic, strong) MainView *mainView;
 @property (nonatomic) BOOL isFirstTimeLaunch;
-- (void)initDB;
+//- (void)initDB;
 @end
 
 @implementation AppDelegate
@@ -30,9 +28,9 @@
 @synthesize window = _window;
 //@synthesize navigationController = _navigationController; 
 //@synthesize mainView = _mainView;
-@synthesize managedObjectContext = _managedObjectContext;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+//@synthesize managedObjectContext = _managedObjectContext;
+//@synthesize managedObjectModel = _managedObjectModel;
+//@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize isFirstTimeLaunch = _isFirstTimeLaunch;
 @synthesize facebook = _facebook;
 
@@ -45,11 +43,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // RestKit initialization
     RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
     objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;    
     
-    RKManagedObjectStore *mos = [RKManagedObjectStore objectStoreWithStoreFilename:@"RKHumorLine.sqlite"];
-    objectManager.objectStore = mos;
+    objectManager.objectStore = [RKManagedObjectStore objectStoreWithStoreFilename:@"RKHumorLine.sqlite"];
     
     RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForClass:[RKPost class]];
     postMapping.primaryKeyAttribute = @"postID";
@@ -66,6 +64,7 @@
     [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
     
     [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];        
+    // -----------------------------------------------------
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
@@ -137,18 +136,18 @@
      See also applicationDidEnterBackground:.
      */
     
-    NSError *error;
-    if (self.managedObjectContext != nil) {
-        if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
-			/*
-			 Replace this implementation with code to handle the error appropriately.
-			 
-			 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-			 */
-			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-			abort();
-        } 
-    }
+    //NSError *error;
+//    if (self.managedObjectContext != nil) {
+//        if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
+//			/*
+//			 Replace this implementation with code to handle the error appropriately.
+//			 
+//			 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
+//			 */
+//			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+//			abort();
+//        } 
+//    }
 }
 
 #pragma mark -
@@ -158,111 +157,111 @@
  Returns the managed object context for the application.
  If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
  */
-- (NSManagedObjectContext *)managedObjectContext {
-    if (_managedObjectContext != nil) {
-        return _managedObjectContext;
-    }	
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    if (coordinator != nil) {
-        _managedObjectContext = [[NSManagedObjectContext alloc] init];
-        [_managedObjectContext setPersistentStoreCoordinator: coordinator];
-    }
-    
-    //if (self.isFirstTimeLaunch) [self initDB];
-    
-    NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
-    
-    return _managedObjectContext;
-}
+//- (NSManagedObjectContext *)managedObjectContext {
+//    if (_managedObjectContext != nil) {
+//        return _managedObjectContext;
+//    }	
+//    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+//    if (coordinator != nil) {
+//        _managedObjectContext = [[NSManagedObjectContext alloc] init];
+//        [_managedObjectContext setPersistentStoreCoordinator: coordinator];
+//    }
+//    
+//    //if (self.isFirstTimeLaunch) [self initDB];
+//    
+//    NSLog(@"IsFirstTimeLaunch : %d", self.isFirstTimeLaunch);
+//    
+//    return _managedObjectContext;
+//}
 
 
 /**
  Returns the managed object model for the application.
  If the model doesn't already exist, it is created by merging all of the models found in the application bundle.
  */
-- (NSManagedObjectModel *)managedObjectModel {
-    if (_managedObjectModel != nil) {
-        return _managedObjectModel;
-    }
-    _managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
-    return _managedObjectModel;
-}
+//- (NSManagedObjectModel *)managedObjectModel {
+//    if (_managedObjectModel != nil) {
+//        return _managedObjectModel;
+//    }
+//    _managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
+//    return _managedObjectModel;
+//}
 
 /**
  Returns the persistent store coordinator for the application.
  If the coordinator doesn't already exist, it is created and the application's store added to it.
  */
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {	
-    if (_persistentStoreCoordinator != nil) {
-        return _persistentStoreCoordinator;
-    }
-    
-	NSString *storePath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"HumorLine.sqlite"];
-	/*
-	 Set up the store.
-	 For the sake of illustration, provide a pre-populated default store.
-	 */
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	// If the expected store doesn't exist, copy the default store.
-	if (![fileManager fileExistsAtPath:storePath]) {
-		NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:@"HumorLine" ofType:@"sqlite"];
-		if (defaultStorePath) {
-			[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
-		}
-        self.isFirstTimeLaunch = YES;
-	}
-	
-	NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
-	
-	NSError *error;
-    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:nil error:&error]) {
-		/*
-		 Replace this implementation with code to handle the error appropriately.
-		 
-		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
-		 
-		 Typical reasons for an error here include:
-		 * The persistent store is not accessible
-		 * The schema for the persistent store is incompatible with current managed object model
-		 Check the error message to determine what the actual problem was.
-		 */
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
-    }    
-    
-    return _persistentStoreCoordinator;
-}
+//- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {	
+//    if (_persistentStoreCoordinator != nil) {
+//        return _persistentStoreCoordinator;
+//    }
+//    
+//	NSString *storePath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"HumorLine.sqlite"];
+//	/*
+//	 Set up the store.
+//	 For the sake of illustration, provide a pre-populated default store.
+//	 */
+//	NSFileManager *fileManager = [NSFileManager defaultManager];
+//	// If the expected store doesn't exist, copy the default store.
+//	if (![fileManager fileExistsAtPath:storePath]) {
+//		NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:@"HumorLine" ofType:@"sqlite"];
+//		if (defaultStorePath) {
+//			[fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
+//		}
+//        self.isFirstTimeLaunch = YES;
+//	}
+//	
+//	NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
+//	
+//	NSError *error;
+//    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+//    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:nil error:&error]) {
+//		/*
+//		 Replace this implementation with code to handle the error appropriately.
+//		 
+//		 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. If it is not possible to recover from the error, display an alert panel that instructs the user to quit the application by pressing the Home button.
+//		 
+//		 Typical reasons for an error here include:
+//		 * The persistent store is not accessible
+//		 * The schema for the persistent store is incompatible with current managed object model
+//		 Check the error message to determine what the actual problem was.
+//		 */
+//		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+//		abort();
+//    }    
+//    
+//    return _persistentStoreCoordinator;
+//}
 
-- (void)initDB {
-    NSLog(@"%@", NSStringFromSelector(_cmd));
-    NSData *data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:@"http://pics.livejournal.com/che_ratnik/pic/0004adqe"]];
-   
-    for (int i = 0; i < 7; i++) {            
-        Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
-        newPost.date = [NSDate date];
-        newPost.type = kPostTypeImage;
-        newPost.likesCount = arc4random() % 100;    
-        Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
-        newPost.image = image;
-        newPost.image.image = [[UIImage alloc] initWithData:data];
-    }
-    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
-    newPost.type = kPostTypeText;
-    newPost.date = [NSDate date];
-    newPost.text = @"Хотел как лучше получилось как всегда";
-    
-//    newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
-//    newPost.type = kPostTypeVideo;
+//- (void)initDB {
+//    NSLog(@"%@", NSStringFromSelector(_cmd));
+//    NSData *data = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:@"http://pics.livejournal.com/che_ratnik/pic/0004adqe"]];
+//   
+//    for (int i = 0; i < 7; i++) {            
+//        Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+//        newPost.date = [NSDate date];
+//        newPost.type = kPostTypeImage;
+//        newPost.likesCount = arc4random() % 100;    
+//        Image *image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:self.managedObjectContext];
+//        newPost.image = image;
+//        newPost.image.image = [[UIImage alloc] initWithData:data];
+//    }
+//    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+//    newPost.type = kPostTypeText;
 //    newPost.date = [NSDate date];
-//    newPost.title = @"lol";
-//    newPost.videoURL = @"http://www.samkeeneinteractivedesign.com/videos/littleVid3.mp4";
-    
-    NSError *error;
-    if (![self.managedObjectContext save:&error]) {
-        NSLog(@"Error saving: %@", error.localizedDescription);
-    }
-}
+//    newPost.text = @"Хотел как лучше получилось как всегда";
+//    
+////    newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.managedObjectContext];
+////    newPost.type = kPostTypeVideo;
+////    newPost.date = [NSDate date];
+////    newPost.title = @"lol";
+////    newPost.videoURL = @"http://www.samkeeneinteractivedesign.com/videos/littleVid3.mp4";
+//    
+//    NSError *error;
+//    if (![self.managedObjectContext save:&error]) {
+//        NSLog(@"Error saving: %@", error.localizedDescription);
+//    }
+//}
 
 #pragma mark -
 #pragma mark Application's documents directory
@@ -270,8 +269,8 @@
 /**
  Returns the path to the application's documents directory.
  */
-- (NSString *)applicationDocumentsDirectory {
-	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-}
+//- (NSString *)applicationDocumentsDirectory {
+//	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+//}
 
 @end

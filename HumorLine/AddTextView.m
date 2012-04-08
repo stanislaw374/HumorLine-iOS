@@ -88,26 +88,26 @@
 - (IBAction)onAddButtonClick:(id)sender {
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     
-    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    newPost.type = kPostTypeText;
-    newPost.text = self.txtText.text;
-    newPost.date = [NSDate date];
-    
-    if (swAddLocation.on) {
-        newPost.lat = self.locationManager.location.coordinate.latitude;
-        newPost.lng = self.locationManager.location.coordinate.longitude;
-    }
-    
-    NSError *error;
-    if ([appDelegate.managedObjectContext save:&error]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Текст успешно добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [alert show];
-        //[self.navigationController popViewControllerAnimated:YES];
-        [self.navigationController popToRootViewControllerAnimated:YES];
-    }
-    else {
-        NSLog(@"Error saving to CoreData: %@", error.localizedDescription);
-    }
+//    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
+//    newPost.type = kPostTypeText;
+//    newPost.text = self.txtText.text;
+//    newPost.date = [NSDate date];
+//    
+//    if (swAddLocation.on) {
+//        newPost.lat = self.locationManager.location.coordinate.latitude;
+//        newPost.lng = self.locationManager.location.coordinate.longitude;
+//    }
+//    
+//    NSError *error;
+//    if ([appDelegate.managedObjectContext save:&error]) {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Текст успешно добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+//        [alert show];
+//        //[self.navigationController popViewControllerAnimated:YES];
+//        [self.navigationController popToRootViewControllerAnimated:YES];
+//    }
+//    else {
+//        NSLog(@"Error saving to CoreData: %@", error.localizedDescription);
+//    }
 }
 
 - (IBAction)onCancelButtonClick:(id)sender {

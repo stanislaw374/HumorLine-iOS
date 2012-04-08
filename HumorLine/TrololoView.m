@@ -335,17 +335,17 @@
     UIImage *imageToSave = [self prepareImageToSave];    
     
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-    newPost.type = kPostTypeImage;
-    newPost.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
-    newPost.image.image = imageToSave;
-    newPost.date = [NSDate date];
-    
-    NSError *error;
-    if (![appDelegate.managedObjectContext save:&error]) {
-        NSLog(@"Error saving: %@", error.localizedDescription);
-        return NO;
-    }
+//    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
+//    newPost.type = kPostTypeImage;
+//    newPost.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
+//    newPost.image.image = imageToSave;
+//    newPost.date = [NSDate date];
+//    
+//    NSError *error;
+//    if (![appDelegate.managedObjectContext save:&error]) {
+//        NSLog(@"Error saving: %@", error.localizedDescription);
+//        return NO;
+//    }
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо сохранено в ленте" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
     [self.navigationController popViewControllerAnimated:YES];

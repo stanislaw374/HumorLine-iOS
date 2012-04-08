@@ -41,6 +41,6 @@
         <element name="Comment" positionX="160" positionY="192" width="128" height="90"/>
         <element name="Image" positionX="-198" positionY="171" width="128" height="75"/>
         <element name="Post" positionX="-18" positionY="18" width="128" height="225"/>
-        <element name="RKPost" positionX="160" positionY="192" width="128" height="195"/>
+        <element name="RKPost" positionX="169" positionY="-99" width="128" height="195"/>
     </elements>
 </model>
