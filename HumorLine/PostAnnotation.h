@@ -11,8 +11,7 @@
 #import "Post.h"
 
 @interface PostAnnotation : NSObject <MKAnnotation>
-@property (nonatomic, copy) NSString *title;
-@property (nonatomic) CLLocationCoordinate2D coordinate;
 @property (nonatomic, strong) Post *post;
-@property (nonatomic) int index;
+
++ (PostAnnotation *)annotationWithPost:(Post *)post;
 @end

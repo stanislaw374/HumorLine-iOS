@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
+#import "Post.h"
 
-@interface OnMapView : UIViewController <MKMapViewDelegate>
+@interface OnMapView : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, PostDelegate>
 
 @property (unsafe_unretained, nonatomic) IBOutlet MKMapView *mapView;
 
 - (IBAction)onTop30ButtonClick:(id)sender;
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onNewButtonClick:(id)sender;
-- (IBAction)onSigninButtonClick:(id)sender;
 
 @end

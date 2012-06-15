@@ -8,11 +8,12 @@
 
 #import "AddTextView.h"
 #import "AppDelegate.h"
-#import "Post.h"
 #import "KeyboardListener.h"
+#import "MBProgressHUD.h"
 
 @interface AddTextView()
 @property (nonatomic, strong) CLLocationManager *locationManager;
+- (void)save;
 @end
 
 @implementation AddTextView
@@ -55,7 +56,7 @@
     // Do any additional setup after loading the view from its nib.
     ((UIScrollView *)self.view).contentSize = self.view.frame.size;
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(save)];
 }
 
 - (void)viewDidUnload
@@ -77,6 +78,8 @@
     UISwitch *sw = (UISwitch *)sender;
     if (sw.on) {
         if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.labelText = @"Определение местонахождения";
             [self.locationManager startUpdatingLocation];
         }
         else {
@@ -85,43 +88,16 @@
     }
 }
 
-- (IBAction)onAddButtonClick:(id)sender {
-    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    
-//    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-//    newPost.type = kPostTypeText;
-//    newPost.text = self.txtText.text;
-//    newPost.date = [NSDate date];
-//    
-//    if (swAddLocation.on) {
-//        newPost.lat = self.locationManager.location.coordinate.latitude;
-//        newPost.lng = self.locationManager.location.coordinate.longitude;
-//    }
-//    
-//    NSError *error;
-//    if ([appDelegate.managedObjectContext save:&error]) {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Текст успешно добавлен" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-//        [alert show];
-//        //[self.navigationController popViewControllerAnimated:YES];
-//        [self.navigationController popToRootViewControllerAnimated:YES];
-//    }
-//    else {
-//        NSLog(@"Error saving to CoreData: %@", error.localizedDescription);
-//    }
-}
-
-- (IBAction)onCancelButtonClick:(id)sender {
-    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
-}
-
 #pragma mark - CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
     [self.locationManager stopUpdatingLocation];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     [self.locationManager stopUpdatingLocation];
     [self.swAddLocation setOn:NO];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
 }
 
 #pragma mark - UITextViewDelegate 
@@ -141,6 +117,34 @@
 - (void)textViewDidEndEditing:(UITextView *)textView {
     [KeyboardListener unsetScrollView];
     [KeyboardListener unsetActiveView];
+}
+
+- (void)save {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    Post *p = [[Post alloc] init];
+    p.type = @"text";
+    p.text = self.txtText.text;
+    if (self.swAddLocation.on) {
+        p.coordinate = self.locationManager.location.coordinate;
+    }
+    
+    [Post addPost:p withDelegate:self];
+}
+
+#pragma mark - PostDelegate
+- (void)postDidAdd {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Текст успешно добавлен в ленту" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+}
+
+- (void)postDidFailWithError:(NSError *)error {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
 }
 
 @end

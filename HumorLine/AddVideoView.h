@@ -8,16 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "Post.h"
 
-@interface AddVideoView : UIViewController <CLLocationManagerDelegate, UITextFieldDelegate>
+@interface AddVideoView : UIViewController <CLLocationManagerDelegate, UITextFieldDelegate, PostDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) NSURL *videoURL;
 @property (unsafe_unretained, nonatomic) IBOutlet UIView *videoView;
-//@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblTitle;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
 @property (unsafe_unretained, nonatomic) IBOutlet UITextField *txtTitle;
-- (IBAction)onAddButtonClick:(id)sender;
-- (IBAction)onCancelButtonClick:(id)sender;
 - (IBAction)onLocationSwitchValueChange:(id)sender;
 - (IBAction)onTextFieldDidEndOnExit:(id)sender;
 @end

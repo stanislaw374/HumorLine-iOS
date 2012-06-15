@@ -8,45 +8,54 @@
 
 #import "PostsView.h"
 #import "UIImageView+WebCache.h"
-#import "Constants.h"
-//#import "MainMenu.h"
 #import "AddCommentView.h"
 #import "UIButton+WebCache.h"
-#import "Image.h"
 #import "PostView.h"
 #import "Comment.h"
 #import "AppDelegate.h"
+#import "RKPost.h"
+#import "Config.h"
+#import "MBProgressHUD.h"
 
-@interface PostsView()
-//@property (nonatomic, strong) MainMenu *mainMenu;
-//@property (nonatomic, strong) AddCommentView *addCommentView;
+@interface PostsView() <UITableViewDataSource, UIScrollViewDelegate, FBSessionDelegate, FBDialogDelegate>
+@property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (unsafe_unretained, nonatomic) IBOutlet UIButton *btnContent;
+@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblRating;
+@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblComments;
+@property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
+@property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblLikes;
+
 @property (nonatomic, strong) NSMutableArray *viewControllers;
+@property (nonatomic) int page;
 @property (nonatomic) int pagesCount;
 @property (nonatomic, strong) NSArray *comments;
 @property (nonatomic) BOOL like;
+
+- (IBAction)onPlusButtonClick:(id)sender;
+- (IBAction)onCommentButtonClick:(id)sender;
+- (IBAction)onFacebookButtonClick:(id)sender;
+- (IBAction)onVKButtonClick:(id)sender;
+
 - (void)loadScrollViewWithPage:(int)page;
 - (void)initUIForCurrentPage;
+- (void)postToFacebook;
+//- (void)postToVK;
 @end
 
 @implementation PostsView
 @synthesize lblRating;
 @synthesize lblComments;
-//@synthesize imageView;
 @synthesize btnContent;
-//@synthesize mainMenu = _mainMenu;
-//@synthesize addCommentView = _addCommentView;
-//@synthesize post = _post;
 @synthesize scrollView;
-@synthesize ratingItem;
-@synthesize commentsItem;
-@synthesize fetchedResultsController = _fetchedResultsController;
-@synthesize currentPage = _currentPage;
 @synthesize tableView;
 @synthesize lblLikes;
 @synthesize pagesCount = _pagesCount;
 @synthesize viewControllers = _viewControllers;
 @synthesize comments = _comments;
 @synthesize like = _like;
+@synthesize page = _page;
+@synthesize posts = _posts;
+@synthesize currentPost = _currentPost;
 
 - (NSMutableArray *)viewControllers {
     if (!_viewControllers) {
@@ -59,29 +68,26 @@
 }
 
 - (int)pagesCount {
-    return self.fetchedResultsController.fetchedObjects.count;
+    return self.posts.count;
 }
 
-//- (AddCommentView *)addCommentView {
-//    if (!_addCommentView) {
-//        _addCommentView = [[AddCommentView alloc] init];
-//    }
-//    return _addCommentView;
-//}
-
-//- (MainMenu *)mainMenu {
-//    if (!_mainMenu) {
-//        _mainMenu = [[MainMenu alloc] initWithViewController:self];
-//    }
-//    return _mainMenu;
-//}
+- (void)setCurrentPost:(Post *)currentPost {
+    _currentPost = currentPost;
+    int page = [self.posts indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+        Post *post = (Post *)obj;
+        if ([post.ID isEqualToNumber:_currentPost.ID]) {
+            return YES;
+        }
+        else return NO;
+    }];
+    self.page = page;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        //self.title = @"Просмотр";
     }
     return self;
 }
@@ -99,21 +105,29 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    //[self.mainMenu addLoginButton];    
+    // Do any additional setup after loading the view from its nib.  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * self.pagesCount, self.scrollView.frame.size.height);
-    self.scrollView.contentOffset = CGPointMake(self.currentPage * self.scrollView.frame.size.width, 0);
+    self.scrollView.contentOffset = CGPointMake(self.page * self.scrollView.frame.size.width, 0);
     
-    [self loadScrollViewWithPage:self.currentPage - 1];
-    [self loadScrollViewWithPage:self.currentPage];
-    [self loadScrollViewWithPage:self.currentPage + 1];
+    [self loadScrollViewWithPage:self.page - 1];
+    [self loadScrollViewWithPage:self.page];
+    [self loadScrollViewWithPage:self.page + 1];
     
-    [self initUIForCurrentPage];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        Post *post = (Post *)[self.posts objectAtIndex:self.page];
+        [post reload];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self initUIForCurrentPage];
+            [MBProgressHUD hideHUDForView:self.view animated:YES];
+        });
+    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -125,8 +139,6 @@
     //[self setImageView:nil];
     [self setLblRating:nil];
     [self setLblComments:nil];
-    [self setRatingItem:nil];
-    [self setCommentsItem:nil];
     [self setBtnContent:nil];
     [self setScrollView:nil];
     [self setTableView:nil];
@@ -144,25 +156,15 @@
 }
 
 - (IBAction)onPlusButtonClick:(id)sender {
-    if (!self.like) {    
-        Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-        
-        //self.ratingItem.title = [NSString stringWithFormat:@"%d", ++post.likesCount];
-        
-        self.lblLikes.text = [NSString stringWithFormat:@"%d", ++post.likesCount];
-        
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        NSError *error;
-//        if (![appDelegate.managedObjectContext save:&error]) {
-//            NSLog(@"Error saving: %@", error.localizedDescription);
-//        }
-        self.like = YES;
-    }
+    Post *post = (Post *)[self.posts objectAtIndex:self.page];
+    [post like];
+    //post.likes = [NSNumber numberWithInt:[post.likes intValue] + 1];
+    [self initUIForCurrentPage];
 }
 
 - (IBAction)onCommentButtonClick:(id)sender {
     AddCommentView *addCommentView = [[AddCommentView alloc] init];
-    addCommentView.post = [self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
+    addCommentView.post = [self.posts objectAtIndex:self.page];
     //[self presentModalViewController:addCommentView animated:YES];
     
     [UIView beginAnimations:nil context:NULL];
@@ -173,7 +175,58 @@
     [UIView commitAnimations];
 }
 
+#pragma mark - Facebook
 - (IBAction)onFacebookButtonClick:(id)sender {
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    delegate.facebook = [[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:@"FBAccessTokenKey"] && [defaults objectForKey:@"FBExpirationDateKey"]) {
+        delegate.facebook.accessToken = [defaults objectForKey:@"FBAccessTokenKey"];
+        delegate.facebook.expirationDate = [defaults objectForKey:@"FBExpirationDateKey"];
+    }
+    
+    if (![delegate.facebook isSessionValid]) {
+        NSArray *permissions = [[NSArray alloc] initWithObjects:@"publish_stream", nil];
+        [delegate.facebook authorize:permissions];
+    }
+    else {
+        [self postToFacebook];
+    }
+}
+
+#pragma mark - FBSessionDelegate
+- (void)fbDidLogin {
+    AppDelegate *delegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[delegate.facebook accessToken] forKey:@"FBAccessTokenKey"];
+    [defaults setObject:[delegate.facebook expirationDate] forKey:@"FBExpirationDateKey"];
+    [defaults synchronize];
+    
+    [self postToFacebook];
+}
+
+- (void)postToFacebook {
+    AppDelegate *delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    
+    Post *post = (Post *)[self.posts objectAtIndex:self.page];
+    
+    NSMutableDictionary *params;
+    if (1) {
+        params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                  FB_APP_ID, @"app_id",
+                  post.imageURL, @"link",
+                  post.previewImage, @"picture",
+                  post.title, @"name",
+                  @"", @"caption",
+                  post.text, @"description",
+                  nil];
+    }
+    
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), params.description);
+    
+    [delegate.facebook dialog:@"feed" andParams:params andDelegate:self];
 }
 
 - (IBAction)onVKButtonClick:(id)sender {
@@ -181,8 +234,7 @@
 
 #pragma mark - UITableViewDataSource
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-    NSLog(@"%d", post.comments.count);
+    Post *post = (Post *)[self.posts objectAtIndex:self.page];
     return post.comments.count;
 }
 
@@ -196,8 +248,8 @@
         cell.textLabel.textColor = [UIColor whiteColor];
         cell.textLabel.font = [UIFont systemFontOfSize:14];
     }    
-
-    cell.textLabel.text = ((Comment *)[self.comments objectAtIndex:indexPath.row]).text;
+    Comment *comment = (Comment *)[((Post *)[self.posts objectAtIndex:self.page]).comments objectAtIndex:indexPath.row];
+    cell.textLabel.text = comment.text;
     return cell;
 }
 
@@ -206,12 +258,11 @@
     if ([self.scrollView isEqual:scrollView_]) {
             
         int pageWidth = scrollView_.frame.size.width;
-        int page = floor((scrollView_.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-        self.currentPage = page;
+        self.page = floor((scrollView_.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
         
-        [self loadScrollViewWithPage:self.currentPage - 1];
-        [self loadScrollViewWithPage:self.currentPage];
-        [self loadScrollViewWithPage:self.currentPage + 1];
+        [self loadScrollViewWithPage:self.page - 1];
+        [self loadScrollViewWithPage:self.page];
+        [self loadScrollViewWithPage:self.page + 1];
         
         [self initUIForCurrentPage];
     }
@@ -228,7 +279,7 @@
     if ((NSNull *)controller == [NSNull null])
     {
         controller = [[PostView alloc] init];
-        controller.post = [self.fetchedResultsController.fetchedObjects objectAtIndex:page];
+        controller.post = [self.posts objectAtIndex:page];
         [self.viewControllers replaceObjectAtIndex:page withObject:controller];
     }
     
@@ -244,19 +295,31 @@
 }
 
 - (void)initUIForCurrentPage {
-    Post *post = (Post *)[self.fetchedResultsController.fetchedObjects objectAtIndex:self.currentPage];
-    //self.ratingItem.title = [NSString stringWithFormat:@"%d", post.likesCount];
-    //self.commentsItem.title = [NSString stringWithFormat:@"%d", post.comments.count];
-    
-    self.lblLikes.text = [NSString stringWithFormat:@"%d", post.likesCount];
-    
-    NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-    NSArray *descs = [[NSArray alloc] initWithObjects:desc, nil];
-    self.comments = [post.comments sortedArrayUsingDescriptors:descs];
-    
+    Post *post = (Post *)[self.posts objectAtIndex:self.page];
+    self.lblLikes.text = [NSString stringWithFormat:@"%d", post.likes]; 
     self.lblComments.text = [NSString stringWithFormat:@"%d", post.comments.count];
-    
     [self.tableView reloadData];
 }
+
+#pragma mark Shit
+//- (void)loadObjects {
+//    RKObjectManager *om = [RKObjectManager sharedManager];
+//    [om loadObjectsAtResourcePath:@"/posts.json" usingBlock:^(RKObjectLoader *loader) {
+//        loader.objectMapping = [om.mappingProvider objectMappingForClass:[RKPost class]]; 
+//        //loader.delegate = self;
+//    }];
+//}
+//
+//- (void)loadObjectsFromDataStore {
+//    //RKPost *post = (RKPost *)[self.posts objectAtIndex:self.page];
+//}
+
+//- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
+//    [self loadObjectsFromDataStore];
+//}
+//
+//- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
+//    NSLog(@"%@ : %@", NSStringFromSelector(_cmd), error.localizedDescription);
+//}
 
 @end

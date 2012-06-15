@@ -9,13 +9,19 @@
 #import "AddPhotoView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "Post.h"
-#import "Image.h"
 #import "AppDelegate.h"
-#import "Constants.h"
 #import "KeyboardListener.h"
+#import "MBProgressHUD.h"
 
 @interface AddPhotoView()
 @property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) UIAlertView *saveAlertView;
+- (void)savePhoto;
+- (void)savePhotoToCameraRoll;
+- (void)savePhotoToFeed;
+- (void)image: (UIImage *) image
+didFinishSavingWithError: (NSError *) error
+                 contextInfo: (void *) contextInfo;
 @end
 
 @implementation AddPhotoView
@@ -28,8 +34,16 @@
 @synthesize image = _image;
 @synthesize scrollView;
 @synthesize locationManager = _locationManager;
+@synthesize saveAlertView = _saveAlertView;
 
 #pragma mark - Lazy Instantiation
+- (UIAlertView *)saveAlertView {
+    if (!_saveAlertView) {
+        _saveAlertView = [[UIAlertView alloc] initWithTitle:@"Сохранить" message:@"" delegate:self cancelButtonTitle:@"Отмена" otherButtonTitles:@"В фотогалерее", @"В ленте", nil];
+    }
+    return _saveAlertView;
+}
+
 - (CLLocationManager *)locationManager {
     if (!_locationManager) {
         _locationManager = [[CLLocationManager alloc] init];
@@ -66,10 +80,7 @@
     // Do any additional setup after loading the view from its nib.
     self.imageView.image = self.image;
     
-//    self.scrollView.layer.borderColor = [[UIColor whiteColor] CGColor];
-//    self.scrollView.layer.borderWidth = 1;
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Добавить" style:UIBarButtonItemStyleBordered target:self action:@selector(onAddButtonClick:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(savePhoto)];
     
     self.imageView.layer.borderColor = [UIColor whiteColor].CGColor;
     self.imageView.layer.borderWidth = 1;
@@ -111,38 +122,6 @@
     return newImage;
 }
 
-- (IBAction)onAddButtonClick:(id)sender {
-    UIImage *image = [self renderView:self.scrollView];
-    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-//    Post *post = (Post *)[NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-//    post.type = kPostTypeImage;
-//    post.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
-//    post.image.image = image;
-//    post.date = [NSDate date];
-////    
-//    if (self.swAddLocation.on) {
-//        post.lat = self.locationManager.location.coordinate.latitude;
-//        post.lng = self.locationManager.location.coordinate.longitude;
-//    }
-//    
-//    NSError *error;    
-//    if (![appDelegate.managedObjectContext save:&error]) {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Ошибка добавления фото" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
-//        [alert show];
-//    }
-//    else {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Фото успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-//        [alert show];
-//        
-//        //[self.navigationController popViewControllerAnimated:YES];
-//        [self.navigationController popToRootViewControllerAnimated:YES];
-//    }
-}
-
-- (IBAction)onCancelButtonClick:(id)sender {
-    //[self.presentingViewController dismissModalViewControllerAnimated:YES];
-}
-
 - (IBAction)onBgClick:(id)sender {
     [self.txtHeader becomeFirstResponder];
     [self.txtHeader resignFirstResponder];
@@ -154,6 +133,8 @@
     UISwitch *switch_ = (UISwitch *)sender;
     if (switch_.on) {
         if ([CLLocationManager locationServicesEnabled] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied) {
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.labelText = @"Определение местонахождения";
             [self.locationManager startUpdatingLocation];
         }
         else {
@@ -190,11 +171,81 @@
 #pragma mark - CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
     [self.locationManager stopUpdatingLocation];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     [self.locationManager stopUpdatingLocation];
     [self.swAddLocation setOn:NO];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+}
+
+#pragma mark - UIAlertViewDelegate 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if ([alertView isEqual:self.saveAlertView]) {
+        switch (buttonIndex) {
+            case 1: [self savePhotoToCameraRoll]; break;
+            case 2: [self savePhotoToFeed]; break;
+        }
+    }
+}
+
+#pragma mark - Photo saving
+- (void)savePhoto {
+    [self.saveAlertView show];
+}
+
+- (void)savePhotoToCameraRoll {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    UIImage *image = [self renderView:self.scrollView];
+    
+    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    if (error) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+    }
+    else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Фото успешно сохранено в фотогалерее" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+    }
+}
+
+- (void)savePhotoToFeed {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    UIImage *image = [self renderView:self.scrollView];
+    
+    Post *post = [[Post alloc] init];
+    post.type = @"image";
+    if (self.swAddLocation.on) {
+        //post.lat = [NSNumber numberWithDouble:self.locationManager.location.coordinate.latitude];
+        //post.lng = [NSNumber numberWithDouble:self.locationManager.location.coordinate.longitude];
+        post.coordinate = self.locationManager.location.coordinate;
+    }
+    post.imageData = UIImagePNGRepresentation(image);
+    
+    [Post addPost:post withDelegate:self];
+}
+
+#pragma mark - PostDelegate
+- (void)postDidAdd {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Фото успешно добавлено в ленту" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+}
+
+- (void)postDidFailWithError:(NSError *)error {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
 }
 
 @end

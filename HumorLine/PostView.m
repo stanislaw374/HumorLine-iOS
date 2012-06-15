@@ -7,8 +7,9 @@
 //
 
 #import "PostView.h"
-#import "Image.h"
 #import <MediaPlayer/MediaPlayer.h>
+#import "MBProgressHUD.h"
+#import "UIImageView+WebCache.h"
 
 @interface PostView()
 @property (nonatomic, strong) MPMoviePlayerController *player;
@@ -41,46 +42,48 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
-    NSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    switch (self.post.type) {
-        case kPostTypeImage:
-        {
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:self.post.image.image];
-            imageView.contentMode = UIViewContentModeScaleAspectFit;
-            imageView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-            //imageView.userInteractionEnabled = NO;
-            imageView.autoresizingMask = self.view.autoresizingMask;
-            //NSLog(@"imageView frame = %@", NSStringFromCGRect(imageView.frame));
-            [self.view addSubview:imageView];
-            break;
+    if ([self.post.type isEqualToString:@"image"]) {
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.view.frame];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.autoresizingMask = self.view.autoresizingMask;
+        
+        if ([self.post hasPreviewImage]) {
+            imageView.image = [self.post previewImage];
         }
-        case kPostTypeVideo:
-        {
-            self.player = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:self.post.videoURL]];
-            self.player.shouldAutoplay = NO;
-            self.player.scalingMode = MPMovieScalingModeAspectFit;
-            self.player.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-            self.player.view.autoresizingMask = self.view.autoresizingMask;
-            
-            [self.view addSubview:self.player.view];
-            break;
+        else {        
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:imageView animated:YES];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                UIImage *image = [self.post previewImage];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    imageView.image = image;
+                    [hud hide:YES];
+                });
+            });
         }
-        case kPostTypeText:
-        {
-            UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-            lbl.numberOfLines = 0;
-            lbl.lineBreakMode = UILineBreakModeWordWrap;
-            lbl.text = self.post.text;
-            lbl.autoresizingMask = self.view.autoresizingMask;
-            lbl.backgroundColor = [UIColor clearColor];
-            lbl.textAlignment = UITextAlignmentCenter;
-            lbl.font = [UIFont boldSystemFontOfSize:24];
-            lbl.textColor = [UIColor whiteColor];
-            [self.view addSubview:lbl];
-            break;
-        }
+        
+        [self.view addSubview:imageView];
+    }
+    else if ([self.post.type isEqualToString:@"video"]) {        
+        NSLog(@"%@ : video URL: %@", NSStringFromSelector(_cmd), self.post.videoURL);    
+        self.player = [[MPMoviePlayerController alloc] initWithContentURL:self.post.videoURL];
+        self.player.shouldAutoplay = NO;
+        self.player.scalingMode = MPMovieScalingModeAspectFit;
+        self.player.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        self.player.view.autoresizingMask = self.view.autoresizingMask;
+        //[self.player play];
+        [self.view addSubview:self.player.view];
+    }
+    else if ([self.post.type isEqualToString:@"text"]) {
+        UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        lbl.numberOfLines = 0;
+        lbl.lineBreakMode = UILineBreakModeWordWrap;
+        lbl.text = self.post.text;
+        lbl.autoresizingMask = self.view.autoresizingMask;
+        lbl.backgroundColor = [UIColor clearColor];
+        lbl.textAlignment = UITextAlignmentCenter;
+        lbl.font = [UIFont boldSystemFontOfSize:24];
+        lbl.textColor = [UIColor whiteColor];
+        [self.view addSubview:lbl];
     }
 }
 

@@ -12,9 +12,7 @@
 
 @implementation Comment
 
-@dynamic date;
-@dynamic text;
-@dynamic commentID;
-@dynamic post;
+@synthesize ID = _ID;
+@synthesize text = _text;
 
 @end

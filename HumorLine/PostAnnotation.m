@@ -9,8 +9,24 @@
 #import "PostAnnotation.h"
 
 @implementation PostAnnotation
-@synthesize title = _title;
-@synthesize coordinate = _coordinate;
 @synthesize post = _post;
-@synthesize index = _index;
+
++ (PostAnnotation *)annotationWithPost:(Post *)post {
+    PostAnnotation *annotation = [[PostAnnotation alloc] init];
+    annotation.post = post;
+    return annotation;
+}
+
+- (NSString *)title {
+    return [self.post.type isEqualToString:@"image"] ? @"Изображение" : @"Видео";
+}
+
+- (NSString *)subtitle {
+    return @"";
+}
+
+- (CLLocationCoordinate2D)coordinate {
+    return self.post.coordinate;
+}
+
 @end

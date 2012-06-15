@@ -7,43 +7,36 @@
 //
 
 #import "MainView.h"
-#import "UIButton+WebCache.h"
 #import "MBProgressHUD.h"
-#import "Constants.h"
 #import "PostsView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "AppDelegate.h"
 #import "Post.h"
-#import "Image.h"
-#import <MediaPlayer/MediaPlayer.h>
 #import "CustomBadge.h"
-#import <MobileCoreServices/MobileCoreServices.h>
-#import "AddPhotoView.h"
-#import "AddVideoView.h"
-#import "AddTextView.h"
 #import "OnMapView.h"
-#import <AVFoundation/AVFoundation.h>
-#import "VideoView.h"
 #import "Top30View.h"
-#import "AddTrololoView.h"
 #import "AddNewView.h"
-#import "SCAppUtils.h"
 #import "Config.h"
-#import "RKPost.h"
-#import "RKPost+Image.h"
+#import "SCAppUtils.h"
+#import "EGORefreshTableHeaderView.h"
+#import "Post.h"
 
 #define kCELL1 @"MainCell1"
 #define kCELL2 @"MainCell4"
 
 enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL_FRAME2 = 4, kCELL_BADGE, kCELL_IMAGE_VIEW, kCELL_VIDEO_VIEW, kCELL_TEXT_VIEW };
 
-@interface MainView()
+@interface MainView() <UITableViewDataSource, UITableViewDelegate, EGORefreshTableHeaderDelegate, PostDelegate>
+@property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic) int page;
 @property (nonatomic, strong) EGORefreshTableHeaderView *refreshTableHeaderView;
 @property (nonatomic) BOOL isLoading;
-@property (nonatomic, strong) NSArray *posts;
-@property (nonatomic) int page;
+@property (nonatomic) BOOL doneLoading;
+@property (nonatomic, strong) NSMutableArray *posts;
 
 - (void)onButtonClick:(id)sender withEvent:(UIEvent *)event;
+
 - (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
 - (void)prepareContentView:(UIView *)contentView;
 - (void)clearCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -53,7 +46,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)reloadTableViewDataSource;
 - (void)doneReloadingTableViewDataSource;
 - (void)loadData;
-- (void)loadObjectsFromDataStore;
 @end
 
 @implementation MainView
@@ -62,19 +54,22 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 @synthesize isLoading = _isLoading;
 @synthesize posts = _posts;
 @synthesize page = _page;
+@synthesize doneLoading = _doneLoading;
 
 #pragma mark - Lazy Instantiation
 
-- (NSArray *)posts {
+- (NSMutableArray *)posts {
     if (!_posts) {
-        _posts = [[NSArray alloc] init];
+        _posts = [[NSMutableArray alloc] init];
     }
     return _posts;
 }
 
 #pragma mark - DataSource Loading
 - (void)reloadTableViewDataSource {
+    [self.posts removeAllObjects];
     self.page = 1;    
+    self.doneLoading = NO;
     [self loadData];
 }
 
@@ -85,31 +80,34 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 }
 
 - (void)loadData {
-    self.isLoading = YES;    
-    RKObjectManager *objectManager = [RKObjectManager sharedManager];
-    [objectManager loadObjectsAtResourcePath:[NSString stringWithFormat:@"/posts.json?page=%d", self.page++] delegate:self block:^(RKObjectLoader *loader) {
-        loader.objectMapping = [objectManager.mappingProvider objectMappingForClass:[RKPost class]];
-    }];         
+    if (!self.doneLoading) {    
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        self.isLoading = YES;    
+        [Post get:self.page++ withDelegate:self];
+    }
 }
 
-- (void)loadObjectsFromDataStore {
-    NSFetchRequest *request = [RKPost fetchRequest];
-    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO];
-    [request setSortDescriptors:[NSArray arrayWithObject:sort]];
-    self.posts = [RKPost objectsWithFetchRequest:request];
-    [self doneReloadingTableViewDataSource];
+#pragma mark - PostDelegate
+- (void)postsDidFailWithError:(NSError *)error {    
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    self.doneLoading = YES;
+    [self.refreshTableHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+    self.isLoading = NO;    
 }
 
-#pragma mark - RKObjectLoaderDelegate
-- (void)objectLoader:(RKObjectLoader *)objectLoader didLoadObjects:(NSArray *)objects {
-    //NSLog(@"%@ : %d", NSStringFromSelector(_cmd), [objects count]);
-    [self loadObjectsFromDataStore];
-}
-
-- (void)objectLoader:(RKObjectLoader *)objectLoader didFailWithError:(NSError *)error {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    [alert show];
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), error);
+- (void)postsDidLoad:(NSArray *)posts {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    if (posts.count > 0) {
+        [self.posts addObjectsFromArray:posts];
+        [self doneReloadingTableViewDataSource];
+    }
+    else {
+        self.doneLoading = YES;
+        [self.refreshTableHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+        self.isLoading = NO;
+    }
 }
 
 #pragma mark -
@@ -161,6 +159,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 
 #pragma mark - UITableViewDataSource
 - (int)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {    
+    if (self.posts.count == 1) return 1;
     int result = self.posts.count / 2;
     if (result > 0) result++;
     return result;
@@ -227,9 +226,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     
     [contentView addSubview:badge];
     [badge setNeedsDisplay];
-    
-    //NSLog(@"Badge frame = %@", NSStringFromCGRect(badge.frame));
-    //NSLog(@"ContentView frame = %@", NSStringFromCGRect(contentView.frame));
 }
 
 - (void)prepareCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
@@ -272,19 +268,19 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 - (void)configureContentView:(UIView *)contentView withOffset:(int)offset {
     contentView.hidden = NO;
     
-    RKPost *post = (RKPost *)[self.posts objectAtIndex:offset];
+    Post *post = (Post *)[self.posts objectAtIndex:offset];
     
     if ([post.type isEqualToString:@"image"] || [post.type isEqualToString:@"video"]) {
         UIImageView *imageView = (UIImageView *)[contentView viewWithTag:kCELL_IMAGE_VIEW];
         imageView.hidden = NO;
         
-        if ([post hasImage]) {
-            imageView.image = [post image];
+        if ([post hasPreviewImage]) {
+            imageView.image = post.previewImage;
         }
         else {
             MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:contentView animated:YES];                
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{               
-                UIImage *image = [post image];   
+                UIImage *image = post.previewImage;  
                 dispatch_async(dispatch_get_main_queue(), ^{
                     imageView.image = image;
                     [hud hide:YES];            
@@ -299,7 +295,7 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
     }
     
     CustomBadge *badge = (CustomBadge *)[contentView viewWithTag:kCELL_BADGE];
-    badge.badgeText = [NSString stringWithFormat:@"%d", [post.likes intValue]];
+    badge.badgeText = [NSString stringWithFormat:@"%d", post.likes];
     [badge setNeedsDisplay];
 }
 
@@ -334,7 +330,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 #pragma mark - UITableView Events
 - (void)onButtonClick:(id)sender withEvent:(UIEvent *)event {
     UIButton *button = (UIButton *)sender;
-    //UITableViewCell *cell = (UITableViewCell *)[button superview];
     UITouch *touch = [event allTouches].anyObject;
     CGPoint touchLocation = [touch locationInView:self.tableView];
     
@@ -344,13 +339,15 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
         offset = (row - 1) * 2 + 1;
     }
     
-    //PostsView *postsView = [[PostsView alloc] init];
-    //postsView.fetchedResultsController = self.fetchedResultsController;
-    //postsView.currentPage = offset + button.tag - 1;
+    PostsView *postsView = [[PostsView alloc] init];
+    postsView.posts = self.posts;
+    //postsView.page = offset + button.tag - 1;
+    Post *post = [self.posts objectAtIndex:offset + button.tag - 1];
+    postsView.currentPost = post;
     
-    //NSLog(@"current page = %d", self.postsView.currentPage);
+    //NSLog(@"%@ , page = %d", NSStringFromSelector(_cmd), postsView.page);    
     
-    //[self.navigationController pushViewController:postsView animated:YES];
+    [self.navigationController pushViewController:postsView animated:YES];
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -365,7 +362,6 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 #pragma mark - EGORefreshTableHeaderDelegate
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView *)view {
     [self reloadTableViewDataSource];
-    //[self performSelector:@selector(doneReloadingTableViewDataSource) withObject:nil afterDelay:1];
 }
 
 - (BOOL)egoRefreshTableHeaderDataSourceIsLoading:(EGORefreshTableHeaderView *)view {
@@ -377,66 +373,21 @@ enum { kCELL_CONTENT_VIEW1 = 1, kCELL_CONTENT_VIEW2 = 2, kCELL_FRAME1 = 3, kCELL
 }
 
 #pragma mark - Menu
-- (IBAction)onAddButtonClick:(id)sender {
-//    if (!self.isMenuMaximized) {
-//        self.menuMaximized.hidden = NO;
-//        CGRect frame = self.menuButton.frame;
-//        frame.origin.y -= 85;
-//        self.menuButton.frame = frame;
-//        self.isMenuMaximized = YES;
-//    }
-//    else {
-//        self.menuMaximized.hidden = YES;
-//        CGRect frame = self.menuButton.frame;
-//        frame.origin.y += 85;
-//        self.menuButton.frame = frame;
-//        self.isMenuMaximized = NO;
-//    }
-    
+- (IBAction)onAddButtonClick:(id)sender {   
     AddNewView *addNewView = [[AddNewView alloc] init];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:addNewView];
     [SCAppUtils customizeNavigationController:navigationController];
     [self presentModalViewController:navigationController animated:YES];
-    
-//    [UIView beginAnimations:nil context:NULL];
-//    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-//    [UIView setAnimationDuration:0.75];
-//    [self.navigationController pushViewController:addNewView animated:NO];
-//    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.navigationController.view cache:NO];
-//    [UIView commitAnimations];
 }
 
 - (IBAction)onTop30ButtonClick:(id)sender {
-    //[self onMenuButtonClick:nil];
-    
-    //[self.navigationController pushViewController:self.top30View animated:NO];
+    Top30View *top30View = [[Top30View alloc] init];
+    [self.navigationController pushViewController:top30View animated:NO];
 }
 
 - (IBAction)onMapButtonClick:(id)sender {
-    //[self onMenuButtonClick:nil];
     OnMapView *onMapView = [[OnMapView alloc] init];
     [self.navigationController pushViewController:onMapView animated:NO];
-}
-
-- (IBAction)onTrololoButtonClick:(id)sender {
-    //[self presentModalViewController:self.addTrololoView animated:YES];
-    //[self onMenuButtonClick:nil];
-    //[self.navigationController pushViewController:self.addTrololoView animated:YES];
-}
-
-- (IBAction)onPhotoButtonClick:(id)sender {
-    //[self onMenuButtonClick:nil];
-    //[self.photoActionSheet showInView:self.view];
-}
-
-- (IBAction)onVideoButtonClick:(id)sender {
-    //[self onMenuButtonClick:nil];
-    //[self.videoActionSheet showInView:self.view];
-}
-
-- (IBAction)onTextButtonClick:(id)sender {
-    //[self onMenuButtonClick:nil];
-    //[self presentModalViewController:self.addTextView animated:YES];
 }
 
 @end

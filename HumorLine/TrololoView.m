@@ -7,44 +7,34 @@
 //
 
 #import "TrololoView.h"
-//#import "Picture.h"
 #import "AppDelegate.h"
-#import "Post.h"
-#import "Image.h"
 #import <QuartzCore/QuartzCore.h>
 #import "UIImage+Thumbnail.h"
 #import "Trollface.h"
 #import "SCAppUtils.h"
 #import "KeyboardListener.h"
+#import "MBProgressHUD.h"
 
 @interface TrololoView()
 @property (nonatomic) int currentImage;
 @property (nonatomic, strong) UIActionSheet *addRageSheet;
 @property (nonatomic, strong) UIActionSheet *addPhotoSheet;
 @property (nonatomic, strong) UIAlertView *saveAlert;
-//@property (nonatomic, unsafe_unretained) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, strong) UIPopoverController *popover;
 @property (nonatomic, strong) NSMutableArray *imageViews;
 @property (nonatomic, strong) UIImageView *currentImageView;
-//@property (nonatomic, strong) UIScrollView *currentScrollView;
 @property (nonatomic) BOOL isPreviewing;
 @property (nonatomic) CGPoint lastPoint;
 @property (nonatomic) BOOL mouseSwiped;
 @property (nonatomic) BOOL isGesture;
-//@property (nonatomic, strong) UIButton *selectedButton;
 @property (nonatomic, unsafe_unretained) UIView *selectedView;
-//@property (nonatomic, strong) UIPopoverController *popoverWithTrollfaces;
 @property (nonatomic) BOOL isEditing;
 - (void)updateUI;
 - (void)viewDragged:(UIPanGestureRecognizer *)gesture;
 - (void)viewPinched:(UIPinchGestureRecognizer *)gesture;
 - (void)viewRotated:(UIRotationGestureRecognizer *)gesture;
-//- (void)viewTapped:(UITapGestureRecognizer *)gesture;
 - (void)onTextFieldDidEndOnExit:(id)sender;
-- (BOOL)saveImageToLine;
-- (BOOL)saveImageToPhotosAlbum;
-//- (void)selectButton:(UIButton *)button;
-//- (void)deselectButton:(UIButton *)button;
+- (void)saveImageToCameraRoll;
 - (void)onButtonClick:(id)sender;
 - (void)showTrollfacePicker;
 - (void)selectView:(UIView *)view;
@@ -54,10 +44,10 @@
 - (void)onSaveButtonClick;
 - (UIImage *)prepareImageToSave;
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo;
+- (void)saveImageToFeed;
 @end
 
 @implementation TrololoView
-//@synthesize currentScrollView = _currentScrollView;
 @synthesize imageView;
 @synthesize saveAlert = _saveAlert;
 @synthesize imagesCount = _imagesCount;
@@ -65,12 +55,9 @@
 @synthesize photoButton = _photoButton;
 @synthesize textButton = _textButton;
 @synthesize nextButton = _nextButton;
-@synthesize nextItem = _nextItem;
-@synthesize trollfacePicker = _trollfacePicker;
 @synthesize currentImage = _currentImage;
 @synthesize addRageSheet = _addRageSheet;
 @synthesize addPhotoSheet = _addPhotoSheet;
-//@synthesize panGestureRecognizer = _panGestureRecognizer;
 @synthesize popover = _popover;
 @synthesize imageViews = _imageViews;
 @synthesize currentImageView = _currentImageView;
@@ -78,8 +65,6 @@
 @synthesize lastPoint = _lastPoint;
 @synthesize mouseSwiped = _mouseSwiped;
 @synthesize isGesture = _isGesture;
-//@synthesize selectedButton = _selectedButton;
-//@synthesize popoverWithTrollfaces = _popoverWithTrollfaces;
 @synthesize isEditing = _isEditing;
 @synthesize selectedView = _selectedView;
 
@@ -111,10 +96,6 @@
     }
     return _saveAlert;
 }
-//
-//- (UIPanGestureRecognizer *)panGestureRecognizer {
-//    return [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
-//}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -143,7 +124,7 @@
     self.currentImage = 0;    
     self.isEditing = YES;
     
-    [self updateUI];
+    //[self updateUI];
     
     NSLog(@"%@ : imageView.frame = %@", NSStringFromSelector(_cmd), NSStringFromCGRect(self.imageView.frame));
     
@@ -161,7 +142,7 @@
         [self.view addSubview:iv];
     }
     self.currentImageView = [self.imageViews objectAtIndex:0];
-    [self.view bringSubviewToFront:self.trollfacePicker];
+    //[self.view bringSubviewToFront:self.trollfacePicker];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(onSaveButtonClick)];
 } 
@@ -170,10 +151,10 @@
 {
     [self setImageView:nil];
     [self setNextButton:nil];
-    [self setNextItem:nil];
+    //[self setNextItem:nil];
     [self setFaceButton:nil];
     [self setPhotoButton:nil];
-    [self setTrollfacePicker:nil];
+    //[self setTrollfacePicker:nil];
     [self setTextButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
@@ -186,9 +167,9 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)showTrollfacePicker {
-    self.trollfacePicker.hidden = !self.trollfacePicker.hidden;
-}
+//- (void)showTrollfacePicker {
+//    //self.trollfacePicker.hidden = !self.trollfacePicker.hidden;
+//}
 
 - (IBAction)onRageButtonClick:(id)sender {    
     FacePickerView *faceView = [[FacePickerView alloc] init];
@@ -196,23 +177,7 @@
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:faceView];
     [SCAppUtils customizeNavigationController:navigationController];
     [self presentModalViewController:navigationController animated:YES];
-    
-//    if (!self.selectedView) {
-//        int trollfaceNumber = arc4random() % [Trollface all].count;
-//        UIImage *trollface = [[Trollface all] objectAtIndex:trollfaceNumber];
-//        
-//    }
-//    else {
-//        [self showTrollfacePicker];
-//    }
 }
-
-//- (void)onButtonClick:(id)sender {
-//    if (self.isEditing) {
-//        UIButton *button = (UIButton *)sender;
-//        [self selectButton:button];
-//    }    
-//}
 
 - (void)onButtonTouchDown:(UIButton *)sender {
     [self selectView:sender];
@@ -268,7 +233,7 @@
         self.currentImage--;
         ((UIImageView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = NO;
         self.currentImageView = [self.imageViews objectAtIndex:self.currentImage];
-        [self updateUI];
+        //[self updateUI];
     }
 }
 
@@ -281,17 +246,11 @@
             ((UIImageView *)[self.imageViews objectAtIndex:self.currentImage]).hidden = NO;
             [self.imageViews objectAtIndex:self.currentImage];        
             self.currentImageView = [self.imageViews objectAtIndex:self.currentImage];
-            [self updateUI];
+            //[self updateUI];
         }
     }
     else {
         if (!self.isPreviewing) [self onPreviewButtonClick:nil];
-//        if ([self saveImage]) {
-//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо успешно добавлено" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-//            [alert show];
-//            //[self.presentingViewController dismissModalViewControllerAnimated:YES];
-//            [self.navigationController popToRootViewControllerAnimated:YES];
-//        }
     }
 }
 
@@ -317,92 +276,10 @@
     return imageToSave;
 }
 
-- (BOOL)saveImageToPhotosAlbum {
-    UIImage *imageToSave = [self prepareImageToSave];
-    UIImageWriteToSavedPhotosAlbum(imageToSave, self, nil, nil);
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо сохранено в фотоальбоме" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    [self.navigationController popViewControllerAnimated:YES];
-    return YES;
-}
-
-- (void)               image: (UIImage *) image
-    didFinishSavingWithError: (NSError *) error
-                 contextInfo: (void *) contextInfo {    
-}
-
-- (BOOL)saveImageToLine {          
-    UIImage *imageToSave = [self prepareImageToSave];    
-    
-    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-//    Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:appDelegate.managedObjectContext];
-//    newPost.type = kPostTypeImage;
-//    newPost.image = (Image *)[NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:appDelegate.managedObjectContext];
-//    newPost.image.image = imageToSave;
-//    newPost.date = [NSDate date];
-//    
-//    NSError *error;
-//    if (![appDelegate.managedObjectContext save:&error]) {
-//        NSLog(@"Error saving: %@", error.localizedDescription);
-//        return NO;
-//    }
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"Трололо сохранено в ленте" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    [self.navigationController popViewControllerAnimated:YES];
-    return YES;
-}
-
-//- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-//    NSString *message = error ? @"Ошибка при сохранении изображения" : @"Изображение сохранено в фотогаллерее";
-//    
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-//    [alert show];
-//    
-//    if (!error) {
-//        [self.navigationController popViewControllerAnimated:YES];
-//    }
-//}
-
 - (IBAction)onPreviewButtonClick:(id)sender {
     if (!self.isPreviewing) {
         self.isPreviewing = YES;
-        //self.imageView.hidden = NO;
-        //self.currentImageView.hidden = YES;
-        //self.title = @"Просмотр";
-//        NSMutableArray *previewImages = [[NSMutableArray alloc] init];
-//        for (UIImageView *imageView_ in self.imageViews) {
-//            UIImage *previewImage = [Picture renderView:imageView_];
-//            UIImageWriteToSavedPhotosAlbum(previewImage, nil, nil, nil);
-//            [previewImages addObject:previewImage];
-//        }
-//        for (UIView *view in self.imageView.subviews) {
-//            [view removeFromSuperview];
-//        }
-//        
-//        NSLog(@"%@ : preview images count: %d", NSStringFromSelector(_cmd), previewImages.count);
-//        
-//        int dx = 0, dy = 0;
-//        for (int i = 0; i < self.imagesCount; i++) {
-//            int width, height;
-//            switch (self.imagesCount) {
-//                case 1:
-//                    width = self.imageView.frame.size.width;
-//                    height = self.imageView.frame.size.height;
-//                    break;
-//                case 2:
-//                    width = self.imageView.frame.size.width;
-//                    height = self.imageView.frame.size.height / 2;                    
-//                    break;
-//            }
-//            UIImageView *previewImageView = [[UIImageView alloc] initWithFrame:CGRectMake(dx, dy, width, height)];
-//            NSLog(@"%@ previewImageViewFrame: %@", NSStringFromSelector(_cmd), NSStringFromCGRect(previewImageView.frame));
-//            previewImageView.contentMode = UIViewContentModeScaleAspectFill;
-//            dy += previewImageView.frame.size.height + 8;
-//            previewImageView.image = [previewImages objectAtIndex:i];
-//            [self.imageView addSubview:previewImageView];
-//        }    
-//        //
-        
+            
         int dx = self.imageView.frame.origin.x, dy = self.imageView.frame.origin.y;
         int sy = 8, sx = 8;
         for (int i = 0; i < self.imagesCount; i++) 
@@ -452,7 +329,7 @@
     }
     else {
         self.isPreviewing = NO;
-        [self updateUI];
+        //[self updateUI];
         for (UIImageView *iv in self.imageViews) {
             iv.frame = self.imageView.frame;
             iv.hidden = YES;
@@ -464,46 +341,10 @@
 
 - (IBAction)onEditingSwitchValueChange:(id)sender {
     self.isEditing = !self.isEditing;
-//    if (self.isEditing) {
-//        //self.faceButton.enabled = YES;
-//        //self.photoButton.enabled = YES;
-//        //self.textButton.enabled = YES;
-//    }
-//    else {
-//        //self.faceButton.enabled = NO;
-//        self.photoButton.enabled = NO;
-//        self.textButton.enabled = NO;
-//    }
-}
-
-- (void)updateUI {
-    //self.title = [NSString stringWithFormat:@"%d / %d", self.currentImage + 1, self.imagesCount];
-    //UIImage *image = (self.currentImage < self.imagesCount - 1) ? [UIImage imageNamed:@"next_button.png"] : [UIImage imageNamed:@"save_button.png"];
-    //[self.nextButton setImage:image forState:UIControlStateNormal];
 }
 
 #pragma mark - UIActionSheetDelegate
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-//    if ([actionSheet isEqual:self.addRageSheet]) {
-//        switch (buttonIndex) {
-//            case 0:
-//            {
-//                UIImageView *image = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"trollface-hello-kitty.png"]];
-//                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-//                    image.transform = CGAffineTransformMakeScale(0.5, 0.5);
-//                }
-//                image.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-//                UIPanGestureRecognizer *gesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(viewDragged:)];
-//                [image addGestureRecognizer:gesture];
-//                UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(viewPinched:)];
-//                [image addGestureRecognizer:pinchGesture];
-//                [image setUserInteractionEnabled:YES];
-//                [self.currentImageView addSubview:image];
-//                break;
-//            }
-//        }        
-//    }
-//    else 
     if ([actionSheet isEqual:self.addPhotoSheet]) {
         UIImagePickerController *imagePicker;
         switch (buttonIndex) {
@@ -532,24 +373,6 @@
         }        
     }
 }
-
-//- (void)selectButton:(UIButton *)button {
-//    //UIButton *t = self.selectedButton;
-//    //[self deselectButton:nil];
-//    
-//    //if (![t isEqual:button]) {
-//        self.selectedButton = button;
-//        self.selectedButton.layer.borderWidth = 4;
-//        self.selectedButton.layer.borderColor = [UIColor redColor].CGColor;
-//    //}
-//}
-//
-//- (void)deselectButton:(UIButton *)button {
-//    if (self.selectedButton) {
-//        self.selectedButton.layer.borderWidth = 0;
-//        self.selectedButton = nil;
-//    }
-//}
 
 - (void)selectView:(UIView *)view {
     [self deselectView];
@@ -871,14 +694,65 @@
     if ([alertView isEqual:self.saveAlert]) {
         switch (buttonIndex) {
             case 1:
-                [self saveImageToPhotosAlbum];
+                [self saveImageToCameraRoll];
                 break;
             case 2:
-                [self saveImageToLine];
+                [self saveImageToFeed];
                 break;
             default: return;
         }
     }
+}
+
+- (void)savePhoto {
+    [self.saveAlert show];
+}
+
+- (void)saveImageToCameraRoll {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    UIImage *image = [self prepareImageToSave];
+    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    if (error) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+    }
+    else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Трололо успешно сохранено в фотогалерее" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+    }
+}
+
+- (void)saveImageToFeed {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    UIImage *image = [self prepareImageToSave];
+    
+    Post *post = [[Post alloc] init];
+    post.type = @"image";
+    post.imageData = UIImagePNGRepresentation(image);
+    
+    [Post addPost:post withDelegate:self];
+}
+
+#pragma mark - PostDelegate
+- (void)postDidAdd {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Трололо успешно добавлено в ленту" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+}
+
+- (void)postDidFailWithError:(NSError *)error {
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
 }
 
 @end

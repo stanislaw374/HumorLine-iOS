@@ -7,15 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "EGORefreshTableHeaderView.h"
-#import <RestKit/RestKit.h>
 
-@interface MainView : UIViewController <UITableViewDataSource, UITableViewDelegate, EGORefreshTableHeaderDelegate, RKObjectLoaderDelegate>
-
-@property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
-
+@interface MainView : UIViewController
 - (IBAction)onAddButtonClick:(id)sender;
 - (IBAction)onTop30ButtonClick:(id)sender;
 - (IBAction)onMapButtonClick:(id)sender;
-
 @end

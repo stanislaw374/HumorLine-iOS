@@ -7,33 +7,50 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreData/CoreData.h>
+#import <CoreLocation/CoreLocation.h>
 
-enum { kPostTypeImage = 0, kPostTypeVideo, kPostTypeText } PostType;
+@class Comment;
 
-@class Comment, Image;
-
-@interface Post : NSManagedObject
-
-@property (nonatomic, retain) NSDate *date;
-@property (nonatomic, retain) NSString * imageURL;
-@property (nonatomic) double lat;
-@property (nonatomic) int32_t likesCount;
-@property (nonatomic) double lng;
-@property (nonatomic, retain) NSString * subtitle;
-@property (nonatomic, retain) NSString * text;
-@property (nonatomic, retain) NSString * title;
-@property (nonatomic) int16_t type;
-@property (nonatomic, retain) NSString * videoURL;
-@property (nonatomic) int64_t postID;
-@property (nonatomic, retain) NSSet *comments;
-@property (nonatomic, retain) Image *image;
+@protocol PostDelegate <NSObject>
+@optional
+- (void)postsDidLoad:(NSArray *)posts;
+- (void)postsDidFailWithError:(NSError *)error;
+- (void)postDidAdd;
+- (void)postDidFailWithError:(NSError *)error;
+//- (void)postCommentsDidLoad;
+//- (void)postCommentsDidFailWithError:(NSError *)error;
+- (void)postCommentDidAdd;
+- (void)postCommentDidFailWithError:(NSError *)error;
 @end
 
-@interface Post (CoreDataGeneratedAccessors)
+@interface Post : NSObject 
+@property (nonatomic, unsafe_unretained) id <PostDelegate> delegate;
 
-- (void)addCommentsObject:(Comment *)value;
-- (void)removeCommentsObject:(Comment *)value;
-- (void)addComments:(NSSet *)values;
-- (void)removeComments:(NSSet *)values;
+@property (nonatomic, strong) NSNumber *ID;             // Идентификатор поста
+@property (nonatomic, strong) NSDate *createdAt;        // Дата создания поста
+@property (nonatomic, strong) NSURL *imageURL;          // url фото
+@property (nonatomic, strong) NSURL *videoURL;          // url видео
+@property (nonatomic) CLLocationCoordinate2D coordinate;
+@property (nonatomic) int likes;          // количество лайков
+@property (nonatomic, strong) NSString *text;           // текст поста
+@property (nonatomic, strong) NSString *title;          // заголовок поста
+@property (nonatomic, strong) NSString *type;           // тип поста (image, video, text)
+@property (nonatomic, strong) NSMutableArray *comments;        // комментарии поста
+
+@property (nonatomic, strong) UIImage *previewImage;
+
+@property (nonatomic, strong) NSData *imageData;    
+@property (nonatomic, strong) NSData *videoData;  
+
++ (void)getNearestByCoordinate:(CLLocationCoordinate2D)coordinate withDelegate:(id <PostDelegate>)delegate; // получение всех постов с сортировкой по возрастанию расстояния до пользователя
++ (void)get:(int)page withDelegate:(id <PostDelegate>)delegate;                             // получение массива постов по номеру страницы
++ (void)get:(int)page andSortBy:(NSString *)sort withDelegate:(id <PostDelegate>)delegate;  // получение массива постов по номеру страницы и с сортировкой
++ (void)addPost:(Post *)post withDelegate:(id <PostDelegate>)delegate;                      // добавление поста
+
+- (BOOL)hasPreviewImage;
+//- (void)getComments;                                                                        // Получение комментариев поста
+- (void)addComment:(Comment *)comment;                                                      // добавление комментария
+- (void)like;           
+- (void)reload;
+
 @end

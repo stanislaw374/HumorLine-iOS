@@ -9,13 +9,12 @@
 #import "AppDelegate.h"
 #import "MainView.h"
 #import "Post.h"
-#import "Image.h"
-#import "Constants.h"
 #import "SCAppUtils.h"
 #import "Config.h"
 #import "Top30View.h"
 #import "OnMapView.h"
 #import "RKPost.h"
+#import "RKComment.h"
 #import <RestKit/RestKit.h>
 
 @interface AppDelegate()
@@ -44,26 +43,42 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // RestKit initialization
-    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURL:CLIENT_BASE_URL];
-    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;    
+//    RKObjectManager *objectManager = [RKObjectManager objectManagerWithBaseURLString:CLIENT_BASE_URL];
+//    objectManager.acceptMIMEType = RKMIMETypeJSON;
+//    objectManager.serializationMIMEType = RKMIMETypeJSON;
+//    objectManager.client.requestQueue.showsNetworkActivityIndicatorWhenBusy = YES;    
+//    
+//    objectManager.objectStore = [RKManagedObjectStore objectStoreWithStoreFilename:@"RKHumorLine.sqlite"];
+//    
+//    // Post mapping 
+//    RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForClass:[RKPost class] inManagedObjectStore:objectManager.objectStore];
+//    postMapping.primaryKeyAttribute = @"postID";
+//    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
+//    [postMapping mapKeyPath:@"created_at" toAttribute:@"createdAt"];
+//    [postMapping mapKeyPath:@"image_url" toAttribute:@"imageURL"];
+//    [postMapping mapKeyPath:@"video_url" toAttribute:@"videoURL"];
+//    [postMapping mapKeyPath:@"post_type" toAttribute:@"type"];
+//    [postMapping mapKeyPath:@"lat" toAttribute:@"lat"];
+//    [postMapping mapKeyPath:@"lng" toAttribute:@"lng"];
+//    [postMapping mapKeyPath:@"title" toAttribute:@"title"];
+//    [postMapping mapKeyPath:@"text" toAttribute:@"text"];
+//    
+//    // Comments mapping
+//    RKManagedObjectMapping *commentMapping = [RKManagedObjectMapping mappingForClass:[RKComment class] inManagedObjectStore:objectManager.objectStore];
+//    commentMapping.primaryKeyAttribute = @"commentID";
+//    [commentMapping mapKeyPath:@"id" toAttribute:@"commentID"];
+//    [commentMapping mapKeyPath:@"text" toAttribute:@"text"];
+//    
+//    [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];
+//    [objectManager.mappingProvider setMapping:commentMapping forKeyPath:@"comment"];
+//    
+//    [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
+//    
+//    RKObjectRouter *router = [[RKObjectRouter alloc] init];
+//    [router routeClass:[RKPost class] toResourcePath:@"/posts/(postID)"];
+//    
+//    objectManager.router = router;
     
-    objectManager.objectStore = [RKManagedObjectStore objectStoreWithStoreFilename:@"RKHumorLine.sqlite"];
-    
-    RKManagedObjectMapping *postMapping = [RKManagedObjectMapping mappingForClass:[RKPost class]];
-    postMapping.primaryKeyAttribute = @"postID";
-    [postMapping mapKeyPath:@"id" toAttribute:@"postID"];
-    [postMapping mapKeyPath:@"created_at" toAttribute:@"createdAt"];
-    [postMapping mapKeyPath:@"image_url" toAttribute:@"imageURL"];
-    [postMapping mapKeyPath:@"video_url" toAttribute:@"videoURL"];
-    [postMapping mapKeyPath:@"post_type" toAttribute:@"type"];
-    [postMapping mapKeyPath:@"lat" toAttribute:@"lat"];
-    [postMapping mapKeyPath:@"lng" toAttribute:@"lng"];
-    [postMapping mapKeyPath:@"title" toAttribute:@"title"];
-    [postMapping mapKeyPath:@"text" toAttribute:@"text"];
-    
-    [RKObjectMapping addDefaultDateFormatterForString:@"E MMM d HH:mm:ss Z y" inTimeZone:nil];
-    
-    [objectManager.mappingProvider setMapping:postMapping forKeyPath:@"post"];        
     // -----------------------------------------------------
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

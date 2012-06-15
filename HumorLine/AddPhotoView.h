@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "Post.h"
 
-@interface AddPhotoView : UIViewController <UITextFieldDelegate, CLLocationManagerDelegate>
+@interface AddPhotoView : UIViewController <UITextFieldDelegate, CLLocationManagerDelegate, UIAlertViewDelegate, PostDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UIImageView *imageView;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblHeader;
 @property (unsafe_unretained, nonatomic) IBOutlet UILabel *lblSubheader;
@@ -18,8 +19,6 @@
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *swAddLocation;
 @property (nonatomic, unsafe_unretained) UIImage *image;
 @property (unsafe_unretained, nonatomic) IBOutlet UIScrollView *scrollView;
-- (IBAction)onAddButtonClick:(id)sender;
-- (IBAction)onCancelButtonClick:(id)sender;
 - (IBAction)onBgClick:(id)sender;
 - (IBAction)onSwAddLocationValueChanged:(id)sender;
 

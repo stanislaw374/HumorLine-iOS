@@ -10,15 +10,11 @@
 
 @interface KeyboardListener : NSObject
 
-//@property (nonatomic, unsafe_unretained) UIView *activeView;
-//@property (nonatomic, unsafe_unretained) UIScrollView *scrollView;
-
 + (void)setScrollView:(UIScrollView *)scrollView;
 + (void)unsetScrollView;
 + (void)setActiveView:(UIView *)view;
 + (void)unsetActiveView;
 
-//- (id)initWithScrollView:(UIScrollView *)scrollView;
 + (void)registerForKeyboardNotifications;
 + (void)unregisterForKeyboardNotifications;
 + (void)keyboardWasShown:(NSNotification*)aNotification;

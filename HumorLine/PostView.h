@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Post.h"
+#import <RestKit/RestKit.h>
 
 @interface PostView : UIViewController
 

@@ -8,22 +8,17 @@
 
 #import "KeyboardListener.h"
 
-//static NSMutableArray *_scrollViews = nil;
 static UIScrollView *_scrollView = nil;
 static UIView *_activeView = nil;
 
 @implementation KeyboardListener
-//@synthesize activeView = _activeView;
-//@synthesize scrollView = _scrollView;
 
 + (void)initialize {
-    //_scrollViews = [[NSMutableArray alloc] init];
     [self registerForKeyboardNotifications];
 }
 
 + (void)setScrollView:(UIScrollView *)scrollView {
     __unsafe_unretained UIScrollView *weakScrollView = scrollView;
-    //[_scrollViews addObject:weakScrollView];
     _scrollView = weakScrollView;
 }
 
@@ -39,19 +34,6 @@ static UIView *_activeView = nil;
 + (void)unsetActiveView {
     _activeView = nil;
 }
-
-//-(id)init {
-//    return [self initWithScrollView:nil];
-//}
-
-//-(id)initWithScrollView:(UIScrollView *)scrollView {
-//    self = [super init];
-//    if (self) {
-//        self.scrollView = scrollView;
-//        [self registerForKeyboardNotifications];
-//    }
-//    return self;
-//}
 
 + (void)registerForKeyboardNotifications
 {
@@ -99,9 +81,5 @@ static UIView *_activeView = nil;
     _scrollView.contentInset = contentInsets;
     _scrollView.scrollIndicatorInsets = contentInsets;
 }
-
-//- (void)dealloc {
-//    [self unregisterForKeyboardNotifications];
-//}
 
 @end
